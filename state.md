@@ -52,9 +52,9 @@ return_to: null
 ```yaml
 # Macro: リポジトリ全体の最終目標
 macro:
-  file: plan/project.md      # 存在する場合
-  exists: false              # project_context.generated と連動
-  summary: null              # 未定義
+  file: plan/project.md
+  exists: true
+  summary: フォークするだけで LLM 主導の TDD 開発環境が整うテンプレートを公開する
 
 # Archive: 公開時に新規ユーザーに不要なファイルを隔離
 archive:
@@ -88,11 +88,11 @@ upper_plans:
 
 ## project_context
 
-> **setup 完了後に更新される。**
+> **Macro 計画の状態を管理。**
 
 ```yaml
-generated: false             # true = setup 完了、plan/project.md 生成済み
-project_plan: null           # 生成後: plan/project.md
+generated: true              # plan/project.md 生成済み
+project_plan: plan/project.md
 ```
 
 ---
@@ -199,7 +199,7 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-08 00:10:45
+last_start: 2025-12-08 00:35:35
 last_end: null
 uncommitted_warning: false
 ```
