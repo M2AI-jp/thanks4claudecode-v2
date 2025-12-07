@@ -1,0 +1,37 @@
+# 保護対象ファイルリスト
+# このファイルに記載されたパスは、ユーザー許可なしに編集できません。
+#
+# 形式: 1行1パス（相対パス、プロジェクトルートから）
+# コメント: # で始まる行は無視
+# 空行: 無視
+#
+# 保護レベル:
+#   HARD_BLOCK - 絶対守護（admin モードでのみ編集可能）
+#   BLOCK      - 運用でゆるめ可能（strict: ブロック / trusted: WARN / developer: 通過）
+#   WARN       - 警告のみ（編集は許可）
+#
+# security.mode:
+#   strict    - HARD_BLOCK/BLOCK をブロック、WARN は警告
+#   trusted   - HARD_BLOCK をブロック、BLOCK を WARN に緩和
+#   developer - HARD_BLOCK をブロック、それ以外は通過
+#   admin     - 全て通過（ワークスペース開発者用）
+
+# === HARD_BLOCK: 絶対守護（admin モードでのみ編集可能） ===
+HARD_BLOCK:CONTEXT.md
+HARD_BLOCK:CLAUDE.md
+HARD_BLOCK:.claude/protected-files.txt
+
+# === BLOCK: 運用でゆるめ可能（strict: ブロック / trusted: WARN） ===
+BLOCK:plan/template/playbook-format.md
+BLOCK:.claude/settings.json
+BLOCK:.claude/hooks/check-protected-edit.sh
+BLOCK:.claude/hooks/session-start.sh
+BLOCK:.claude/hooks/session-end.sh
+BLOCK:.claude/hooks/check-coherence.sh
+BLOCK:.claude/hooks/check-state-update.sh
+BLOCK:.claude/hooks/pre-bash-check.sh
+
+# === WARN: 警告のみ（慎重に扱うべきファイル） ===
+WARN:state.md
+WARN:AGENTS.md
+WARN:README.md

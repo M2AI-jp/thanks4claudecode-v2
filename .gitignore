@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files (secrets)
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+
+# dotenvx (private keys - NEVER commit)
+.env.keys
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code (user-specific)
+.claude.json
+.claude.json.backup
+.claude/statsig/
+.claude/settings.local.json
+.claude/.session-init/
+
+# Temporary files
+.tmp/
+out/
+
+# Coverage
+coverage/
+
+# User projects (created during setup)
+projects/
+
+# E2E Test Environment
+test/E2E/
+
+# Workspace development files (not needed for new users)
+plan/archive/
+test/core/
+test/scenarios/
+test/results/
+test/template/
