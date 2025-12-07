@@ -164,7 +164,7 @@
 
 禁止事項:
   - 静的セクションを編集してはならない
-  - 静的セクションの内容を変更したい場合は spec.yaml を参照
+  - 静的セクションは state.md 内で定義されている
 
 動的セクションの編集タイミング:
   - セッション開始時: session_tracking（自動）
@@ -243,8 +243,6 @@
 
 ## BRANCH（Git 運用詳細）
 
-> 詳細は `spec.yaml` の `git_workflow` セクションを参照
-
 ```yaml
 四つ組の連動:
   - focus.current + layer.state + playbook + branch
@@ -260,8 +258,6 @@ AUTO_MERGE 条件:
 ---
 
 ## SECURITY（セキュリティ詳細）
-
-> 詳細は `spec.yaml` の `security` セクションを参照
 
 ```yaml
 bypassPermissions モード有効:
@@ -423,8 +419,6 @@ MCP: context7 を活用（ライブラリの公式ドキュメント取得）
 
 ## CODEX_HANDOFF（Codex へのタスク委譲）
 
-> 詳細は `spec.yaml` の `codex_integration` セクションを参照
-
 ```yaml
 トリガー: Phase.executor = "codex" AND status = "in_progress"
 
@@ -454,7 +448,6 @@ MCP: context7 を活用（ライブラリの公式ドキュメント取得）
 | CONTEXT.md | ユーザー意図、設計思想、ビジョン |
 | state.md | 現在地、goal、done_criteria |
 | playbook | タスク管理、Phase定義 |
-| spec.yaml | 詳細仕様（Git, Security, Agents等） |
 
 **他のドキュメントを参照するな。新規作成するな。**
 

@@ -82,5 +82,4 @@ git checkout -- state.md
 ## 次のステップ
 
 - [README.md](README.md) - 詳細な説明
-- [CONTEXT.md](CONTEXT.md) - 設計思想
-- [CONTRIBUTING.md](CONTRIBUTING.md) - 貢献ガイドライン
+- [setup/playbook-setup.md](setup/playbook-setup.md) - セットアップフロー詳細

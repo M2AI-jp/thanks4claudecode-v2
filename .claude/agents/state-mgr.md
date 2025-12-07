@@ -127,4 +127,3 @@ playbook 自体の妥当性: {問題なし|修正が必要}
 
 - state.md - 現在地
 - playbook（state.md に記載があれば）
-- spec.yaml - 機能一覧
