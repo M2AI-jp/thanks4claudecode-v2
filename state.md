@@ -199,7 +199,7 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-08 00:35:35
+last_start: null
 last_end: null
 uncommitted_warning: false
 ```
@@ -218,6 +218,4 @@ uncommitted_warning: false
 
 | 日時 | 内容 |
 |------|------|
-| 2025-12-08 | V8.1: 開発時ファイルを .archive/ に退避。公開準備。 |
-| 2025-12-08 | V8: 3層計画管理システム実装完了。plan-guard.md, DISPATCH 更新, plan_hierarchy 3層化 |
 | - | フォーク直後の初期状態 |
