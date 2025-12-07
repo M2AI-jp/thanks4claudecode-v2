@@ -10,8 +10,8 @@
 ## focus
 
 ```yaml
-current: workspace           # plan-template | workspace | setup | product
-session: task                # task | discussion (playbook作成中は一時的にdiscussion)
+current: setup               # plan-template | workspace | setup | product
+session: discussion          # task | discussion (playbook作成中は一時的にdiscussion)
 ```
 
 ---
@@ -28,7 +28,7 @@ mode: trusted                # strict | trusted | developer | admin
 
 ```yaml
 plan-template:    null
-workspace:        plan/active/playbook-3layer-plan.md
+workspace:        null                       # 完了した playbook は .archive/plan/ に退避
 setup:            setup/playbook-setup.md   # デフォルト playbook
 product:          null                       # setup 完了後、product 開発用に作成
 ```
@@ -56,23 +56,32 @@ macro:
   exists: false              # project_context.generated と連動
   summary: null              # 未定義
 
+# Archive: 公開時に新規ユーザーに不要なファイルを隔離
+archive:
+  folder: .archive/          # 一時退避フォルダ
+  purpose: |
+    開発時に使用したファイル（テスト履歴、ロードマップ、メタ改善記録など）を
+    公開前に退避させ、新規ユーザーのコンテキスト負荷を軽減する。
+    必要に応じて復元可能。
+  restore_command: "git checkout .archive/ && mv .archive/* ."
+
 # Medium: 単機能実装の中期計画（1ブランチ = 1playbook）
 medium:
-  file: plan/active/playbook-3layer-plan.md
-  exists: true
-  goal: 3層計画管理システムの実装
+  file: null                 # 新タスク開始時
+  exists: false
+  goal: null
 
 # Micro: セッション単位の作業（playbook の 1 Phase）
 micro:
-  phase: complete
-  name: 全 Phase 完了
-  status: done
+  phase: null
+  name: null
+  status: pending
 
-# 上位計画参照（必要時のみ参照、通常は隔離）
+# 上位計画参照（.archive/ に退避済み、必要時のみ復元）
 upper_plans:
-  vision: plan/vision.md           # WHY-ultimate
-  meta_roadmap: plan/meta-roadmap.md  # HOW-to-improve
-  roadmap: plan/roadmap.md         # WHAT（参照用）
+  vision: .archive/plan/vision.md           # WHY-ultimate
+  meta_roadmap: .archive/plan/meta-roadmap.md  # HOW-to-improve
+  roadmap: .archive/plan/roadmap.md         # WHAT
 ```
 
 ---
@@ -101,9 +110,9 @@ playbook: null
 ## layer: workspace
 
 ```yaml
-state: state_update
-sub: v8-3layer-plan-guard-complete
-playbook: plan/active/playbook-3layer-plan.md
+state: done
+sub: v8-3layer-plan-guard-archived
+playbook: null
 ```
 
 ---
@@ -140,24 +149,19 @@ playbook: null
 ## goal
 
 ```yaml
-phase: workspace
-milestone: v8-3layer-plan-guard
-task: 3層計画管理システムの実装
+phase: setup
+milestone: Phase0
+task: ルート選択
 assignee: claude_code
 
 done_criteria:
-  - plan-guard SubAgent が存在し、CLAUDE.md DISPATCH に登録されている
-  - シナリオ S0-S5 が全て正しく動作する
-  - 3層計画構造（Macro/Medium/Micro）が state.md に反映されている
+  - ユーザーが目的を選択した
 ```
 
 ### 次のステップ
 ```
-p1: playbook 作成 (done)
-p2: plan-guard SubAgent 作成
-p3: CLAUDE.md DISPATCH 更新
-p4: state.md 3層構造への更新
-p5: シナリオテスト
+Phase 0: ルート選択（チュートリアル or 本番開発）
+Phase 1: プロジェクト設計（何を作るか）
 ```
 
 ---
@@ -165,10 +169,8 @@ p5: シナリオテスト
 ## verification
 
 ```yaml
-self_complete: true
+self_complete: false
 user_verified: false
-critic_result: CONDITIONAL_PASS
-note: 動作検証は次回セッション開始時に実施
 ```
 
 ---
@@ -216,5 +218,6 @@ uncommitted_warning: false
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-08 | V8.1: 開発時ファイルを .archive/ に退避。公開準備。 |
 | 2025-12-08 | V8: 3層計画管理システム実装完了。plan-guard.md, DISPATCH 更新, plan_hierarchy 3層化 |
 | - | フォーク直後の初期状態 |
