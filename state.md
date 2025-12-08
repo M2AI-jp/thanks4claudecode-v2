@@ -152,16 +152,16 @@ playbook: null
 ```yaml
 phase: done
 current_phase: 全 Phase 完了
-task: Issue #11 完了 → 次タスク開始
+task: 全 13 タスク完了
 assignee: claude
 
 done_criteria:
-  - p1-p4 全て critic PASS ✓
-  - test-rollback.sh PASS=15, FAIL=0 ✓
-  - git commit 完了
+  - 全タスク実装完了 ✓
+  - project.md 更新済み ✓
+  - git commit 完了 ✓
 ```
 
-> **Issue #11 完了。残り 10 タスク（task-01〜task-13、#11除く）。**
+> **全 13 タスク完了！Issue #8〜#11 + task-01〜13 全て実装済み。**
 
 ---
 
@@ -217,6 +217,7 @@ uncommitted_warning: false
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-08 | 全タスク完了。13件実装：SubAgents(reviewer, health-checker), Skills(context-mgmt, exec-mgmt, learning), playbook拡張。 |
 | 2025-12-08 | Issue #11 完了。p1-p4 全 Phase critic PASS。test PASS=15。 |
 | 2025-12-08 | Issue #11 開始。ロールバック機能 p1 設計フェーズ。 |
 | 2025-12-08 | Issue #10 完了。playbook-auto-clear.md 全 Phase critic PASS。残り 11 タスク。 |

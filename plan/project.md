@@ -43,46 +43,14 @@ completed:
   - task-01: タイムボックス機能（playbook スキーマ拡張: time_limit）
   - task-02: 優先順位管理（playbook スキーマ拡張: priority）
   - task-03: 依存関係管理（playbook スキーマ拡張: depends_on 強化）
+  - task-09: /compact 最適化（context-management Skill）
+  - task-10: 履歴の要約（context-management Skill + session-history/）
+  - task-12: ヘルスチェック（health-checker SubAgent）
+  - task-04: 並列実行制御（execution-management Skill）
+  - task-05: リソース配分（execution-management Skill）
+  - task-13: 学習・改善機構（learning Skill + logs/）
 
-remaining_tasks:
-  # 実行管理（2件）
-  - id: task-04
-    name: 並列実行制御
-    category: 実行管理
-    description: 複数タスクの並列実行を制御
-    priority: low
-
-  - id: task-05
-    name: リソース配分
-    category: 実行管理
-    description: コンテキスト・時間のリソース配分最適化
-    priority: low
-
-  # コンテキスト管理（2件）
-  - id: task-09
-    name: /compact 最適化
-    category: コンテキスト管理
-    description: 優先保持情報の最適化
-    priority: medium
-
-  - id: task-10
-    name: 履歴の要約
-    category: コンテキスト管理
-    description: セッション履歴の自動要約・保存
-    priority: medium
-
-  # 回復・監視（2件）
-  - id: task-12
-    name: ヘルスチェック
-    category: 回復・監視
-    description: システム状態の定期監視
-    priority: medium
-
-  - id: task-13
-    name: 学習・改善機構
-    category: 回復・監視
-    description: 失敗パターンの記録・学習
-    priority: low
+remaining_tasks: []  # 全タスク完了
 ```
 
 ---
@@ -90,23 +58,14 @@ remaining_tasks:
 ## priority_order
 
 ```yaml
-# 優先度順の実装順序（task-11 完了）
-high:
-  - (完了)
+# 全タスク完了
+all_completed: true
+completed_count: 13
 
-medium:
-  - task-01: タイムボックス
-  - task-02: 優先順位管理
-  - task-03: 依存関係管理
-  - task-07: レビュー機能
-  - task-09: /compact 最適化
-  - task-10: 履歴の要約
-  - task-12: ヘルスチェック
-
-low:
-  - task-04: 並列実行制御
-  - task-05: リソース配分
-  - task-13: 学習・改善機構
+completion_summary:
+  high: Issue #8, #9, #10, #11
+  medium: task-01, task-02, task-03, task-07, task-09, task-10, task-12
+  low: task-04, task-05, task-13
 ```
 
 ---
@@ -115,4 +74,5 @@ low:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-08 | 全タスク完了。13件の機能実装を終了。 |
 | 2025-12-08 | 初版作成。MECE 分析の残タスク 13件を登録。 |
