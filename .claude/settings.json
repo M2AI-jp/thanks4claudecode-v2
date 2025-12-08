@@ -58,6 +58,16 @@
             "type": "command",
             "command": "bash .claude/hooks/critic-guard.sh",
             "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/scope-guard.sh",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/executor-guard.sh",
+            "timeout": 3000
           }
         ]
       },
@@ -82,6 +92,16 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/critic-guard.sh",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/scope-guard.sh",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/executor-guard.sh",
             "timeout": 3000
           }
         ]

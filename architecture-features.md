@@ -247,6 +247,7 @@ Claude の勝手な判断:
 - pm を呼ぶかどうかは Claude の判断に依存
 
 **対策（現在の実装）:**
+- scope-guard.sh: done_when/done_criteria 変更時に警告を発出
 - pm SubAgent: スコープ変更は必ず pm を経由
 - CLAUDE.md の禁止事項: 「done_criteria を推測で定義する【報酬詐欺】」
 
@@ -278,7 +279,9 @@ CLAUDE.md を書き換え:
 
 **対策（現在の実装）:**
 - CLAUDE.md の PROTECTED セクション: 編集時は「変更案を提示」
-- protected-files.txt: HARD_BLOCK レベルは admin でも警告
+- protected-files.txt: ガバナンス上重要な Hook も HARD_BLOCK に追加
+  - init-guard.sh, critic-guard.sh, scope-guard.sh, executor-guard.sh
+- admin でも編集時は警告が表示される
 
 ---
 
@@ -332,9 +335,11 @@ Claude の行動:
 - executor フィールドは「参照」であり「強制」ではなかった
 - Phase 開始時に executor をチェックする仕組みがなかった
 
-**対策（今後の課題）:**
-- executor-guard.sh: Phase 開始時に executor を検証
-- executor が codex なら MCP 呼び出しを強制
+**対策（現在の実装）:**
+- executor-guard.sh: コード編集時に現在 Phase の executor を検証
+- executor が claudecode 以外（codex/coderabbit/user）の場合:
+  - コードファイル編集をブロック
+  - 適切なツール/MCP の使用を案内
 
 ---
 
@@ -344,12 +349,12 @@ Claude の行動:
 |---------|------|----------|
 | 自己報酬詐欺 | critic バイパス | ✅ critic-guard.sh |
 | 計画乖離 | DRIFT 無視 | ✅ prompt-validator.sh |
-| スコープ | pm バイパス | ⚠️ ルールのみ |
-| 保護突破 | admin 悪用 | ⚠️ HARD_BLOCK のみ |
+| スコープ | pm バイパス | ✅ scope-guard.sh |
+| 保護突破 | admin 悪用 | ✅ HARD_BLOCK（hooks も保護） |
 | 状態遷移 | forbidden 無視 | ✅ check-coherence.sh |
-| executor | 構造的強制なし | ❌ 未実装 |
+| executor | 構造的強制なし | ✅ executor-guard.sh |
 
-> **✅ = Hook で強制 / ⚠️ = ルールで抑止 / ❌ = 未対策**
+> **全欠陥を Hook で構造的に強制**
 
 ---
 

@@ -20,6 +20,11 @@
 # CONTEXT.md は .archive に退避済み（開発履歴）
 HARD_BLOCK:CLAUDE.md
 HARD_BLOCK:.claude/protected-files.txt
+# ガバナンス上重要な Hook（admin でも警告付き編集）
+HARD_BLOCK:.claude/hooks/init-guard.sh
+HARD_BLOCK:.claude/hooks/critic-guard.sh
+HARD_BLOCK:.claude/hooks/scope-guard.sh
+HARD_BLOCK:.claude/hooks/executor-guard.sh
 
 # === BLOCK: 運用でゆるめ可能（strict: ブロック / trusted: WARN） ===
 BLOCK:plan/template/playbook-format.md
