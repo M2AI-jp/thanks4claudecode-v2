@@ -121,7 +121,10 @@ if [ "$SECURITY_MODE" = "strict" ]; then
 fi
 
 # === git commit チェック ===
-if [[ "$COMMAND" == *"git commit"* ]] || [[ "$COMMAND" == *"git "* && "$COMMAND" == *" commit"* ]]; then
+# 注意: "commit" を含む文字列（コメント等）で誤発動しないよう、パターンを厳密に
+# パターン: "git commit" で始まる、または "&&" や ";" の後に "git commit" がある
+GIT_COMMIT_PATTERN='^git[[:space:]]+commit|&&[[:space:]]*git[[:space:]]+commit|;[[:space:]]*git[[:space:]]+commit'
+if [[ "$COMMAND" =~ $GIT_COMMIT_PATTERN ]]; then
     # 回帰テストを実行
     if [ -f ".claude/tests/regression-test.sh" ]; then
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2

@@ -162,3 +162,5 @@ status: done
 | 日時 | 内容 |
 |------|------|
 | 2025-12-08 | 初版作成。Issue #9。 |
+| 2025-12-08 | p1-p4 全 Phase 完了。Issue #9 クローズ。 |
+| 2025-12-08 | バグ修正: pre-bash-check.sh の git commit 誤検出。 |
