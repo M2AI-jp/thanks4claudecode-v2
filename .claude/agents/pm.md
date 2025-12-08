@@ -55,18 +55,24 @@ playbook なしで作業開始しない:
 1. ユーザーの要望を確認
    → 「何を作りたいですか？」（1回だけ）
 
-2. ゴールと done_criteria を定義
-   → 自分で考えて提案
+2. 技術的な done_criteria を書く前に検証
+   → context7 でライブラリの推奨パターンを確認
+   → 公式ドキュメントの最新安定版を確認
+   → setup/CATALOG.md のバージョンが古くないか確認
 
-3. Phase を分割
+3. ゴールと done_criteria を定義
+   → 自分で考えて提案
+   → 公式ドキュメントに基づくパターンを採用
+
+4. Phase を分割
    → 2-5 Phase が理想
 
-4. plan/active/playbook-{name}.md を作成
+5. plan/active/playbook-{name}.md を作成
 
-5. state.md を更新
+6. state.md を更新
    → active_playbooks.{focus.current}: {path}
 
-6. ブランチを作成
+7. ブランチを作成
    → git checkout -b {fix|feat}/{name}
 ```
 
