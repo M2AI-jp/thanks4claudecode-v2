@@ -13,10 +13,63 @@
 project: {プロジェクト名}
 branch: {type}/{description}  # feat/xxx, fix/xxx, refactor/xxx, docs/xxx
 created: {作成日}
+issue: {Issue 番号 or null}
+derives_from: {project.done_when の id}  # 例: DW-001
 ```
 
 > **branch フィールド**: playbook とブランチは 1:1 で紐づく。
-> session-start.sh が現在のブランチと照合し、不一致なら警告。
+> **derives_from フィールド**: この playbook が対応する project.done_when の ID。
+> 計画の連鎖（project → playbook）を追跡可能にする。
+
+---
+
+## playbook 導出ガイド
+
+> **project.done_when から playbook を作成する手順**
+
+```yaml
+手順:
+  1. project.md の not_achieved を確認
+  2. depends_on を分析し、着手可能な done_when を特定
+  3. priority で優先順位を決定
+  4. 選択した done_when の decomposition を読み込み
+  5. 以下を変換:
+     - derives_from: done_when.id
+     - goal.summary: decomposition.playbook_summary
+     - goal.done_when: decomposition.success_indicators
+     - phases: decomposition.phase_hints を展開
+
+phase_hints → phases 変換ルール:
+  phase_hints[i] を以下の Phase に変換:
+    id: p{i}
+    name: phase_hints[i].name
+    goal: phase_hints[i].what
+    done_criteria: # success_indicators から導出、または Claude が具体化
+    test_method: # Claude が具体化
+    status: pending
+
+例:
+  # project.md の decomposition
+  decomposition:
+    playbook_summary: setup フローの検証と改善
+    phase_hints:
+      - name: 現状分析
+        what: setup/playbook-setup.md を読み、構造を理解
+    success_indicators:
+      - setup が Phase 8 まで完了する
+
+  # 導出された playbook
+  meta:
+    derives_from: DW-001
+  goal:
+    summary: setup フローの検証と改善
+    done_when:
+      - setup が Phase 8 まで完了する
+  phases:
+    - id: p0
+      name: 現状分析
+      goal: setup/playbook-setup.md を読み、構造を理解
+```
 
 ---
 
@@ -399,6 +452,7 @@ enforcement:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-08 | V9: derives_from と playbook 導出ガイドを追加。計画の連鎖対応。 |
 | 2025-12-08 | V8: executor を拡張（claudecode/codex/coderabbit/user）。executor_config 追加。 |
 | 2025-12-08 | V7: max_iterations フィールド追加。デッドロック防止。 |
 | 2025-12-02 | V6: ダブルチェック機能追加。自己報酬詐欺防止の構造的強制。 |

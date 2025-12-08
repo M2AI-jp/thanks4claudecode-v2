@@ -43,16 +43,20 @@
 
   8. [自認] を出力
 
-【フェーズ 5: Macro チェック & 自律行動】
+【フェーズ 5: Macro チェック & 計画の導出】
 
   9. plan/project.md の存在を確認
-  10. Macro が存在する場合:
-      - done_when と current_phase.tasks を確認
-      - 「Macro: {summary} / 残タスク: {未完了} → {next} を進めます。」
-  11. Macro が存在しない場合（setup レイヤー）:
+  10. playbook=null かつ Macro が存在する場合:
+      - project.md の not_achieved を確認
+      - depends_on を分析し、着手可能な done_when を特定
+      - decomposition を参照して playbook を作成（または pm を呼び出す）
+      - 「Macro: {summary} / 次: {done_when.name} を進めます。」
+  11. playbook がある場合:
+      - 現在の Phase を確認し LOOP に入る
+  12. Macro が存在しない場合（setup レイヤー）:
       - 「Macro は Phase 8 で生成されます。setup を進めます。」
       - playbook の Phase 0 から開始
-  12. LOOP に入る（ユーザーが止めない限り進む）
+  13. LOOP に入る（ユーザーが止めない限り進む）
 
   ⚠️ 禁止: 「よろしいですか？」と聞く
   ⚠️ 禁止: 「何か続けますか？」と聞く
@@ -135,15 +139,18 @@ while true:
 トリガー: playbook の全 Phase が done
 
 行動:
-  1. 残タスク検出:
-     - plan/project.md の未完了タスクを確認
-     - Issue のラベル・マイルストーンを確認
-  2. 残タスクあり:
+  1. project.done_when の更新:
+     - derives_from で紐づく done_when.status を achieved に
+  2. 次タスクの導出（計画の連鎖）:
+     - project.md の not_achieved を確認
+     - depends_on を分析し、着手可能な done_when を特定
+     - decomposition を参照して新 playbook を作成
+  3. 残タスクあり:
      - 新ブランチ作成: git checkout -b feat/{next-task}
      - 新 playbook 作成: plan/active/playbook-{next-task}.md
      - state.md 更新: active_playbooks.product を更新
      - 即座に LOOP に入る
-  3. 残タスクなし:
+  4. 残タスクなし:
      - 「全タスク完了。次の指示を待ちます。」
 
 禁止:
@@ -262,6 +269,7 @@ MCP の使い分け:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-08 | V5.1: 計画の連鎖（Plan Derivation）。project.done_when → playbook の自動導出。INIT/POST_LOOP 更新。 |
 | 2025-12-08 | V5.0: アクションベース Guards。session 分類廃止。Edit/Write 時のみ playbook チェック。意図推測不要に。 |
 | 2025-12-08 | V4.1: 構造的強制。Hook が session を TASK にリセット → NLU で判断 → 安全側フォール。キーワード判定完全廃止。 |
 | 2025-12-08 | V4.0: session 自動判定システム。prompt-validator.sh がキーワード判定 → state.md 自動更新。Claude 依存を排除。 |

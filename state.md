@@ -29,7 +29,7 @@ mode: admin                  # strict | trusted | developer | admin
 plan-template:    null
 workspace:        null                       # 完了した playbook は .archive/plan/ に退避
 setup:            null                       # テンプレートは常に pending（正常）
-product:          plan/active/playbook-action-based-guards.md  # アクションベース Guards
+product:          plan/active/playbook-plan-chain.md  # 計画の連鎖的導出システム
 ```
 
 ---
@@ -150,18 +150,19 @@ playbook: null
 
 ```yaml
 phase: done
-current_phase: p6 - 統合テスト完了
-task: アクションベース Guards への移行
+current_phase: 全 Phase 完了（p0-p5）
+task: 計画の連鎖的導出システム
 assignee: claude
 
 done_criteria:
-  - session 分類ロジックが完全に削除されている ✓
-  - Edit/Write の PreToolUse でのみ playbook-guard が発動する ✓
-  - Read/Grep/WebSearch 等は playbook なしでも許可される ✓
-  - 「おはよう」でも「調査して」でも、Edit しない限りブロックされない ✓
+  - project.done_when に decomposition（分解指針）が構造化されている
+  - pm SubAgent が計画の導出を支援できる
+  - /playbook-init が decomposition を参照して playbook を生成できる
+  - CLAUDE.md に計画の連鎖ルールが明記されている
+  - 実際に project.done_when から playbook を自動導出できることを検証
 ```
 
-> **playbook-action-based-guards: 全 Phase 完了（p0-p6）**
+> **playbook-plan-chain: p0-p5 全完了、コミット準備中**
 
 ---
 
@@ -198,7 +199,7 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-08 19:06:21
+last_start: 2025-12-08 19:29:02
 last_end: 2025-12-08 02:20:49
 uncommitted_warning: false
 ```

@@ -11,24 +11,31 @@ playbook の作成・管理・進捗追跡を行うプロジェクトマネー�
 
 ## トリガー条件
 
-- session=task AND playbook=null（playbook がない）
+- playbook=null でセッション開始（playbook がない）
+- playbook が完了した（次のタスクを決定）
 - 新しいタスクが開始された
 - Phase が完了した
 - スコープ外の要求が検出された
 
 ## 責務
 
-1. **playbook 作成**
+1. **計画の導出（Plan Derivation）** ← 新規追加
+   - project.md の not_achieved を分析
+   - depends_on を解決し、着手可能な done_when を特定
+   - decomposition を参照して playbook skeleton を生成
+   - 優先度（priority）に基づく実行順序の決定
+
+2. **playbook 作成**
    - ユーザーの要望をヒアリング（最小限）
    - plan/template/playbook-format.md に従って作成
    - state.md の active_playbooks を更新
 
-2. **進捗管理**
+3. **進捗管理**
    - Phase の状態更新（pending → in_progress → done）
    - done_criteria の達成追跡
    - 次の Phase への移行判断
 
-3. **スコープ管理**
+4. **スコープ管理**
    - 「それは別タスクです」と NO を言う
    - スコープクリープを検出して警告
    - 別 playbook の作成を提案
@@ -49,30 +56,66 @@ playbook なしで作業開始しない:
   - 詳細は自分で決める
 ```
 
-## playbook 作成フロー
+## 計画の導出フロー（Plan Derivation）
+
+> **project.done_when から playbook を自動導出する手順**
+
+```
+1. project.md の not_achieved を読み込み
+   → 未達成の done_when を全て取得
+
+2. 依存解決（depends_on の分析）
+   → 着手可能な done_when を特定
+   → 依存先が全て achieved であるもののみ対象
+
+3. 優先度判断
+   → priority: high > medium > low
+   → 同一優先度なら estimated_effort が小さいものを優先
+
+4. decomposition を参照
+   → playbook_summary → goal.summary
+   → success_indicators → goal.done_when
+   → phase_hints → phases
+
+5. playbook skeleton を生成
+   → derives_from: done_when.id を設定
+   → phases の done_criteria は Claude が具体化
+
+6. 提案または自動作成
+   → 複雑な場合: ユーザーに確認
+   → 単純な場合: 自動で作成
+```
+
+## playbook 作成フロー（従来）
+
+> **ユーザーの要望から playbook を作成する手順**
 
 ```
 1. ユーザーの要望を確認
    → 「何を作りたいですか？」（1回だけ）
 
-2. 技術的な done_criteria を書く前に検証
+2. project.md との関連を確認
+   → not_achieved に該当するものがあれば derives_from を設定
+   → なければ新規 done_when として追加を検討
+
+3. 技術的な done_criteria を書く前に検証
    → context7 でライブラリの推奨パターンを確認
    → 公式ドキュメントの最新安定版を確認
    → setup/CATALOG.md のバージョンが古くないか確認
 
-3. ゴールと done_criteria を定義
+4. ゴールと done_criteria を定義
    → 自分で考えて提案
    → 公式ドキュメントに基づくパターンを採用
 
-4. Phase を分割
+5. Phase を分割
    → 2-5 Phase が理想
 
-5. plan/active/playbook-{name}.md を作成
+6. plan/active/playbook-{name}.md を作成
 
-6. state.md を更新
+7. state.md を更新
    → active_playbooks.{focus.current}: {path}
 
-7. ブランチを作成
+8. ブランチを作成
    → git checkout -b {fix|feat}/{name}
 ```
 
