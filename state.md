@@ -179,18 +179,18 @@ playbook: null
 
 ```yaml
 phase: done
-current_phase: p6 - 統合テスト完了
-task: session 自動判定システム構築
+current_phase: p7 - NLU ベース移行完了
+task: session 分類システム（Hook + LLM）
 assignee: claude
 
 done_criteria:
-  - prompt-validator.sh がキーワード判定 ✓
-  - state.md の session を自動更新 ✓
-  - 後続 Hooks が session を参照 ✓
-  - 統合テスト全 PASS ✓
+  - Hook が発火して分類指示 ✓
+  - Claude が NLU で分類 ✓
+  - Guards が session で動作変更 ✓
+  - 全テスト PASS ✓
 ```
 
-> **playbook-session-redesign: 全 Phase 完了（p0-p6 critic PASS）**
+> **playbook-session-redesign: 全 Phase 完了（p0-p7 critic PASS）**
 
 ---
 
