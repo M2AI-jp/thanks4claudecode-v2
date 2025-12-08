@@ -30,7 +30,7 @@ mode: admin                  # strict | trusted | developer | admin
 plan-template:    null
 workspace:        null                       # 完了した playbook は .archive/plan/ に退避
 setup:            null                       # テンプレートは常に pending（正常）
-product:          plan/active/playbook-autonomy-enhancement.md  # Issue #8
+product:          plan/active/playbook-regression-test.md  # Issue #9
 ```
 
 ---
@@ -136,32 +136,32 @@ playbook: null  # テンプレートは pending のまま（正常）
 
 ```yaml
 state: implementing
-sub: autonomy-enhancement
-playbook: plan/active/playbook-autonomy-enhancement.md
+sub: regression-test
+playbook: plan/active/playbook-regression-test.md
 ```
 
 ### 概要
 > ユーザーが実際にプロダクトを開発するためのレイヤー。
 > setup 完了後、plan/project.md を参照して TDD で開発。
-> **Issue #8: 自律性強化 - PDCA自動回転・妥当性評価フレームワーク**
+> **Issue #9: 回帰テスト機能**
 
 ---
 
 ## goal
 
 ```yaml
-phase: planning
-current_phase: 残タスク実装開始
-task: Issue #9-#21 を順次実装
+phase: done
+current_phase: 全 Phase 完了
+task: Issue #9 完了処理
 assignee: claude
 
 done_criteria:
-  - plan/project.md 作成済み
-  - 13件の Issue 登録済み
-  - high 優先度から順次実装
+  - p1-p4 全て critic PASS
+  - git commit 完了
+  - Issue クローズ
 ```
 
-> **MECE 分析の残タスク 13件を Issue 登録。high 優先度から実装開始。**
+> **Issue #9: 回帰テスト機能。全 Phase 完了。コミット・クローズ待ち。**
 
 ---
 
@@ -198,7 +198,7 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-08 12:27:35
+last_start: 2025-12-08 12:51:59
 last_end: 2025-12-08 02:20:49
 uncommitted_warning: false
 ```
