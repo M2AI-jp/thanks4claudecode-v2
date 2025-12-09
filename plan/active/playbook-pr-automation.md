@@ -139,7 +139,7 @@ done_when:
   prerequisites:
     - PR が GitHub に作成済み
     - CI/CD チェック（GitHub Actions）が PASS（あれば）
-  status: pending
+  status: done
 
 # Phase 5: POST_LOOP 統合と CLAUDE.md 更新
 - id: p5

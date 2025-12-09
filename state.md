@@ -36,18 +36,18 @@ branch: feat/pr-automation
 ## goal
 
 ```yaml
-phase: p4
-name: playbook-pr-automation / マージ自動化スクリプト強化
-task: merge-pr.sh 作成と PR マージ処理の実装
+phase: p5
+name: playbook-pr-automation / POST_LOOP 統合と CLAUDE.md 更新
+task: PR 作成・マージフローの POST_LOOP 統合
 assignee: claudecode
 
 done_criteria:
-  - merge-pr.sh が .claude/hooks/ に存在する
-  - PR のステータスを確認する処理を含む（draft → ready）
-  - gh pr merge コマンドで自動マージを実行する処理を含む
-  - マージコンフリクト検出とエラー通知を含む
-  - マージコミットメッセージが CLAUDE.md に従っている
-  - ShellCheck でエラーなしに通る
+  - CLAUDE.md の POST_LOOP セクションに PR 作成・マージフローを記載
+  - 実行順序が明記されている（PR 作成 → PR マージ → 次タスク導出）
+  - 各ステップの条件分岐を明記している（成功時・失敗時）
+  - state.md と playbook との整合性を確認する処理を追加
+  - CLAUDE.md の syntax が正しい（YAML/Markdown）
+  - check-coherence.sh が PASS する
   - 実際に動作確認済み（test_method 実行）
 ```
 
