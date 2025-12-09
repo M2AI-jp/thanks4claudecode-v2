@@ -74,7 +74,7 @@ expert:
 plan-template:    null
 workspace:        null                       # 完了した playbook は .archive/plan/ に退避
 setup:            null                       # テンプレートは常に pending（正常）
-product:          plan/active/playbook-artifact-health.md
+product:          null  # playbook-artifact-health 完了・アーカイブ
 ```
 
 ---
@@ -194,27 +194,22 @@ playbook: null  # playbook-system-completion 完了・アーカイブ済み
 ## goal
 
 ```yaml
-phase: implementing
-current_phase: p1
-task: 仕組みの健全化 - アーティファクト管理最適化
-assignee: claudecode
+phase: idle
+current_phase: null
+task: null
+assignee: null
 
-done_criteria:
-  - 完了済み playbook が plan/active/ に残存する根本原因が特定されている
-  - phase-*.md ファイルの作成目的が明確化されている
-  - アーカイブプロセスが「提案のみ」から改善されている
-  - 再発防止ルールが文書化されている
+done_criteria: []
 ```
 
-> **playbook-artifact-health 開始。**
-> playbook-skills-integration p4 を代替し、仕組みの根本的な健全化を実施。
+> **playbook-artifact-health 完了・アーカイブ。** 次タスク待ち。
 
 ---
 
 ## verification
 
 ```yaml
-self_complete: false      # Phase 1 進行中
+self_complete: true       # playbook-artifact-health 全10Phase完了 (critic PASS)
 user_verified: false
 ```
 
@@ -266,6 +261,7 @@ uncommitted_warning: false
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-09 | **playbook-artifact-health 完了・アーカイブ**: 全10Phase完了。完了済み playbook アーカイブ、phase-*.md 削除、アーカイブプロセス改善、再発防止ルール文書化。critic PASS。 |
 | 2025-12-09 | **playbook-system-completion 完了・アーカイブ**: 全4Phase完了。タスク標準化、git自動化、ファイル棚卸し、setup完成。main マージ済み。 |
 | 2025-12-09 | **playbook-system-completion 開始**: Phase 1 タスク開始プロセス標準化。project.md に system_completion セクション追加。 |
 | 2025-12-09 | **playbook-ecosystem-improvements 完了**: 全5Phase完了。setup CodeRabbit/Codex選択、Linter/Formatter実装、CLAUDE.md更新、学習モード動作確認、セッションサマリーアーカイブ機能。 |
