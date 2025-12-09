@@ -54,10 +54,10 @@ fi
 SECURITY_MODE="strict"
 if [ -f "$STATE_FILE" ]; then
     # ## security セクションから mode: を探す（コードブロック内を考慮）
-    MODE_LINE=$(grep -A 5 "^## security" "$STATE_FILE" 2>/dev/null | grep "mode:" | head -1 || echo "")
+    MODE_LINE=$(grep -A 10 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 || echo "")
     if [ -n "$MODE_LINE" ]; then
         # コメントを除去してから値を取得
-        SECURITY_MODE=$(echo "$MODE_LINE" | sed "s/#.*//" | sed "s/mode:[[:space:]]*//" | tr -d " ")
+        SECURITY_MODE=$(echo "$MODE_LINE" | sed "s/#.*//" | sed "s/security:[[:space:]]*//" | tr -d " ")
     fi
 fi
 

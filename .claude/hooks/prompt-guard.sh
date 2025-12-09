@@ -4,11 +4,13 @@
 # 確認事項対応:
 #   #1: 全ユーザープロンプトが同一ワークフローで処理される
 #   #10: 構造的にプロンプト拒否が可能
+#   #NEW: ユーザープロンプトを保存し、コンテキスト消失を防止
 #
 # 設計思想:
 #   - 全プロンプトで plan-guard ロジックを構造的に強制
 #   - スコープ外プロンプトには警告またはブロック
 #   - plan との整合性を構造的にチェック
+#   - 全プロンプトを user-intent.md に保存（compact 対策）
 #
 # 入力: { "prompt": "ユーザー入力" }
 # 出力:
@@ -33,6 +35,48 @@ PROMPT=$(echo "$INPUT" | jq -r '.prompt // ""')
 if [ -z "$PROMPT" ]; then
     exit 0
 fi
+
+# ==============================================================================
+# プロンプト保存機能（コンテキスト消失対策）
+# ==============================================================================
+INTENT_DIR=".claude/.session-init"
+INTENT_FILE="$INTENT_DIR/user-intent.md"
+
+# ディレクトリがなければ作成
+mkdir -p "$INTENT_DIR"
+
+# タイムスタンプ
+TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+
+# user-intent.md が存在しなければヘッダー作成
+if [ ! -f "$INTENT_FILE" ]; then
+    cat > "$INTENT_FILE" << 'HEADER'
+# User Intent Log
+
+> **セッション中のユーザープロンプトを記録。compact 後も参照可能。**
+
+---
+
+HEADER
+fi
+
+# プロンプトを追記（最新が上）
+{
+    echo "## [$TIMESTAMP]"
+    echo ""
+    echo '```'
+    echo "$PROMPT"
+    echo '```'
+    echo ""
+    echo "---"
+    echo ""
+    cat "$INTENT_FILE"
+} > "$INTENT_FILE.tmp"
+mv "$INTENT_FILE.tmp" "$INTENT_FILE"
+
+# ==============================================================================
+# 以下、既存のスコープチェック処理
+# ==============================================================================
 
 # state.md の存在確認
 STATE_FILE="state.md"
