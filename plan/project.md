@@ -716,6 +716,95 @@ branch: feat/engineering-ecosystem
 
 ---
 
+## system_completion
+
+> **システム完成度向上 - 品質の一貫性と運用効率化**
+
+```yaml
+# ========================================
+# 設計思想
+# ========================================
+
+philosophy: |
+  「仕組みの完成」を実現するための最終整備。
+  - タスク開始プロセスの標準化（品質のバラつき解消）
+  - git 操作の自動化（運用効率化）
+  - ファイル棚卸し（負債の可視化）
+  - setup の完成（再現可能な環境構築）
+
+# ========================================
+# done_when
+# ========================================
+
+done_when:
+  dw_sc_1_task_standardization:
+    name: タスク開始プロセス標準化
+    status: not_achieved
+    description: |
+      全てのタスク開始は project.md からの導出を経由する。
+      playbook から直接組み立てたり、単一タスクで開始したりするバラつきを解消。
+      pm SubAgent を強化し、タスク開始の必須経由点にする。
+    depends_on: []
+    decomposition:
+      - pm SubAgent 強化（project.md 参照必須化）
+      - /task-start コマンド作成
+      - CLAUDE.md INIT/POST_LOOP 更新
+      - タスク開始フロー図作成
+
+  dw_sc_2_git_automation:
+    name: git 自動化
+    status: not_achieved
+    description: |
+      コミット、マージ、ブランチ作成を SubAgent で自動化。
+      Phase 完了時の自動コミット、playbook 完了時の自動マージ。
+    depends_on:
+      - dw_sc_1_task_standardization
+    decomposition:
+      - git-ops SubAgent 作成
+      - 自動コミット機能（Phase 完了時）
+      - 自動マージ機能（playbook 完了時）
+      - 自動ブランチ作成（新タスク開始時）
+      - pm SubAgent との連携
+
+  dw_sc_3_file_inventory:
+    name: 全ファイル棚卸し
+    status: not_achieved
+    description: |
+      全ファイルの存在理由を明確化。
+      削除候補・統合候補を詳細な理由付きでドキュメント化。
+    depends_on: []
+    decomposition:
+      - 全ファイル一覧取得
+      - 各ファイルの存在理由を記述
+      - 削除候補リスト作成（理由付き）
+      - 統合候補リスト作成（理由付き）
+      - docs/file-inventory.md 作成
+
+  dw_sc_4_setup_completion:
+    name: setup 完成
+    status: not_achieved
+    description: |
+      現在の機能増加を反映した setup の完成。
+      このリポジトリ自体を参照可能なテンプレートとして整備。
+    depends_on:
+      - dw_sc_3_file_inventory
+    decomposition:
+      - 現在の機能一覧を setup に反映
+      - 設計思想セクションの強化
+      - Phase 構成の見直し
+      - 新規ユーザー向けクイックスタート
+      - このリポジトリを参照した実例セクション
+
+# ========================================
+# playbook
+# ========================================
+
+playbook: plan/active/playbook-system-completion.md
+branch: feat/system-completion
+```
+
+---
+
 ## learning_skill_design
 
 > **失敗パターン自動学習の設計（設計のみ、実装は将来）**
@@ -778,6 +867,7 @@ implementation_plan:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-09 | system_completion セクション追加。タスク標準化、git自動化、ファイル棚卸し、setup完成の4タスク。 |
 | 2025-12-09 | executor_design, learning_skill_design セクション追加（設計のみ）。 |
 | 2025-12-09 | 三位一体アーキテクチャとして再設計。ユーザー確認事項 #1,#2,#5,#7,#8,#9,#11 に対応。 |
 | 2025-12-09 | 0から再設計。「整合性確認」から「動作実証」へ転換。13テストケースを定義。 |

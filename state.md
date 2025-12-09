@@ -74,7 +74,7 @@ expert:
 plan-template:    null
 workspace:        null                       # 完了した playbook は .archive/plan/ に退避
 setup:            null                       # テンプレートは常に pending（正常）
-product:          plan/active/playbook-ecosystem-improvements.md
+product:          plan/active/playbook-system-completion.md
 ```
 
 ---
@@ -111,15 +111,15 @@ archive:
 
 # Medium: 単機能実装の中期計画（1ブランチ = 1playbook）
 medium:
-  file: null
-  exists: false
-  goal: null  # playbook-system-improvements 完了・アーカイブ済み
+  file: plan/active/playbook-system-completion.md
+  exists: true
+  goal: システム完成度向上 - 品質の一貫性と運用効率化
 
 # Micro: セッション単位の作業（playbook の 1 Phase）
 micro:
-  phase: null
-  name: null
-  status: idle  # 次タスク待ち
+  phase: 3
+  name: 全ファイル棚卸し
+  status: implementing
 
 # 上位計画参照（.archive/ に退避済み、必要時のみ復元）
 upper_plans:
@@ -180,14 +180,14 @@ playbook: null  # テンプレートは pending のまま（正常）
 
 ```yaml
 state: implementing
-sub: ecosystem-improvements
-playbook: plan/active/playbook-ecosystem-improvements.md
+sub: system-completion
+playbook: plan/active/playbook-system-completion.md
 ```
 
 ### 概要
 > ユーザーが実際にプロダクトを開発するためのレイヤー。
 > setup 完了後、plan/project.md を参照して TDD で開発。
-> **playbook-current-implementation-redesign 全 8 Phase 完了。** docs/current-implementation.md を「復旧可能な仕様書」として再設計完了。
+> **playbook-system-completion 進行中。** タスク標準化、git自動化、ファイル棚卸し、setup完成。
 
 ---
 
@@ -195,26 +195,27 @@ playbook: plan/active/playbook-ecosystem-improvements.md
 
 ```yaml
 phase: implementing
-current_phase: 5
-task: セッションサマリーアーカイブ機能
+current_phase: 3
+task: 全ファイル棚卸しドキュメント作成
 assignee: claude_code
 
 done_criteria:
-  - session-end.sh でサマリーを生成する仕組みがある
-  - .claude/logs/sessions/ にセッションログが保存される
-  - ログには git 状態、変更ファイル、Phase 進捗が含まれる
-  - 人間が読みやすいフォーマット（Markdown）
+  - docs/file-inventory.md が作成されている
+  - 全ファイル（100+ 件）の存在理由が記載されている
+  - 削除候補が理由付きでリストされている
+  - 統合候補が理由付きでリストされている
+  - カテゴリ別に整理されている
 ```
 
-> **playbook-ecosystem-improvements 完了。**
-> 全 5 Phase critic PASS。次タスク待ち。
+> **playbook-system-completion Phase 3 開始。**
+> 全ファイルの存在理由を明確化し、削除候補・統合候補をドキュメント化する。
 
 ---
 
 ## verification
 
 ```yaml
-self_complete: true       # playbook-current-implementation-redesign 完了
+self_complete: false      # Phase 1 進行中
 user_verified: false
 ```
 
@@ -244,7 +245,7 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-09 16:32:17
+last_start: 2025-12-09 20:35:07
 last_end: 2025-12-09 16:13:11
 uncommitted_warning: true
 ```
@@ -266,6 +267,7 @@ uncommitted_warning: true
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-09 | **playbook-system-completion 開始**: Phase 1 タスク開始プロセス標準化。project.md に system_completion セクション追加。 |
 | 2025-12-09 | **playbook-ecosystem-improvements 完了**: 全5Phase完了。setup CodeRabbit/Codex選択、Linter/Formatter実装、CLAUDE.md更新、学習モード動作確認、セッションサマリーアーカイブ機能。 |
 | 2025-12-09 | **playbook-engineering-ecosystem 完了**: 全6Phase完了。CodeRabbit評価、Linter/Formatter統合、TDD LOOP静的解析、学習モード、ShellCheck導入、ドキュメント更新。 |
 | 2025-12-09 | **playbook-current-implementation-redesign 完了**: 全8Phase完了。docs/current-implementation.md を「復旧可能な仕様書」として再設計。critic PASS。 |

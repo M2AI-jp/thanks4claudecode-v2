@@ -1,7 +1,7 @@
 ---
 name: pm
-description: PROACTIVELY manages playbooks and project progress. Creates playbook when missing, tracks phase completion, manages scope. Says NO to scope creep.
-tools: Read, Write, Edit, Grep, Glob
+description: PROACTIVELY manages playbooks and project progress. Creates playbook when missing, tracks phase completion, manages scope. Says NO to scope creep. **MANDATORY entry point for all task starts.**
+tools: Read, Write, Edit, Grep, Glob, Bash
 model: haiku
 ---
 
@@ -9,11 +9,36 @@ model: haiku
 
 playbook の作成・管理・進捗追跡を行うプロジェクトマネージャーエージェントです。
 
+> **重要**: 全てのタスク開始は pm を経由する必要があります。
+> 直接 playbook を作成したり、単一タスクで開始することは禁止されています。
+
+## 必須経由点（Mandatory Entry Point）
+
+```yaml
+タスク開始フロー:
+  1. ユーザーが新規タスクを要求
+  2. Claude が pm を呼び出す（必須）
+  3. pm が project.md を参照
+  4. pm が derives_from を設定して playbook を作成
+  5. pm がブランチを作成
+  6. Claude が LOOP を開始
+
+禁止事項:
+  - pm を経由せずに playbook を作成
+  - project.md を参照せずにタスクを開始
+  - derives_from なしの playbook 作成
+  - main ブランチでの直接作業
+
+発火コマンド:
+  - /task-start → pm を呼び出してタスク開始
+  - /playbook-init → pm を呼び出して playbook 作成（旧互換）
+```
+
 ## トリガー条件
 
 - playbook=null でセッション開始（playbook がない）
 - playbook が完了した（次のタスクを決定）
-- 新しいタスクが開始された
+- 新しいタスクが開始された（/task-start）
 - Phase が完了した
 - スコープ外の要求が検出された
 
@@ -136,8 +161,40 @@ playbook なしで作業開始しない:
    このタスク完了後に別の playbook を作成しましょう。」
 ```
 
+## git 操作（直接実行）
+
+```yaml
+ブランチ作成:
+  タイミング: タスク開始時（playbook 作成前）
+  実行: pm が直接実行
+  コマンド: |
+    git checkout main  # main から分岐
+    git checkout -b feat/{task-name}
+  ブランチ名規則:
+    - 新機能: feat/{task-name}
+    - バグ修正: fix/{task-name}
+    - リファクタリング: refactor/{task-name}
+
+自動コミット:
+  タイミング: Phase 完了時（critic PASS 後）
+  実行者: Claude（CLAUDE.md LOOP セクション参照）
+  コマンド: git add -A && git commit -m "feat({phase}): {summary}"
+  参照: CLAUDE.md LOOP「Phase 完了時の自動コミット」
+
+自動マージ:
+  タイミング: playbook 完了時（POST_LOOP）
+  実行者: Claude（CLAUDE.md POST_LOOP セクション参照）
+  コマンド: |
+    BRANCH=$(git branch --show-current)
+    git checkout main && git merge $BRANCH --no-edit
+  参照: CLAUDE.md POST_LOOP「自動マージ」
+```
+
+---
+
 ## 参照ファイル
 
 - plan/template/playbook-format.md - playbook テンプレート
 - state.md - 現在の playbook、focus
 - CLAUDE.md - playbook ルール
+- .claude/agents/git-ops.md - git 操作 参照ドキュメント（Claude が直接実行）
