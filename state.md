@@ -36,18 +36,18 @@ branch: feat/pr-automation
 ## goal
 
 ```yaml
-phase: p2
-name: playbook-pr-automation / PR 作成スクリプト実装
-task: create-pr.sh スクリプトの実装
+phase: p3
+name: playbook-pr-automation / PR 自動作成フック統合
+task: create-pr-hook.sh 作成と settings.json 統合
 assignee: claudecode
 
 done_criteria:
-  - create-pr.sh が .claude/hooks/ に存在する
-  - スクリプトが gh CLI で PR を作成する処理を含む
-  - PR の説明文に done_criteria を含める仕様が実装されている
-  - PR タイトルに playbook 名と phase 名を含める仕様が実装されている
-  - エラーハンドリング（PR 既存の場合の対応）が実装されている
-  - ShellCheck でエラーなしに通る
+  - create-pr-hook.sh が .claude/hooks/ に存在する
+  - POST_LOOP で PR 作成が自動呼び出しされる
+  - CLAUDE.md POST_LOOP セクションに「PR 作成」を記載
+  - .claude/settings.json に hook 登録が追加される
+  - settings.json の JSON 形式が正しい
+  - check-coherence.sh が PASS する
   - 実際に動作確認済み（test_method 実行）
 ```
 
