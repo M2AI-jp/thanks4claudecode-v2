@@ -171,6 +171,16 @@
             "timeout": 3000
           }
         ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/archive-playbook.sh",
+            "timeout": 3000
+          }
+        ]
       }
     ],
     "SessionEnd": [

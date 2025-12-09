@@ -72,9 +72,9 @@ medium:
 
 # Micro: セッション単位の作業（playbook の 1 Phase）
 micro:
-  phase: p5
-  name: check-main-branch.sh 設計検証
-  status: in_progress
+  phase: done
+  name: 全 Phase 完了
+  status: done
 
 # 上位計画参照（.archive/ に退避済み、必要時のみ復元）
 upper_plans:
@@ -135,7 +135,7 @@ playbook: null  # テンプレートは pending のまま（正常）
 
 ```yaml
 state: implementing
-sub: system-improvements-p5
+sub: system-improvements-p9
 playbook: plan/active/playbook-system-improvements.md
 ```
 
@@ -149,8 +149,8 @@ playbook: plan/active/playbook-system-improvements.md
 ## goal
 
 ```yaml
-phase: p5
-current_phase: check-main-branch.sh 設計検証
+phase: done
+current_phase: playbook 完了
 task: システム改善タスク一括処理 (playbook-system-improvements)
 assignee: claude
 
@@ -201,7 +201,7 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-09 12:28:23
+last_start: 2025-12-09 12:53:59
 last_end: 2025-12-09 02:00:00
 uncommitted_warning: false
 ```

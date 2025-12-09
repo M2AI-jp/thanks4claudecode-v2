@@ -211,9 +211,17 @@ done_when:
     3. Edit 試行 → exit 2 確認
     4. focus を product に戻す
     5. Edit 試行 → 許可確認
-  status: pending
+  status: done
   priority: medium
   time_limit: 15min
+  evidence: |
+    - git checkout main で main ブランチに切り替え
+    - sed で focus=workspace に変更
+    - Write 試行 → exit 2 でブロック（Hook error 確認）
+    - Bash 試行 → exit 2 でブロック（追加証拠）
+    - git checkout は許可（設計通り）
+    - feat/next-improvements で focus=product → Edit 許可（セッション中の動作が証拠）
+  critic_result: PASS (2nd attempt - 実動作テスト)
 
 ---
 
@@ -233,9 +241,16 @@ done_when:
     2. playbook 完了状態検出ロジック実装
     3. テスト playbook で全 Phase done に
     4. Edit 後にアーカイブ提案が表示されることを確認
-  status: pending
+  status: done
   priority: medium
   time_limit: 25min
+  evidence: |
+    - archive-playbook.sh 作成: 91行、shebang + set -e
+    - 全 Phase done チェック: grep -c で total/done をカウント
+    - ポジティブテスト: 全 Phase done → アーカイブ提案表示
+    - ネガティブテスト: pending Phase あり → 出力なし (スキップ)
+    - settings.json line 175-183 に PostToolUse:Edit で登録
+  critic_result: PASS (1st attempt)
 
 ---
 
@@ -253,10 +268,15 @@ done_when:
     - 実装は将来の playbook に委譲
   test_method: |
     設計ドキュメント作成のみ（実装なし）
-  status: pending
+  status: done
   priority: low
   time_limit: 15min
   scope_reduction: 設計のみ、実装は将来
+  evidence: |
+    - project.md に executor_design セクション追加 (line 524-591)
+    - claude_code/codex/coderabbit/user の4種類を定義
+    - 実装計画（phase_1-3）を future として記載
+  critic_result: PASS (設計ドキュメントのみ)
 
 ---
 
@@ -273,10 +293,15 @@ done_when:
     - 実装は将来の playbook に委譲
   test_method: |
     設計ドキュメント作成のみ（実装なし）
-  status: pending
+  status: done
   priority: low
   time_limit: 15min
   scope_reduction: 設計のみ、実装は将来
+  evidence: |
+    - project.md に learning_skill_design セクション追加 (line 595-649)
+    - failure_recorder/lesson_retriever/archive_analyzer の3コンポーネント定義
+    - 実装計画（phase_1-3）を future として記載
+  critic_result: PASS (設計ドキュメントのみ)
 
 ---
 
@@ -294,10 +319,16 @@ done_when:
     1. 追加内容をテキストで提示
     2. ユーザー承認を得る
     3. 承認後に Edit 実行
-  status: pending
+  status: done
   priority: low
   time_limit: 10min
   scope_reduction: 提案作成のみ、適用はユーザー承認後
+  evidence: |
+    - CLAUDE.md への CONSENT セクション追加提案をテキストで作成
+    - [理解確認] フォーマット、フロー、user_response を記載
+    - BLOCK ファイルのため適用はユーザー承認後
+    - consent-guard.sh は settings.json に登録済み（p3 で完了）
+  critic_result: PASS (提案作成のみ)
 
 ---
 
