@@ -33,6 +33,8 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
 HARD_BLOCK_FILES=(
     "CLAUDE.md"
     ".claude/protected-files.txt"
+    ".claude/.session-init/consent"
+    ".claude/.session-init/pending"
 )
 
 # BLOCK ファイル（strict モードでのみ保護）
@@ -42,7 +44,7 @@ BLOCK_FILES=(
     "plan/template/"
 )
 
-# 書き込み系パターン
+# 書き込み・削除系パターン
 WRITE_PATTERNS=(
     "sed -i"
     "sed -i ''"
@@ -54,6 +56,9 @@ WRITE_PATTERNS=(
     "tee "
     " > "
     " >> "
+    "rm "
+    "rm -f"
+    "rm -rf"
 )
 
 # HARD_BLOCK チェック（常時ブロック）

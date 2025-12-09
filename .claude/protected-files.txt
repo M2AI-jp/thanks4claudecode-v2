@@ -20,6 +20,9 @@
 # CONTEXT.md は .archive に退避済み（開発履歴）
 HARD_BLOCK:CLAUDE.md
 HARD_BLOCK:.claude/protected-files.txt
+# Hook 回避防止: consent ファイルの削除を禁止
+HARD_BLOCK:.claude/.session-init/consent
+HARD_BLOCK:.claude/.session-init/pending
 # ガバナンス上重要な Hook（admin でも警告付き編集）
 HARD_BLOCK:.claude/hooks/init-guard.sh
 HARD_BLOCK:.claude/hooks/critic-guard.sh

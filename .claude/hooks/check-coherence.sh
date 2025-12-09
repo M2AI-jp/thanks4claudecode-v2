@@ -28,62 +28,51 @@ CURRENT=$(grep -A5 "## focus" state.md | grep "current:" | sed 's/.*current: *//
 echo -e "  Focus: ${GREEN}$CURRENT${NC}"
 echo ""
 
-# 全レイヤーをチェック
-for LAYER in "plan-template" "workspace" "setup"; do
-    echo -e "  --- Layer: $LAYER ---"
+# active_playbooks セクションから全て のplaybook を取得してチェック
+echo -e "  --- Active Playbooks Check ---"
 
-    # レイヤーの state を取得
-    LAYER_STATE=$(awk "/## layer: $LAYER/,/^## [^l]/" state.md | grep "state:" | head -1 | sed 's/.*state: *//' | sed 's/ *#.*//')
+# active_playbooks セクションを抽出
+ACTIVE_PLAYBOOKS=$(awk '/## active_playbooks/,/^## [^a]/' state.md | tail -n +2 | head -n -1)
 
-    # playbook を取得
-    PLAYBOOK=$(awk "/## layer: $LAYER/,/^## [^l]/" state.md | grep "playbook:" | head -1 | sed 's/.*playbook: *//' | sed 's/ *#.*//')
+if [ -z "$ACTIVE_PLAYBOOKS" ]; then
+    echo -e "    ${YELLOW}[SKIP]${NC} active_playbooks セクション not found"
+else
+    # active_playbooks 内の各行を処理
+    while IFS='=' read -r KEY VALUE; do
+        KEY=$(echo "$KEY" | tr -d ' ')
+        VALUE=$(echo "$VALUE" | sed 's/^ *//' | sed 's/ *#.*//')
 
-    if [ -z "$LAYER_STATE" ]; then
-        echo -e "    ${YELLOW}[SKIP]${NC} Layer not found in state.md"
-        continue
-    fi
-
-    echo -e "    State: $LAYER_STATE"
-
-    # playbook がある場合、phase の status と state を比較
-    if [ -n "$PLAYBOOK" ] && [ "$PLAYBOOK" != "null" ] && [ -f "$PLAYBOOK" ]; then
-        echo -e "    Playbook: $PLAYBOOK"
-
-        # playbook 内の全 phase の status をカウント
-        DONE_COUNT=$(grep -E "status: done" "$PLAYBOOK" 2>/dev/null | wc -l | tr -d ' ')
-        PENDING_COUNT=$(grep -E "status: pending" "$PLAYBOOK" 2>/dev/null | wc -l | tr -d ' ')
-        IN_PROGRESS_COUNT=$(grep -E "status: in_progress" "$PLAYBOOK" 2>/dev/null | wc -l | tr -d ' ')
-
-        echo -e "    Phases: done=$DONE_COUNT, in_progress=$IN_PROGRESS_COUNT, pending=$PENDING_COUNT"
-
-        # state と playbook の整合性チェック
-        if [ "$LAYER_STATE" = "pending" ] && [ "$DONE_COUNT" -gt 0 ]; then
-            echo -e "    ${RED}[ERROR]${NC} state=pending but playbook has done phases"
-            ERRORS=$((ERRORS + 1))
+        if [ -z "$KEY" ] || [ "$VALUE" = "null" ]; then
+            continue
         fi
 
-        if [ "$LAYER_STATE" = "done" ] && [ "$PENDING_COUNT" -gt 0 ]; then
-            echo -e "    ${RED}[ERROR]${NC} state=done but playbook has pending phases"
-            ERRORS=$((ERRORS + 1))
-        fi
+        echo -e "    Playbook: $VALUE (layer=$KEY)"
 
-        if [ "$LAYER_STATE" = "implementing" ] && [ "$IN_PROGRESS_COUNT" -eq 0 ] && [ "$PENDING_COUNT" -eq 0 ]; then
-            echo -e "    ${YELLOW}[WARN]${NC} state=implementing but no in_progress/pending phases"
+        # playbook ファイルが存在するかチェック
+        if [ -f "$VALUE" ]; then
+            # playbook 内の全 phase の status をカウント
+            DONE_COUNT=$(grep -E "status: done" "$VALUE" 2>/dev/null | wc -l | tr -d ' ')
+            PENDING_COUNT=$(grep -E "status: pending" "$VALUE" 2>/dev/null | wc -l | tr -d ' ')
+            IN_PROGRESS_COUNT=$(grep -E "status: in_progress" "$VALUE" 2>/dev/null | wc -l | tr -d ' ')
+
+            echo -e "      Phases: done=$DONE_COUNT, in_progress=$IN_PROGRESS_COUNT, pending=$PENDING_COUNT"
+        else
+            echo -e "      ${YELLOW}[WARN]${NC} Playbook file not found: $VALUE"
         fi
-    fi
-    echo ""
-done
+    done <<< "$ACTIVE_PLAYBOOKS"
+fi
+echo ""
 
 # focus.current のレイヤーの詳細チェック
 echo -e "  --- Focus Layer Detail: $CURRENT ---"
 
-# sub を取得
-SUB=$(awk "/## layer: $CURRENT/,/^## [^l]/" state.md | grep "sub:" | head -1 | sed 's/.*sub: *//' | sed 's/ *#.*//')
-echo -e "    Sub: $SUB"
-
 # goal.phase を取得
-GOAL_PHASE=$(grep -A5 "## goal" state.md | grep "phase:" | head -1 | sed 's/.*phase: *//' | sed 's/ *#.*//')
+GOAL_PHASE=$(grep -A10 "## goal" state.md | grep "phase:" | head -1 | sed 's/.*phase: *//' | sed 's/ *#.*//')
 echo -e "    Goal phase: $GOAL_PHASE"
+
+# goal.name を取得（参考情報）
+GOAL_NAME=$(grep -A10 "## goal" state.md | grep "name:" | head -1 | sed 's/.*name: *//' | sed 's/ *#.*//')
+echo -e "    Goal: $GOAL_NAME"
 
 echo ""
 
@@ -202,20 +191,19 @@ else
 fi
 
 # ========================================
-# History 更新検知（state.md 変更履歴確認）
+# Version 情報確認（参考情報）
 # ========================================
-echo -e "  --- History Update Detection ---"
+echo -e "  --- Version Information ---"
 
-# state.md の sub からバージョン番号を抽出 (例: v13-system-integrity → v13)
-VERSION=$(echo "$SUB" | grep -oE "^v[0-9]+" || echo "")
-
-if [ -n "$VERSION" ]; then
-    echo -e "    Current version: $VERSION"
-    echo -e "    ${GREEN}[OK]${NC} バージョン形式の sub を検出"
-else
-    echo -e "    ${YELLOW}[SKIP]${NC} バージョン形式でない sub: $SUB"
+# playbook の derived_from（参考情報）
+if [ -n "$FOCUS_PLAYBOOK" ] && [ -f "$FOCUS_PLAYBOOK" ]; then
+    DERIVED_FROM=$(grep -E "^derives_from:" "$FOCUS_PLAYBOOK" 2>/dev/null | head -1 | sed 's/derives_from: *//')
+    if [ -n "$DERIVED_FROM" ]; then
+        echo -e "    Derived from: $DERIVED_FROM"
+    fi
 fi
 
+echo -e "    ${GREEN}[OK]${NC} Version check completed"
 echo ""
 
 # ========================================

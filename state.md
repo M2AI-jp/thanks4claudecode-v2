@@ -17,7 +17,7 @@ current: product
 ## active_playbooks
 
 ```yaml
-product: plan/active/playbook-plan-optimization.md
+product: plan/active/playbook-pr-automation.md
 setup: null
 workspace: null
 ```
@@ -27,8 +27,8 @@ workspace: null
 ## playbook
 
 ```yaml
-active: plan/active/playbook-plan-optimization.md
-branch: feat/full-autonomy-implementation
+active: plan/active/playbook-pr-automation.md
+branch: feat/pr-automation
 ```
 
 ---
@@ -36,14 +36,17 @@ branch: feat/full-autonomy-implementation
 ## goal
 
 ```yaml
-phase: done
-name: playbook-plan-optimization 完了
-task: null
-assignee: null
+phase: p1
+name: playbook-pr-automation / 現状分析と設計
+task: PR 作成・マージフローの現状分析
+assignee: claudecode
 
-done_criteria: []
-# 完了: 2025-12-10
-# critic: PASS
+done_criteria:
+  - docs/git-operations.md の「PR 作成・マージ」セクションを読んだ
+  - CLAUDE.md の「POST_LOOP」セクションを読んだ
+  - GitHub API vs gh CLI の比較表を作成した
+  - 実装方針（gh CLI 使用）を決定した
+  - 実装予定の Phase を列挙した
 ```
 
 ---
