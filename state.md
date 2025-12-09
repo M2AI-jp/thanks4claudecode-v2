@@ -17,7 +17,7 @@ current: product
 ## active_playbooks
 
 ```yaml
-product: plan/active/playbook-full-autonomy.md
+product: null  # archived: .archive/plan/playbook-full-autonomy.md
 setup: null
 workspace: null
 ```
@@ -27,7 +27,7 @@ workspace: null
 ## playbook
 
 ```yaml
-active: plan/active/playbook-full-autonomy.md
+active: null  # archived: .archive/plan/playbook-full-autonomy.md
 branch: feat/full-autonomy-implementation
 ```
 
@@ -36,15 +36,15 @@ branch: feat/full-autonomy-implementation
 ## goal
 
 ```yaml
-phase: p8
-name: 最終コミット
-task: 全変更をコミットし、playbook をアーカイブ
-assignee: claudecode
+phase: done
+name: playbook-full-autonomy 完了
+task: null
+assignee: null
 
-done_criteria:
-  - git commit が成功
-  - mission.md の success_criteria が全てチェック済み
-  - playbook が .archive/ に移動
+done_criteria: []
+# 完了: 2025-12-10
+# critic: PASS
+# commit: 5fdfa75
 ```
 
 ---
