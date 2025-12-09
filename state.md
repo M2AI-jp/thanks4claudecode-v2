@@ -194,28 +194,26 @@ playbook: plan/active/playbook-component-refinement.md
 ## goal
 
 ```yaml
-phase: p1
-current_phase: p1
+phase: p6
+current_phase: p6
 task: playbook-component-refinement
 assignee: claudecode
 
 done_criteria:
-  - coherence SubAgent が削除されている
-  - state-mgr SubAgent が削除されている
-  - git-ops が docs/ に移動されている
-  - beginner-advisor が Skill に転換されている
-  - pre-bash-check.sh のメッセージが条件化されている
-  - critic PASS
+  - 削除された SubAgent が .claude/agents/ に存在しない ✅
+  - 新規作成された Skill/docs が正しく配置されている ✅
+  - 全 Hook が正常に動作している ✅
+  - critic PASS ✅
 ```
 
-> **playbook-component-refinement p1 開始。** coherence SubAgent 削除。
+> **playbook-component-refinement 全 Phase 完了。** コンポーネント構造改善完了。
 
 ---
 
 ## verification
 
 ```yaml
-self_complete: false
+self_complete: true
 user_verified: false
 ```
 
@@ -267,6 +265,7 @@ uncommitted_warning: false
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-09 | **playbook-component-refinement 完了**: 全6Phase完了。coherence/state-mgr SubAgent 削除、git-ops を docs/ へ移動、beginner-advisor を Skill 転換、Phase完了メッセージ条件化。critic PASS。 |
 | 2025-12-09 | **playbook-artifact-health 完了・アーカイブ**: 全10Phase完了。完了済み playbook アーカイブ、phase-*.md 削除、アーカイブプロセス改善、再発防止ルール文書化。critic PASS。 |
 | 2025-12-09 | **playbook-system-completion 完了・アーカイブ**: 全4Phase完了。タスク標準化、git自動化、ファイル棚卸し、setup完成。main マージ済み。 |
 | 2025-12-09 | **playbook-system-completion 開始**: Phase 1 タスク開始プロセス標準化。project.md に system_completion セクション追加。 |

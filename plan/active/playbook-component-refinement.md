@@ -145,7 +145,7 @@ done_when:
     3. ls docs/ でドキュメントを確認
     4. git commit テストで Hook 発火を確認
     5. critic を呼び出して PASS を取得
-  status: pending
+  status: done
 ```
 
 ---
@@ -206,7 +206,15 @@ p5:
     default_behavior: "CLAUDE_VERBOSE 未設定時はメッセージ非表示"
     verbose_behavior: "CLAUDE_VERBOSE=1 設定時のみメッセージ表示"
   note: "playbook 記載の pre-bash-check.sh ではなく、実際のメッセージ出力元は check-coherence.sh だった"
-p6: null
+p6:
+  action: 最終検証
+  verification:
+    agents_count: "6ファイル: critic, health-checker, plan-guard, pm, reviewer, setup-guide"
+    deleted_agents: "coherence, state-mgr, git-ops, beginner-advisor が存在しない"
+    skills_count: "10ディレクトリ（beginner-advisor 新規追加）"
+    docs_git_ops: "docs/git-operations.md が存在"
+    git_commit: "69cc0c5 - Phase完了メッセージ非表示を確認"
+    critic: "PASS（2回目）"
 ```
 
 ---
@@ -215,4 +223,5 @@ p6: null
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-09 | **全 Phase 完了**: p1-p6 done。critic PASS。main マージ準備完了。 |
 | 2025-12-09 | 初版作成。コンポーネント構造改善 playbook。 |
