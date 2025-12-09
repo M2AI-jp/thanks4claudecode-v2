@@ -49,8 +49,9 @@ WS="$(pwd)"
 # init-guard.sh が必須ファイル Read 完了まで他ツールをブロックするために使用
 # consent-guard.sh が [理解確認] 完了まで Edit/Write をブロックするために使用
 INIT_DIR=".claude/.session-init"
-rm -rf "$INIT_DIR" 2>/dev/null || true
 mkdir -p "$INIT_DIR"
+# user-intent.md は保持（compact 後の復元に必要）、セッション管理ファイルのみリセット
+rm -f "$INIT_DIR/pending" "$INIT_DIR/consent" "$INIT_DIR/required_playbook" 2>/dev/null || true
 touch "$INIT_DIR/pending"
 touch "$INIT_DIR/consent"  # consent-guard.sh 用 - [理解確認] 完了で削除
 
@@ -95,6 +96,27 @@ $SEP
     git add -A && git commit -m "..."
 
 EOF
+fi
+
+# === user-intent.md からユーザー意図を復元（compact 後の自動反映）===
+INTENT_FILE=".claude/.session-init/user-intent.md"
+if [ -f "$INTENT_FILE" ]; then
+    # 最新3件のユーザー意図を抽出
+    LATEST_INTENTS=$(awk '/^## \[/{count++; if(count>3) exit} {print}' "$INTENT_FILE" 2>/dev/null | head -50)
+
+    if [ -n "$LATEST_INTENTS" ]; then
+        cat <<EOF
+$SEP
+  📝 ユーザー意図（compact 前に保存）
+$SEP
+以下は前回セッションでのユーザー指示です。
+この意図に沿って作業を継続してください。
+
+$LATEST_INTENTS
+$SEP
+
+EOF
+    fi
 fi
 
 # main ブランチ警告（workspace のみ - setup/product は main で作業可能）
