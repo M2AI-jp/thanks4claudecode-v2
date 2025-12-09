@@ -194,17 +194,17 @@ playbook: plan/active/playbook-repository-refinement.md
 ## goal
 
 ```yaml
-phase: p3
-current_phase: p3
+phase: p4
+current_phase: p4
 task: playbook-repository-refinement
 assignee: claudecode
 
 done_criteria:
-  - required_playbook が存在しないファイルを参照してもデッドロックしない
-  - フォールバック機構が実装されている
+  - 全 Hook が settings.json に登録されているか、削除されている
+  - .claude/hooks/ と settings.json が整合
 ```
 
-> **playbook-repository-refinement p3 進行中。** init-guard.sh デッドロック対策。
+> **playbook-repository-refinement p4 進行中。** 未登録 Hooks の処理。
 
 ---
 

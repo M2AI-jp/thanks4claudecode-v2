@@ -103,7 +103,7 @@ done_when:
     1. 存在しない playbook を required_playbook に設定
     2. セッションを開始
     3. デッドロックせずに回復できることを確認
-  status: pending
+  status: done
 
 - id: p4
   name: 未登録 Hooks の処理
@@ -247,7 +247,27 @@ p2:
         - strict モードで SECURITY_MODE='strict' を取得
         - admin チェックが false → ブロック継続のパスに入る
         - admin モードに戻すと SECURITY_MODE='admin' → バイパス
-p3: {}
+p3:
+  implementation:
+    file: init-guard.sh
+    modified_lines: "50-63"
+    change: |
+      playbook ファイルの存在確認を追加。
+      存在しない場合は REQUIRED_FILES に追加しない。
+      警告メッセージを stderr に出力。
+  test:
+    non_existent_playbook:
+      input: "plan/active/non-existent-playbook.md"
+      result: "REQUIRED_FILES: state.md のみ（playbook 除外）"
+      conclusion: "デッドロック回避成功"
+    existing_playbook:
+      input: "plan/active/playbook-repository-refinement.md"
+      result: "REQUIRED_FILES: state.md + playbook"
+      conclusion: "正常動作（存在する playbook は含まれる）"
+  fallback_mechanism:
+    condition: "playbook ファイルが存在しない"
+    behavior: "REQUIRED_FILES から除外 + 警告表示"
+    message: "⚠️ playbook ファイルが存在しません → 必須 Read 対象から除外"
 p4: {}
 p5: {}
 p6: {}

@@ -48,10 +48,17 @@ REQUIRED_FILES=(
 )
 
 # playbook は state.md から動的に取得（session-start.sh で設定済み）
+# デッドロック対策: playbook ファイルが実際に存在する場合のみ REQUIRED_FILES に追加
 if [[ -f "$INIT_DIR/required_playbook" ]]; then
     PLAYBOOK=$(cat "$INIT_DIR/required_playbook")
     if [[ -n "$PLAYBOOK" && "$PLAYBOOK" != "null" ]]; then
-        REQUIRED_FILES+=("$PLAYBOOK")
+        if [[ -f "$PLAYBOOK" ]]; then
+            REQUIRED_FILES+=("$PLAYBOOK")
+        else
+            # フォールバック: 存在しない playbook は必須から除外（デッドロック回避）
+            echo "⚠️ playbook ファイルが存在しません: $PLAYBOOK" >&2
+            echo "  → 必須 Read 対象から除外しました（デッドロック回避）" >&2
+        fi
     fi
 fi
 
