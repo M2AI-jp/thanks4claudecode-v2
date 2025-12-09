@@ -350,7 +350,48 @@ critic-guard.sh
     └── 参照: state.md (self_complete) → critic SubAgent が更新
 ```
 
-### 7.2 削除影響範囲
+### 7.2 ドキュメント依存（参照コンテキスト）
+
+```
+セッション開始時の自動読み込み:
+  ┌─────────────┐
+  │  CLAUDE.md  │──────────────────────────────────────┐
+  └─────────────┘                                       │
+        │                                               │
+        ▼                                               ▼
+  ┌─────────────┐    ┌─────────────────┐    ┌──────────────────────┐
+  │  state.md   │───→│  project.md     │───→│  playbook (active)   │
+  └─────────────┘    └─────────────────┘    └──────────────────────┘
+        │
+        └── focus, playbook, goal を提供
+
+参照時の自動読み込み（親ディレクトリ CLAUDE.md）:
+  .claude/agents/* 参照時    → .claude/agents/CLAUDE.md
+  .claude/skills/* 参照時    → .claude/skills/CLAUDE.md
+  .claude/hooks/* 参照時     → .claude/hooks/CLAUDE.md
+  .claude/context/* 参照時   → .claude/context/CLAUDE.md
+  .claude/frameworks/* 参照時 → .claude/frameworks/CLAUDE.md
+  docs/* 参照時              → docs/CLAUDE.md
+
+Hooks → SubAgents → Skills 連鎖:
+  playbook-guard.sh ─→ pm SubAgent     ─→ plan-management Skill
+  critic-guard.sh   ─→ critic SubAgent ─→ .claude/frameworks/
+  (expertise=beginner)                 ─→ beginner-advisor SubAgent
+```
+
+### 7.3 依存マトリクス
+
+| コンポーネント | 参照先ドキュメント | 更新先 |
+|--------------|------------------|--------|
+| session-start.sh | state.md | state.md (session) |
+| init-guard.sh | state.md, CLAUDE.md | - |
+| playbook-guard.sh | state.md (playbook) | pm を呼び出し |
+| critic-guard.sh | state.md (verification) | critic を呼び出し |
+| pm SubAgent | project.md, playbook | playbook, state.md |
+| critic SubAgent | .claude/frameworks/, playbook | state.md (verification) |
+| Skills | 各 skill.md | - |
+
+### 7.4 削除影響範囲
 
 | 削除対象 | 復旧優先度 | 影響 |
 |---------|----------|------|
@@ -663,6 +704,7 @@ context-log の蓄積に応じて current-implementation.md を更新。
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-10 | セクション 7 にドキュメント依存（参照コンテキスト）を追加。Hooks/SubAgents/Skills/ドキュメント間の依存を可視化。 |
 | 2025-12-09 | コンテキスト外部化システム追加。context-log.md、セッションサマリー自動生成（sessions/）、current-implementation.md 連携を追加。Hook 登録数を 16 に修正。 |
 | 2025-12-09 | エンジニアリングエコシステム追加。Linter/Formatter、静的解析、学習モード、ShellCheck、CodeRabbit 評価を統合。 |
 | 2025-12-09 | 全面改訂。playbook-current-implementation-redesign Phase 1-8 の成果物を統合。復旧可能な仕様書として再設計。 |
