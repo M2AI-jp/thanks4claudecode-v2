@@ -28,7 +28,7 @@ workspace: null
 
 ```yaml
 active: plan/active/playbook-pr-automation.md
-branch: feat/pr-automation
+branch: main
 ```
 
 ---
@@ -36,19 +36,16 @@ branch: feat/pr-automation
 ## goal
 
 ```yaml
-phase: p6
-name: playbook-pr-automation / 統合テストと動作確認
-task: PR 作成・マージフロー全体の動作確認
+phase: p7
+name: playbook-pr-automation / ドキュメント更新とクリーンアップ
+task: PR 自動化機能の実装完了をドキュメントに反映
 assignee: claudecode
 
 done_criteria:
-  - test ブランチで playbook を完了させた
-  - test ブランチから PR が自動作成された
-  - PR が GitHub に表示されている
-  - PR の説明文に done_criteria が含まれている
-  - PR が自動的にマージされた
-  - git log に自動マージコミットが記録されている
-  - 次の playbook が自動導出されている
+  - docs/git-operations.md の「PR 作成・マージ」セクションを「実装済み」に更新
+  - docs/current-implementation.md が自動更新されている
+  - 実装関連のメモファイルが削除されている（temp-*.md など）
+  - README.md に「PR 自動化」機能を追加
   - check-coherence.sh が PASS する
   - 実際に動作確認済み（test_method 実行）
 ```
