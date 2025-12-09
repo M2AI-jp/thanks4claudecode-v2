@@ -502,7 +502,7 @@ known_issues:
 ## current_state
 
 ```yaml
-phase: システム改善完了
+phase: リポジトリ完成形
 
 completed:
   - 三位一体アーキテクチャ設計
@@ -512,25 +512,31 @@ completed:
   - Phase 完了出力の構造化
   - project.md と playbook の相互監視設計
   - 入力→処理→出力の連鎖設計
-  - playbook-system-improvements 全10Phase完了:
-    - check-coherence.sh 登録
-    - depends-check.sh 実装
-    - consent-guard.sh 統合
-    - scope-guard.sh STRICT_MODE
-    - check-main-branch.sh 検証
-    - archive-playbook.sh 実装
-    - executor_design 設計
-    - learning_skill_design 設計
-    - CLAUDE.md CONSENT 提案
+  - playbook-system-improvements 全10Phase完了
+  - playbook-engineering-ecosystem 全6Phase完了
+  - playbook-system-completion 全4Phase完了
+  - playbook-context-architecture（進行中）:
+    - p1: state.md 機能分離 ✓
+    - p2: CLAUDE.md 機能分離 ✓
+    - p3: .claude/ フォルダ構造化 ✓
+    - p4: docs/ 構造化 ✓
+    - p5: project.md 再編集（現在）
+    - p6: 機能検証
 
-in_progress: []
+in_progress:
+  - playbook-context-architecture p5: project.md 再編集
 
-completed_recently:
-  - engineering_ecosystem（playbook-engineering-ecosystem.md）全 6 Phase 完了
+context_architecture_summary:
+  目的: コンテキストを機能として管理
+  成果:
+    - state.md: 履歴を .claude/context/history.md に分離
+    - CLAUDE.md: 特定状況向け指示を Skill 化（32%削減）
+    - .claude/: 各フォルダに CLAUDE.md 配置（自動コンテキスト）
+    - docs/: CLAUDE.md 配置、ファイル分類整理
 
 next:
-  - (オプション) CLAUDE.md CONSENT/LOOP セクション追加（ユーザー承認後）
-  - 新規ユーザー向けテンプレート検証
+  - p6 機能検証と critic PASS
+  - リポジトリ完成
 ```
 
 ---
@@ -867,6 +873,7 @@ implementation_plan:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-10 | current_state 更新。playbook-context-architecture 進行状況反映。リポジトリ完成形フェーズへ移行。 |
 | 2025-12-09 | system_completion セクション追加。タスク標準化、git自動化、ファイル棚卸し、setup完成の4タスク。 |
 | 2025-12-09 | executor_design, learning_skill_design セクション追加（設計のみ）。 |
 | 2025-12-09 | 三位一体アーキテクチャとして再設計。ユーザー確認事項 #1,#2,#5,#7,#8,#9,#11 に対応。 |
