@@ -118,8 +118,8 @@ medium:
 # Micro: セッション単位の作業（playbook の 1 Phase）
 micro:
   phase: 4
-  name: setup 完成
-  status: implementing
+  name: playbook 完了
+  status: done
 
 # 上位計画参照（.archive/ に退避済み、必要時のみ復元）
 upper_plans:
@@ -194,21 +194,20 @@ playbook: plan/active/playbook-system-completion.md
 ## goal
 
 ```yaml
-phase: implementing
+phase: done
 current_phase: 4
-task: setup 完成
+task: playbook-system-completion 全 Phase 完了
 assignee: claude_code
 
 done_criteria:
-  - setup/playbook-setup.md が現在の全機能を反映している
-  - 設計思想セクションが強化されている
-  - Phase 構成が現状に合わせて見直されている
-  - 新規ユーザー向けクイックスタートがある
-  - このリポジトリを実例として参照するセクションがある
+  - Phase 1: タスク開始プロセス標準化 - critic PASS
+  - Phase 2: git 自動化 - critic PASS
+  - Phase 3: 全ファイル棚卸しドキュメント作成 - critic PASS
+  - Phase 4: setup 完成 - critic PASS
 ```
 
-> **playbook-system-completion Phase 4 開始。**
-> setup/playbook-setup.md を現在の機能増加を反映して完成させる。
+> **playbook-system-completion 完了。**
+> 全 4 Phase critic PASS。POST_LOOP 実行中。
 
 ---
 

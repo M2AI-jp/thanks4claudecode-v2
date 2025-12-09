@@ -5,6 +5,65 @@
 
 ---
 
+## Quickstart（5分で開始）
+
+> **最速で始めたい方向け。詳細は後述の Phase を参照。**
+
+```bash
+# 1. このリポジトリをクローン
+git clone https://github.com/your-username/thanks4claudecode.git my-project
+cd my-project
+
+# 2. Claude Code で開く
+claude .
+
+# 3. Claude に「setup を始めて」と伝える
+# → Phase 0 から自動でガイドが始まります
+```
+
+**必要なもの:**
+- Mac（Intel / Apple Silicon）
+- Claude Pro 契約（$20/月）
+- GitHub アカウント
+
+**所要時間:**
+- Tutorial Route: 10分
+- Production Route: 30-60分
+
+---
+
+## このリポジトリの活用方法
+
+> **このリポジトリ自体が「完成した実例」として参照可能です。**
+
+```yaml
+実例として参照できるもの:
+  .claude/:
+    hooks/: 22個の Hook 実装例（構造的強制）
+    agents/: 10個の SubAgent 定義（検証・自動化）
+    skills/: 9個の Skill 定義（自動発火）
+    commands/: 7個のコマンド定義
+    frameworks/: 評価フレームワーク
+
+  CLAUDE.md: LLM 振る舞い制御の実例（三位一体の思考制御層）
+  state.md: 統合状態管理の実例
+  plan/: 計画管理の実例
+  docs/: ドキュメント体系の実例
+
+学習の流れ:
+  1. まず setup を完了（Phase 0-8）
+  2. plan/project.md を生成
+  3. 実際にプロダクトを開発しながら仕組みを体験
+  4. 必要に応じて .claude/ の中身を参照・カスタマイズ
+
+参照ドキュメント:
+  - docs/current-implementation.md: 現在実装の詳細仕様
+  - docs/extension-system.md: Claude Code 公式リファレンス
+  - docs/file-inventory.md: 全ファイルの存在理由
+```
+
+---
+
 ## meta
 
 ```yaml
@@ -129,6 +188,11 @@ LLM の発言テンプレート（Phase 4 完了後）:
 
 ## 設計思想
 
+> **三位一体アーキテクチャ**: Hooks（構造的強制）+ SubAgents（検証）+ CLAUDE.md（思考制御）
+> 単独では機能しない。組み合わせて初めて強制力を持つ。
+
+### 基本原則
+
 ```yaml
 ターゲット: 初心者〜経験者（スキルレベルで分岐）
 プラットフォーム: Mac
@@ -144,6 +208,101 @@ LLM の性質を活用:
   - 最初に決めたことに引っ張られる → setup で全て決める
   - plan/project.md をセッション開始時に読む → 決定が維持される
   - 曖昧さを排除 → 後のセッションで迷わない
+```
+
+### 三位一体アーキテクチャ
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CLAUDE.md（思考制御）                     │
+│    INIT / LOOP / POST_LOOP / CRITIQUE / CONSENT             │
+│    → LLM の行動パターンを規定（自己拘束ルール）              │
+└────────────────────────────┬────────────────────────────────┘
+                             │ 参照・従う
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Hooks（構造的強制）                        │
+│    PreToolUse / PostToolUse / SessionStart / SessionEnd     │
+│    → ツール実行時に bash スクリプトで強制ブロック            │
+│    → LLM の意思とは無関係に発火                              │
+└────────────────────────────┬────────────────────────────────┘
+                             │ 呼び出す
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    SubAgents（検証）                         │
+│    critic / pm / reviewer / health-checker                  │
+│    → 外部視点からの検証（報酬詐欺防止）                      │
+│    → done_criteria の達成を第三者判定                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### アクションベース Guards
+
+```yaml
+設計思想:
+  - プロンプトの「意図」ではなく「アクション」を制御
+  - Edit/Write 時のみ playbook チェック
+  - Read/Grep/WebSearch 等は playbook なしでも常に許可
+
+利点:
+  - 「意図」の推測が不要
+  - 調査・報告は自由に対応可能
+  - 実際にコードを変更するときだけ計画を要求
+
+実装:
+  - playbook-guard.sh: Edit/Write 前に playbook 存在チェック
+  - consent-guard.sh: 合意プロセス未完了時にブロック
+```
+
+### 報酬詐欺防止
+
+```yaml
+問題:
+  - LLM は「完了しました」と自己申告する傾向がある
+  - done_criteria を満たしていないのに done と報告
+
+解決:
+  - critic SubAgent による第三者検証
+  - critic PASS なしで done 不可（critic-guard.sh でブロック）
+  - 5層防御: CLAUDE.md → Hooks → critic → evidence → test
+
+禁止パターン:
+  - 「〇〇した」だけで証拠なし
+  - 「〇〇のはず」「思う」という曖昧表現
+  - シミュレーションのみで実際の動作確認なし
+```
+
+### 計画の連鎖（Plan Derivation）
+
+```yaml
+構造:
+  Macro（project.md）→ Medium（playbook）→ Micro（Phase）
+
+フロー:
+  1. project.md の done_when を分析
+  2. depends_on を解決し、着手可能なタスクを特定
+  3. decomposition を参照して playbook を自動生成
+  4. Phase ごとに done_criteria を検証
+  5. playbook 完了 → project.md の done_when を achieved に
+  6. 次の playbook を自動導出
+
+必須経由点:
+  - 全タスク開始は pm SubAgent 経由
+  - derives_from なしの playbook は禁止
+```
+
+### コンテキスト外部化
+
+```yaml
+問題:
+  - チャット履歴が長くなるとルールが効かなくなる
+  - LLM が「何をやっているか」が不明確になる
+
+解決:
+  - state.md / project.md / playbook を唯一の真実源に
+  - チャット履歴に依存しない
+  - .claude/logs/context-log.md で処理経過を記録
+  - 80% コンテキスト超過時は /clear を推奨
 ```
 
 ---
@@ -1303,3 +1462,73 @@ Skills:
   .claude/skills/ に自動生成
   lint-checker, test-runner, deploy-checker
 ```
+
+---
+
+## 現在のシステム構成（2025-12-09 時点）
+
+> **setup 完了後に利用可能になる機能の一覧**
+
+### コンポーネント数
+
+| カテゴリ | 数 | 説明 |
+|---------|---|------|
+| Hooks | 22 | 構造的強制（settings.json に 16 個登録） |
+| SubAgents | 10 | 検証・自動化エージェント |
+| Skills | 9 | 自動発火スキル（4 個はテンプレート） |
+| Commands | 7 | スラッシュコマンド |
+| Frameworks | 1 | 評価フレームワーク |
+
+### 主要機能
+
+```yaml
+タスク管理:
+  - pm SubAgent: タスク開始の必須経由点
+  - /task-start: 標準タスク開始コマンド
+  - playbook-guard: playbook なしの Edit/Write をブロック
+
+品質保証:
+  - critic SubAgent: done_criteria の第三者検証
+  - critic-guard: critic PASS なしの done をブロック
+  - reviewer SubAgent: コードレビュー
+
+git 自動化:
+  - Phase 完了時: 自動コミット
+  - playbook 完了時: 自動マージ
+  - 新タスク時: 自動ブランチ作成
+
+状態管理:
+  - state.md: 統合状態管理（Single Source of Truth）
+  - state-mgr SubAgent: 状態遷移管理
+  - state-rollback: 状態巻き戻し
+
+セキュリティ:
+  - protected-files.txt: 保護ファイル定義
+  - check-protected-edit: 保護ファイル編集チェック
+  - check-main-branch: main ブランチ保護
+
+コンテキスト:
+  - session-start/end: セッション管理
+  - context-log.md: コンテキスト外部化
+  - stop-summary: セッション終了サマリー
+```
+
+### 参照ドキュメント
+
+| ファイル | 内容 |
+|---------|------|
+| docs/current-implementation.md | 現在実装の詳細仕様（復旧手順含む） |
+| docs/extension-system.md | Claude Code 公式リファレンス |
+| docs/file-inventory.md | 全ファイルの存在理由 |
+| docs/task-initiation-flow.md | タスク開始フロー図 |
+| CLAUDE.md | LLM 振る舞いルール |
+
+---
+
+## 変更履歴
+
+| 日時 | 内容 |
+|------|------|
+| 2025-12-09 | V2.0: 設計思想強化、クイックスタート追加、実例参照セクション追加、現在のシステム構成追加 |
+| 2025-12-08 | V1.1: レビューツール選択（CodeRabbit/Codex）追加、Linter/Formatter Phase 追加 |
+| 2025-12-01 | V1.0: 初版作成 |
