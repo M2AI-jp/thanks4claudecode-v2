@@ -75,6 +75,15 @@ workflow:
 > **完了済みタスク（サマリーのみ）**
 
 ```yaml
+context-preservation:
+  date: 2025-12-10
+  summary: コンテキスト保持機能強化
+  result:
+    - UserPromptSubmit: プロンプトを user-intent.md に保存
+    - PreCompact: compact 前に重要コンテキストを保持
+    - Stop: ユーザー意図との整合性チェック
+    - check-protected-edit.sh のセキュリティモード検出バグ修正
+
 plan-double-check:
   date: 2025-12-10
   summary: 計画ダブルチェック機能 + フォルダ構造統合
@@ -149,6 +158,7 @@ old_roadmap: .archive/plan/roadmap.md
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-10 | context-preservation 完了。3フック強化でコンテキスト保持。 |
 | 2025-12-10 | plan-double-check 完了。plan-reviewer SubAgent 追加、フォルダ構造統合。 |
 | 2025-12-10 | playbook-system-foundation-redesign 完了。project.md/state.md 大幅削減。 |
 | 2025-12-10 | playbook-context-architecture 完了。 |
