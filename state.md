@@ -194,17 +194,17 @@ playbook: plan/active/playbook-repository-refinement.md
 ## goal
 
 ```yaml
-phase: p4
-current_phase: p4
+phase: p5
+current_phase: p5
 task: playbook-repository-refinement
 assignee: claudecode
 
 done_criteria:
-  - 全 Hook が settings.json に登録されているか、削除されている
-  - .claude/hooks/ と settings.json が整合
+  - 全 Skill に有効な frontmatter が存在する
+  - または不要な Skill が削除されている
 ```
 
-> **playbook-repository-refinement p4 進行中。** 未登録 Hooks の処理。
+> **playbook-repository-refinement p5 進行中。** 不完全 Skills の処理。
 
 ---
 

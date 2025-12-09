@@ -117,7 +117,7 @@ done_when:
     1. settings.json の hooks を再確認
     2. .claude/hooks/*.sh を再確認
     3. 差分がないことを確認
-  status: pending
+  status: done
 
 - id: p5
   name: 不完全 Skills の処理
@@ -268,7 +268,35 @@ p3:
     condition: "playbook ファイルが存在しない"
     behavior: "REQUIRED_FILES から除外 + 警告表示"
     message: "⚠️ playbook ファイルが存在しません → 必須 Read 対象から除外"
-p4: {}
+p4:
+  deleted_hooks:
+    - check-manifest-sync.sh: "削除 - spec.yaml 廃止済みのため不要"
+    - check-playbook-quality.sh: "削除 - 現在の playbook フォーマット（V10）と不一致、critic で代替"
+    - check-state-update.sh: "削除 - 自動コミットで state.md は常に更新される"
+  verification:
+    settings_json_count: 19
+    hooks_dir_count: 19
+    match: true
+  registered_hooks:
+    - archive-playbook.sh
+    - check-coherence.sh
+    - check-file-dependencies.sh
+    - check-main-branch.sh
+    - check-protected-edit.sh
+    - consent-guard.sh
+    - critic-guard.sh
+    - depends-check.sh
+    - executor-guard.sh
+    - init-guard.sh
+    - lint-check.sh
+    - log-subagent.sh
+    - playbook-guard.sh
+    - pre-bash-check.sh
+    - prompt-guard.sh
+    - scope-guard.sh
+    - session-end.sh
+    - session-start.sh
+    - stop-summary.sh
 p5: {}
 p6: {}
 ```
