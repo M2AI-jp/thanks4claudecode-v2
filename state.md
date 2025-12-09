@@ -74,7 +74,7 @@ expert:
 plan-template:    null
 workspace:        null                       # 完了した playbook は .archive/plan/ に退避
 setup:            null                       # テンプレートは常に pending（正常）
-product:          null  # playbook-system-completion 完了・アーカイブ済み (2025-12-09)
+product:          plan/active/playbook-skills-integration.md
 ```
 
 ---
@@ -194,16 +194,20 @@ playbook: null  # playbook-system-completion 完了・アーカイブ済み
 ## goal
 
 ```yaml
-phase: idle
-current_phase: null
-task: 次タスク待ち
-assignee: null
+phase: implementing
+current_phase: p4
+task: Skills 統合 - コンテキスト0から検証
+assignee: claudecode
 
-done_criteria: []
+done_criteria:
+  - /clear 実行後、INIT で必要なファイルが全て参照される
+  - Skills への呼び出しルートが SubAgents 経由で確立
+  - template/ への参照ルートが pm 経由で確立
+  - 「仕組みとして参照されないファイル」が存在しない（アーカイブ系を除く）
 ```
 
-> **playbook-system-completion 完了・アーカイブ済み。**
-> 全 4 Phase critic PASS。次の指示を待ちます。
+> **playbook-skills-integration 進行中。**
+> SubAgents → Skills の連鎖を確立し、全ファイルへのアクセス経路を整備。
 
 ---
 
@@ -240,9 +244,9 @@ forbidden: [pending→implementing], [pending→done], [*→done without state_u
 > **Hooks による自動更新。LLM の行動に依存しない。**
 
 ```yaml
-last_start: 2025-12-09 20:35:07
-last_end: 2025-12-09 16:13:11
-uncommitted_warning: true
+last_start: 2025-12-09 20:57:11
+last_end: 2025-12-09 20:57:09
+uncommitted_warning: false
 ```
 
 ---

@@ -124,9 +124,61 @@ CRITIQUE 実行時、以下を自問してください：
 - 証拠なしに PASS と言わない。
 - 質問しない。判定を実行する。
 
+## Skills 連携（必須）
+
+> **コード変更を含む Phase の評価時、以下の Skills を呼び出すこと。**
+
+### 呼び出しルール
+
+```yaml
+lint-checker:
+  条件: 変更ファイルに .ts/.tsx/.js/.jsx/.sh が含まれる
+  タイミング: done_criteria 評価の前
+  呼び出し: Skill: "lint-checker"
+  目的: 静的解析エラーがないことを確認
+
+test-runner:
+  条件: 変更ファイルに *.test.* / *.spec.* / test/ が含まれる
+  タイミング: done_criteria 評価の前
+  呼び出し: Skill: "test-runner"
+  目的: テストが通ることを確認
+
+deploy-checker:
+  条件: done_criteria に「デプロイ」「本番」が含まれる
+  タイミング: done_criteria 評価の前
+  呼び出し: Skill: "deploy-checker"
+  目的: デプロイ状態を確認
+```
+
+### 評価フロー（Skills 統合版）
+
+```
+1. 変更ファイルを確認: git diff --name-only
+2. 該当 Skills を呼び出し（上記ルールに従う）
+3. Skills の結果を確認（FAIL なら即 CRITIQUE FAIL）
+4. done_criteria を評価（従来通り）
+5. 総合判定を出力
+```
+
+### Skills 呼び出し結果の扱い
+
+```yaml
+Skills PASS:
+  → done_criteria 評価に進む
+
+Skills FAIL:
+  → CRITIQUE は自動的に FAIL
+  → 修正項目に Skills の指摘を含める
+  → 再評価を要求
+```
+
+---
+
 ## 参照ファイル
 
 - **.claude/frameworks/done-criteria-validation.md** - **必須**: 妥当性評価の固定フレームワーク
+- **.claude/skills/lint-checker/skill.md** - lint チェック手順
+- **.claude/skills/test-runner/skill.md** - テスト実行手順
 - state.md - 現在の goal.done_criteria
 - playbook - phase の done_criteria
 

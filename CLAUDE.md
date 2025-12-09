@@ -406,6 +406,107 @@ FAIL → 修正 → 再実行
 
 ---
 
+## SKILLS_CHAIN（Skills 呼び出し連鎖）
+
+> **Skills は SubAgents 経由で呼び出される。直接呼び出しも可能だが、連鎖を通じて自動発火する。**
+
+```yaml
+# ========================================
+# 連鎖構造
+# ========================================
+
+architecture: |
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                 Skills 呼び出し連鎖                             │
+  ├─────────────────────────────────────────────────────────────────┤
+  │                                                                  │
+  │  【Hooks】              【SubAgents】           【Skills】       │
+  │                                                                  │
+  │  playbook-guard.sh  ─→  pm               ─→  plan-management    │
+  │        │                  │                                      │
+  │        │                  └─→ Read: plan/template/*.md          │
+  │        │                                                         │
+  │  critic-guard.sh   ─→  critic            ─→  lint-checker       │
+  │                          │               ─→  test-runner        │
+  │                          │               ─→  deploy-checker     │
+  │                          │                                       │
+  │                          └─→ Read: .claude/frameworks/*.md      │
+  │                                                                  │
+  └─────────────────────────────────────────────────────────────────┘
+
+# ========================================
+# SubAgent → Skills 呼び出しルール
+# ========================================
+
+critic_skills:
+  lint-checker:
+    条件: 変更ファイルに .ts/.tsx/.js/.jsx/.sh が含まれる
+    タイミング: done_criteria 評価の前
+  test-runner:
+    条件: 変更ファイルに *.test.* / *.spec.* が含まれる
+    タイミング: done_criteria 評価の前
+  deploy-checker:
+    条件: done_criteria に「デプロイ」「本番」が含まれる
+    タイミング: done_criteria 評価の前
+
+pm_templates:
+  playbook-format.md:
+    条件: playbook 作成時（必須）
+    目的: 最新のフォーマットと記述ルールを確認
+  planning-rules.md:
+    条件: 複雑な計画時
+    目的: 計画の記述ルールを確認
+
+# ========================================
+# 全ファイルへのアクセス経路
+# ========================================
+
+access_routes:
+  # 自動参照（INIT で読まれる）
+  auto_init:
+    - CLAUDE.md（Claude Code 起動時）
+    - state.md（INIT 必須 Read）
+    - plan/project.md（INIT 必須 Read）
+    - playbook（active_playbooks から特定）
+
+  # SubAgent 経由で参照
+  via_subagents:
+    critic:
+      - .claude/frameworks/done-criteria-validation.md
+      - .claude/skills/lint-checker/skill.md
+      - .claude/skills/test-runner/skill.md
+      - .claude/skills/deploy-checker/skill.md
+    pm:
+      - plan/template/playbook-format.md
+      - plan/template/planning-rules.md
+      - setup/CATALOG.md
+    coherence:
+      - state.md
+      - playbook
+
+  # Hook 経由で参照
+  via_hooks:
+    - .claude/protected-files.txt（check-protected-edit.sh）
+    - state.md（各種 guard）
+
+  # アーカイブ系（限定的参照）
+  archive:
+    - docs/*（明示的参照時のみ）
+    - .claude/logs/*（記録用、learning Skill で参照可能）
+    - .archive/*（過去の playbook、learning Skill で参照可能）
+
+# ========================================
+# Skills 直接呼び出し
+# ========================================
+
+direct_call:
+  方法: Skill ツールを使用
+  例: Skill: "lint-checker"
+  用途: SubAgent を経由せず直接呼び出したい場合
+```
+
+---
+
 ## CONTEXT_EXTERNALIZATION（コンテキスト外部化）
 
 > **チャット履歴に依存しない状態管理。コード変更 + 意図・理由をセットで外部化。**
@@ -514,6 +615,7 @@ MCP の使い分け:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-09 | V5.5: SKILLS_CHAIN 追加。SubAgents → Skills の呼び出し連鎖を明記。全ファイルへのアクセス経路マップ。 |
 | 2025-12-09 | V5.4: CONTEXT_EXTERNALIZATION 追加。context-log.md でプロンプト→意図→処理→結果を記録。コンテキストの外部化。 |
 | 2025-12-09 | V5.3: LOOP に静的解析ステップ追加。lint-check.sh で ESLint/ShellCheck/Ruff を自動実行。 |
 | 2025-12-09 | V5.2: 合意プロセス（CONSENT）。INIT に フェーズ 4.5 追加。playbook=null 時に [理解確認] を強制。ユーザー応答待ちを例外許可。 |

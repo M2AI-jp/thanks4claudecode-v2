@@ -116,6 +116,11 @@ playbook なしで作業開始しない:
 > **ユーザーの要望から playbook を作成する手順**
 
 ```
+0. 【必須】テンプレート参照（スキップ禁止）
+   → Read: plan/template/playbook-format.md
+   → Read: plan/template/planning-rules.md（必要に応じて）
+   → 目的: 最新のフォーマットと記述ルールを確認
+
 1. ユーザーの要望を確認
    → 「何を作りたいですか？」（1回だけ）
 
@@ -131,9 +136,11 @@ playbook なしで作業開始しない:
 4. ゴールと done_criteria を定義
    → 自分で考えて提案
    → 公式ドキュメントに基づくパターンを採用
+   → playbook-format.md の done_criteria 記述ガイドに従う
 
 5. Phase を分割
    → 2-5 Phase が理想
+   → playbook-format.md の Phase 記述ルールに従う
 
 6. plan/active/playbook-{name}.md を作成
 
@@ -142,6 +149,20 @@ playbook なしで作業開始しない:
 
 8. ブランチを作成
    → git checkout -b {fix|feat}/{name}
+```
+
+### テンプレート必須参照の理由
+
+```yaml
+なぜ必須か:
+  - playbook-format.md は頻繁に更新される（V9 まで改訂済み）
+  - 古い知識で playbook を作ると構造が不正確になる
+  - done_criteria 記述ガイド、executor 判定ガイド等の重要情報
+
+禁止事項:
+  - テンプレートを参照せずに playbook を作成
+  - 「覚えているから」でスキップ
+  - 古いフォーマットで作成
 ```
 
 ## スコープ判定
