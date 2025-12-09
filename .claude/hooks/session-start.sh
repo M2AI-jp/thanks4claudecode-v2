@@ -9,8 +9,18 @@
 # 自動更新機能:
 #   - state.md の session_tracking.last_start を自動更新
 #   - LLM の行動に依存しない
+#
+# トリガー対応:
+#   - startup: 通常のセッション開始
+#   - resume: セッション再開
+#   - clear: /clear 後の再初期化
+#   - compact: auto-compact 後の復元
 
 set -e
+
+# === stdin から JSON を読み込み、trigger を検出 ===
+INPUT=$(cat)
+TRIGGER=$(echo "$INPUT" | jq -r '.trigger // "startup"' 2>/dev/null || echo "startup")
 
 # === state.md の session_tracking を自動更新 ===
 if [ -f "state.md" ]; then
@@ -83,6 +93,72 @@ PROJECT_PLAN=$(grep -A10 "## project_context" state.md 2>/dev/null | grep "proje
 # === 警告出力（条件付き）===
 echo ""
 
+# === MISSION（最上位概念）- 全ての判断はここに立ち返る ===
+MISSION_FILE="plan/mission.md"
+if [ -f "$MISSION_FILE" ]; then
+    # statement: | の後の2行を抽出
+    MISSION_STATEMENT=$(awk '/statement: \|/,/^$/' "$MISSION_FILE" 2>/dev/null | grep -v "statement:" | sed 's/^  //' | head -2 | tr '\n' ' ')
+    if [ -n "$MISSION_STATEMENT" ]; then
+        cat <<EOF
+$SEP
+  🎯 MISSION（最上位概念）
+$SEP
+$MISSION_STATEMENT
+
+⚠️ 全ての判断はこの mission に立ち返る。
+   ユーザープロンプトに引っ張られるな。
+
+EOF
+    fi
+fi
+
+# システム健全性チェック（軽量、SessionStart 統合）
+if [ -f ".claude/hooks/system-health-check.sh" ]; then
+    bash .claude/hooks/system-health-check.sh 2>/dev/null || true
+fi
+
+# === ドキュメント自動更新: 変更が蓄積されていれば自動実行 ===
+CHANGE_LOG=".claude/logs/changes.log"
+GEN_SCRIPT=".claude/hooks/generate-implementation-doc.sh"
+if [ -f "$CHANGE_LOG" ] && [ -f "$GEN_SCRIPT" ]; then
+    CHANGE_COUNT=$(wc -l < "$CHANGE_LOG" | tr -d ' ')
+    if [ "$CHANGE_COUNT" -ge 3 ]; then
+        # 自動実行（提案ではなく実行）
+        bash "$GEN_SCRIPT" > /dev/null 2>&1 || true
+        # ログをクリア
+        rm -f "$CHANGE_LOG"
+        cat <<EOF
+$SEP
+  ✅ ドキュメント自動更新完了
+$SEP
+$CHANGE_COUNT 件の変更を検知し、current-implementation.md を自動更新しました。
+（Self-Healing: 自律的なドキュメントメンテナンス）
+
+EOF
+    fi
+fi
+
+# === 失敗学習ループ: 繰り返し発生している問題を警告 ===
+FAILURE_LOG=".claude/logs/failures.log"
+if [ -f "$FAILURE_LOG" ]; then
+    # 3回以上繰り返された失敗パターンを抽出
+    REPEATED_FAILURES=$(awk -F'"' '{print $4":"$8}' "$FAILURE_LOG" 2>/dev/null | sort | uniq -c | sort -rn | head -5 | awk '$1 >= 3 {print "  ⚠️ " $2 " (" $1 "回)"}')
+
+    if [ -n "$REPEATED_FAILURES" ]; then
+        cat <<EOF
+$SEP
+  🔄 過去の失敗パターン（学習）
+$SEP
+以下の問題が繰り返し発生しています:
+$REPEATED_FAILURES
+
+同じ失敗を繰り返さないよう注意してください。
+詳細: $FAILURE_LOG
+
+EOF
+    fi
+fi
+
 # 未コミット変更警告（state-plan-git-branch 4つ組連動の担保）
 UNCOMMITTED=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
 if [ "$UNCOMMITTED" -gt 0 ]; then
@@ -98,14 +174,67 @@ $SEP
 EOF
 fi
 
-# === user-intent.md からユーザー意図を復元（compact 後の自動反映）===
+# === compact トリガー時の特別処理 ===
+SNAPSHOT_FILE=".claude/.session-init/snapshot.json"
+if [ "$TRIGGER" = "compact" ]; then
+    cat <<EOF
+$SEP
+  📦 Auto-Compact からの復元
+$SEP
+コンテキストウィンドウが上限に達したため、auto-compact が実行されました。
+以下の状態から作業を継続してください。
+
+EOF
+
+    # snapshot.json から状態を復元
+    if [ -f "$SNAPSHOT_FILE" ]; then
+        SNAP_FOCUS=$(jq -r '.focus // "unknown"' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_PHASE=$(jq -r '.current_phase // "null"' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_GOAL=$(jq -r '.phase_goal // "null"' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_PLAYBOOK=$(jq -r '.playbook // "null"' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_BRANCH=$(jq -r '.branch // "unknown"' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_UNCOMMITTED=$(jq -r '.uncommitted_count // "0"' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_CRITERIA=$(jq -r '.done_criteria // ""' "$SNAPSHOT_FILE" 2>/dev/null)
+        SNAP_TIMESTAMP=$(jq -r '.timestamp // ""' "$SNAPSHOT_FILE" 2>/dev/null)
+
+        cat <<EOF
+【Compact 前の状態】($SNAP_TIMESTAMP)
+  focus: $SNAP_FOCUS
+  phase: $SNAP_PHASE
+  phase_goal: $SNAP_GOAL
+  playbook: $SNAP_PLAYBOOK
+  branch: $SNAP_BRANCH
+  uncommitted: $SNAP_UNCOMMITTED 件
+
+【done_criteria】
+$SNAP_CRITERIA
+
+EOF
+    fi
+fi
+
+# === user-intent.md からユーザー意図を復元 ===
 INTENT_FILE=".claude/.session-init/user-intent.md"
 if [ -f "$INTENT_FILE" ]; then
     # 最新3件のユーザー意図を抽出
     LATEST_INTENTS=$(awk '/^## \[/{count++; if(count>3) exit} {print}' "$INTENT_FILE" 2>/dev/null | head -50)
 
     if [ -n "$LATEST_INTENTS" ]; then
-        cat <<EOF
+        # compact トリガーの場合はより強調
+        if [ "$TRIGGER" = "compact" ]; then
+            cat <<EOF
+$SEP
+  🎯 【重要】元のユーザー指示（必ず継続）
+$SEP
+以下は auto-compact 前のユーザー指示です。
+この意図を忘れずに作業を継続してください。
+
+$LATEST_INTENTS
+$SEP
+
+EOF
+        else
+            cat <<EOF
 $SEP
   📝 ユーザー意図（compact 前に保存）
 $SEP
@@ -116,6 +245,7 @@ $LATEST_INTENTS
 $SEP
 
 EOF
+        fi
     fi
 fi
 

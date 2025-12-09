@@ -40,10 +40,10 @@ if [[ -f "state.md" ]]; then
     FOCUS=$(grep -A5 "## focus" state.md | grep "current:" | sed 's/.*: *//' | sed 's/ *#.*//')
 fi
 
-# 必須ファイル: state.md のみ
-# CONTEXT.md は .archive に退避済み（開発履歴）
-# 設計思想は CLAUDE.md と architecture-*.md を参照
+# 必須ファイル: mission.md（最上位概念）+ state.md
+# mission.md は全ての判断の基準。ユーザープロンプトに引っ張られないために必須。
 REQUIRED_FILES=(
+    "plan/mission.md"
     "state.md"
 )
 

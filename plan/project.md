@@ -1,138 +1,138 @@
 # project.md
 
-> **Macro 計画: LLM 自律制御システム**
+> **Macro 計画: mission を達成するための具体的方針**
 >
-> Hooks + SubAgents + CLAUDE.md = 三位一体アーキテクチャ
+> 上位: plan/mission.md（全ての判断の基準）
+> 下位: plan/playbook-*.md（具体的タスク）
+
+---
+
+## derives_from
+
+```yaml
+mission: plan/mission.md
+mission_statement: |
+  Claude Code の自律性と信頼性を最大化し、
+  ユーザーの手作業に依存しないシステムを構築する。
+```
 
 ---
 
 ## vision
 
 ```yaml
-goal: どんなプロンプトでも同一ワークフローが発火し、入力→処理→出力が連鎖する仕組み
-why: Claude Code は強力だが、計画なしで動くと暴走する
-solution: 三位一体アーキテクチャによる多層防御
+# mission を達成するための技術的ビジョン
+
+goal: どんなプロンプトでも mission に立ち返り、自律的に正しく動作する
+how: 三位一体アーキテクチャ（Hooks + SubAgents + CLAUDE.md）による多層防御
+
+architecture:
+  Hooks: 構造的強制（exit 2 でブロック、systemMessage で誘導）
+  SubAgents: 検証（critic/pm/reviewer/health-checker）
+  CLAUDE.md: 思考制御（mission 参照、報酬詐欺防止）
+
+self_healing:
+  Context_Continuity: compact 後も状態を復元
+  Document_Freshness: 陳腐化を検知して自動更新
+  Feature_Verification: Hook/SubAgent の動作を自動検証
+  Self_Improvement: 失敗から学習して再発防止
 ```
 
 ---
 
-## architecture
+## current_focus
 
 ```yaml
-三位一体:
-  Hooks: 構造的強制（exit 2 でブロック）
-  SubAgents: 検証（critic/pm/plan-reviewer/coherence）
-  CLAUDE.md: 思考制御（ガイドライン遵守）
+# 今取り組んでいること（mission の success_criteria に対応）
 
-核心: 単独では機能しない。組み合わせて初めて強制力を持つ。
-計画品質: pm（作成）→ plan-reviewer（検証）で「作成者 ≠ 検証者」を強制。
+priority: 目的一貫性
+reason: |
+  ユーザープロンプトに引っ張られる問題が根本原因。
+  mission を常に参照し、整合性をチェックする仕組みが必要。
 
-workflow:
-  1. SessionStart → pending 作成 → Read 強制
-  2. PreToolUse → playbook チェック → ブロック or 通過
-  3. LOOP → done_criteria 検証 → critic PASS
-  4. Stop → サマリー出力 → POST_LOOP
+active_work:
+  - mission.md の SessionStart 統合
+  - prompt-guard.sh での mission 整合性チェック
+  - current-implementation.md の自動更新（実行レベル）
 ```
 
 ---
 
-## tasks
-
-> **チェックボックス式タスク管理。担当: cc=claudecode, user=ユーザー, codex=Codex**
-
-### active
+## done_when
 
 ```yaml
-# 現在進行中のタスク
-- none
-```
+# mission 達成の具体的マイルストーン
 
-### backlog
+autonomy:
+  id: d_autonomy
+  name: 自律性の確立
+  status: in_progress
+  criteria:
+    - compact 後も mission を見失わない
+    - 次タスクを自動導出して開始できる
+    - ユーザープロンプトなしで 1 playbook を完遂できる
 
-```yaml
-# 将来のタスク（優先度順）
-- id: t_learning_skill
-  name: 失敗パターン自動学習
-  status: designed
-  tasks:
-    - [ ] failures.log 自動記録 Hook (cc)
-    - [ ] 類似パターン検索 (cc)
-    - [ ] Phase 開始時に自動提示 (cc)
+reliability:
+  id: d_reliability
+  name: 信頼性の確立
+  status: achieved
+  criteria:
+    - 全 Hook が test-hooks.sh で PASS
+    - settings.json と実ファイルが一致
 
-- id: t_executor_extension
-  name: 複数 Executor 拡張
-  status: designed
-  tasks:
-    - [ ] executor-guard.sh 拡張 (cc)
-    - [ ] Codex MCP 統合 (cc)
-    - [ ] CodeRabbit 統合 (cc)
+self_awareness:
+  id: d_self_awareness
+  name: 自己認識の確立
+  status: in_progress
+  criteria:
+    - current-implementation.md が常に最新（自動更新）
+    - state.md が実状態と一致
+
+self_healing:
+  id: d_self_healing
+  name: 自己修復の確立
+  status: in_progress
+  criteria:
+    - 陳腐化ドキュメントを自動更新（提案ではなく実行）
+    - Hook 故障を自動検知・修復
+
+purpose_consistency:
+  id: d_purpose_consistency
+  name: 目的一貫性の確立
+  status: not_started
+  criteria:
+    - SessionStart で mission.md を必ず読む
+    - prompt-guard.sh で mission 整合性チェック
+    - 報酬詐欺パターンを自己検出
 ```
 
 ---
 
 ## achieved
 
-> **完了済みタスク（サマリーのみ）**
-
 ```yaml
-context-preservation:
+# 完了済み（サマリーのみ）
+
+self_healing_foundation:
+  date: 2025-12-10
+  summary: Self-Healing System 基盤実装
+  result:
+    - pre-compact.sh: snapshot.json 保存
+    - session-start.sh: compact 復元、失敗学習ループ
+    - doc-freshness-check.sh: 鮮度チェック
+    - update-tracker.sh: 変更追跡
+    - generate-implementation-doc.sh: ドキュメント自動生成
+    - test-hooks.sh: 機能検証
+    - system-health-check.sh: 健全性チェック
+    - failure-logger.sh: 失敗記録
+
+context_preservation:
   date: 2025-12-10
   summary: コンテキスト保持機能強化
-  result:
-    - UserPromptSubmit: プロンプトを user-intent.md に保存
-    - PreCompact: compact 前に重要コンテキストを保持
-    - Stop: ユーザー意図との整合性チェック
-    - check-protected-edit.sh のセキュリティモード検出バグ修正
 
-plan-double-check:
+plan_double_check:
   date: 2025-12-10
-  summary: 計画ダブルチェック機能 + フォルダ構造統合
-  result:
-    - plan-reviewer SubAgent 新規作成（普遍的レビュー基準6項目）
-    - pm.md に plan-reviewer 必須呼び出し追加
-    - plan/active/ 廃止 → plan/ 直下に playbook 配置
-    - 「作成者 ≠ 検証者」原則の構造的強制
-
-playbook-system-foundation-redesign:
-  date: 2025-12-10
-  summary: システム基盤再設計
-  result:
-    - project.md 880→144行（84%削減）
-    - state.md 271→79行（71%削減）
-    - current-implementation.md ドキュメント依存追記
-    - チェックボックス式タスク管理導入
-
-playbook-context-architecture:
-  date: 2025-12-10
-  summary: コンテキストを機能として管理
-  result:
-    - state.md 履歴分離
-    - CLAUDE.md 32%削減（3 Skills 作成）
-    - .claude/ フォルダ構造化
-    - docs/ 構造化
-
-playbook-system-completion:
-  date: 2025-12-09
-  summary: システム完成度向上
-  result:
-    - タスク開始プロセス標準化
-    - git 自動化
-    - ファイル棚卸し
-    - setup 完成
-
-playbook-engineering-ecosystem:
-  date: 2025-12-09
-  summary: エンジニアリングエコシステム拡張
-  result:
-    - Linter/Formatter 統合
-    - TDD LOOP 静的解析
-    - 学習モード実装
-    - ShellCheck 導入
-
-playbook-system-improvements:
-  date: 2025-12-08
-  summary: 10Phase の機能改善
-  result: 13件の機能実装完了
+  summary: 計画ダブルチェック機能
 ```
 
 ---
@@ -140,16 +140,9 @@ playbook-system-improvements:
 ## reference
 
 ```yaml
-# 詳細設計ドキュメント
-universal_workflow: docs/current-implementation.md#6-入力処理出力フロー
-tdd_fraud_prevention: CLAUDE.md#LOOP, CLAUDE.md#CRITIQUE
-hooks_integration: docs/current-implementation.md#2-hooks-完全仕様
-subagents_spec: docs/current-implementation.md#3-subagents-完全仕様
-
-# アーカイブ（必要時のみ参照）
-vision_detail: .archive/plan/vision.md
-meta_roadmap: .archive/plan/meta-roadmap.md
-old_roadmap: .archive/plan/roadmap.md
+mission: plan/mission.md
+current_implementation: docs/current-implementation.md
+self_healing_design: plan/self-healing-system.md
 ```
 
 ---
@@ -158,8 +151,4 @@ old_roadmap: .archive/plan/roadmap.md
 
 | 日時 | 内容 |
 |------|------|
-| 2025-12-10 | context-preservation 完了。3フック強化でコンテキスト保持。 |
-| 2025-12-10 | plan-double-check 完了。plan-reviewer SubAgent 追加、フォルダ構造統合。 |
-| 2025-12-10 | playbook-system-foundation-redesign 完了。project.md/state.md 大幅削減。 |
-| 2025-12-10 | playbook-context-architecture 完了。 |
-| 2025-12-09 | system_completion/engineering_ecosystem 完了。 |
+| 2025-12-10 | mission.md から導出される形に再構成。タスク管理→マイルストーン管理に変更。 |

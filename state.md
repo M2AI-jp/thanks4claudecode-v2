@@ -14,11 +14,21 @@ current: product
 
 ---
 
+## active_playbooks
+
+```yaml
+product: plan/active/playbook-full-autonomy.md
+setup: null
+workspace: null
+```
+
+---
+
 ## playbook
 
 ```yaml
-active: null
-branch: main
+active: plan/active/playbook-full-autonomy.md
+branch: feat/full-autonomy-implementation
 ```
 
 ---
@@ -26,12 +36,15 @@ branch: main
 ## goal
 
 ```yaml
-phase: null
-name: null
-task: null
-assignee: null
+phase: p8
+name: 最終コミット
+task: 全変更をコミットし、playbook をアーカイブ
+assignee: claudecode
 
-done_criteria: []
+done_criteria:
+  - git commit が成功
+  - mission.md の success_criteria が全てチェック済み
+  - playbook が .archive/ に移動
 ```
 
 ---
@@ -48,7 +61,7 @@ user_verified: false
 ## session
 
 ```yaml
-last_start: 2025-12-10 02:17:13
+last_start: 2025-12-10 03:25:05
 last_end: 2025-12-09 21:22:42
 ```
 

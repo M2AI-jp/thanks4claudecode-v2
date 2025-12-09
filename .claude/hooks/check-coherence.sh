@@ -188,6 +188,11 @@ else
                     WARNINGS=$((WARNINGS + 1))
                 fi
                 ;;
+            "product")
+                # product: 全ファイル editable（本番開発モード）
+                # .claude/**, plan/**, docs/**, src/** など全て許可
+                # 保護対象ファイルは check-protected-edit.sh で別途チェック
+                ;;
             *)
                 # 未知のレイヤー
                 echo -e "        ${YELLOW}[WARN]${NC} Unknown focus: $CURRENT"

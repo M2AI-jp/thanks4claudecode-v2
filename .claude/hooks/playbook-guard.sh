@@ -53,6 +53,11 @@ PLAYBOOK=$(grep -A6 "^## playbook" "$STATE_FILE" | grep "^active:" | head -1 | s
 
 # playbook が null または空なら ブロック
 if [[ -z "$PLAYBOOK" || "$PLAYBOOK" == "null" ]]; then
+    # 失敗を記録（学習ループ用）
+    if [[ -f ".claude/hooks/failure-logger.sh" ]]; then
+        echo '{"hook": "playbook-guard", "context": "playbook=null", "action": "Edit/Write blocked"}' | bash .claude/hooks/failure-logger.sh 2>/dev/null || true
+    fi
+
     cat >&2 << 'EOF'
 ========================================
   ⛔ playbook 必須
