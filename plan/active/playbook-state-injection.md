@@ -90,7 +90,7 @@ test_method: |
   4. 動作テスト: test-injection.sh を作成して複数回実行
   5. systemMessage が正しく出力されることを確認
   6. git diff で変更内容を確認
-status: in_progress
+status: done
 ```
 
 ### p2: /clear 後の発火テストと条件分岐
@@ -120,7 +120,7 @@ test_method: |
   4. test-injection.sh を実行して systemMessage が注入されることを確認
   5. state.md の playbook=null, goal=null の場合の出力を記録
   6. 修正が必要な場合は prompt-guard.sh を調整
-status: pending
+status: in_progress
 ```
 
 ### p3: LLM Read 省略時の情報到達確認
