@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/active/playbook-strict-criteria.md
+branch: feat/strict-criteria
 ```
 
 ---
@@ -27,9 +27,12 @@ branch: null
 ## goal
 
 ```yaml
-milestone: M005  # 確実な初期化システム（StateInjection）- 完了
-phase: null
-done_criteria: []
+milestone: M006  # 厳密な done_criteria 定義システム
+phase: p0
+done_criteria:
+  - done_criteria が Given/When/Then 形式で定義される
+  - 各 criteria に test_command が紐付けられている
+  - 曖昧な表現（「動作する」「正しく」等）が検出・拒否される
 ```
 
 ---

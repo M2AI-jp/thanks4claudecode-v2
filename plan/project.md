@@ -92,6 +92,41 @@ success_criteria:
     - [x] systemMessage に project_summary/last_critic が含まれる
     - [x] /clear 後も最初のプロンプトで情報が注入される
     - [x] playbook=null の場合も正しく動作する
+
+- id: M006
+  name: "厳密な done_criteria 定義システム"
+  description: |
+    done_criteria の事前定義精度を向上させる。
+    自然言語の曖昧な定義ではなく、検証可能な形式で定義し、
+    「テストをクリアするためのテスト」という構造的問題を解消する。
+  status: not_started
+  depends_on: [M005]
+  playbooks: []
+  done_when:
+    - [ ] done_criteria が Given/When/Then 形式で定義される
+    - [ ] 各 criteria に test_command が紐付けられている
+    - [ ] 曖昧な表現（「動作する」「正しく」等）が検出・拒否される
+  decomposition:
+    playbook_summary: |
+      done_criteria の定義精度を向上させるシステムを構築。
+      「テストをクリアするためのテスト」から「テストで検証できる仕様」へ転換。
+    phase_hints:
+      - name: "done_criteria 検証ルール定義"
+        what: |
+          曖昧な表現を自動検出するルールセット（禁止パターン）を定義。
+          Given/When/Then 形式での定義テンプレートを作成。
+      - name: "test_command マッピング実装"
+        what: |
+          各 done_criteria に対応する test_command を自動マッピング。
+          実行可能な検証コマンドを明示。
+      - name: "critic による criteria レビュー機構"
+        what: |
+          playbook 作成時に critic が criteria 定義の品質をチェック。
+          PASS/FAIL で曖昧さを検出・拒否。
+    success_indicators:
+      - done_criteria の曖昧表現が自動検出される
+      - criteria: test_command が1:1で紐付けられている
+      - critic が criteria 品質をチェックできる
 ```
 
 ---
