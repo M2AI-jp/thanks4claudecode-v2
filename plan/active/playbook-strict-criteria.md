@@ -230,7 +230,7 @@ subtasks:
     executor: user
     test_command: "手動確認: critic を呼び出して本 playbook の p0 を検証し、subtask 単位の結果を確認"
 
-status: pending
+status: done
 max_iterations: 5
 ```
 

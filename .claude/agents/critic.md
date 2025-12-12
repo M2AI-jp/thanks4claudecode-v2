@@ -69,34 +69,98 @@ playbook リセットのトリガー:
   - 新しいセッションで動作確認
 ```
 
-## 出力フォーマット
+## subtasks 検証ロジック（V11 新規）
+
+> **各 subtask の test_command を実行し、PASS/FAIL を判定する**
+
+### 検証フロー
+
+```yaml
+1. playbook から subtasks を抽出
+   → grep -A10 'subtasks:' plan/active/*.md
+
+2. 各 subtask について:
+   a. criterion を確認
+   b. test_command を実行（Bash ツール）
+   c. 出力に "PASS" が含まれれば PASS
+   d. それ以外は FAIL
+
+3. 判定ルール:
+   → 1つでも FAIL の subtask があれば phase を FAIL にする
+   → 全て PASS で phase を PASS
+
+4. executor: user の場合:
+   → test_command が "手動確認:" で始まる
+   → ユーザー確認が必要と報告（DEFERRED）
+```
+
+### test_command 実行例
+
+```yaml
+ファイル存在:
+  test_command: "test -f docs/readme.md && echo PASS"
+  実行: Bash(command="test -f docs/readme.md && echo PASS")
+  判定: 出力に "PASS" → PASS
+
+内容確認:
+  test_command: "grep -q 'subtasks' pm.md && echo PASS"
+  実行: Bash(command="grep -q 'subtasks' pm.md && echo PASS")
+  判定: 出力に "PASS" → PASS
+
+手動確認:
+  test_command: "手動確認: ユーザーが〇〇を完了したか"
+  判定: DEFERRED（ユーザー確認待ち）
+```
+
+---
+
+## 出力フォーマット（V11: subtask 単位）
 
 評価結果は以下の形式で出力してください：
 
 ```
 [CRITIQUE]
-done_criteria 達成状況:
-  - {criteria1}: {PASS|FAIL}
+
+subtasks 達成状況:
+  - p{N}.1: {PASS|FAIL|DEFERRED}
+    criterion: "{criterion の内容}"
+    test_command: "{実行したコマンド}"
     証拠: {具体的な証拠を記載}
 
-  - {criteria2}: {PASS|FAIL}
+  - p{N}.2: {PASS|FAIL|DEFERRED}
+    criterion: "{criterion の内容}"
+    test_command: "{実行したコマンド}"
     証拠: {具体的な証拠を記載}
+
+subtask サマリー:
+  PASS: {N}個
+  FAIL: {N}個
+  DEFERRED: {N}個
 
 playbook 自体の妥当性:
-  - done_criteria の明確さ: {OK|要改善}
+  - criterion の検証可能性: {OK|要改善}
+  - test_command の正確性: {OK|要改善}
   - 漏れている要件: {なし|{要件リスト}}
-  - 過剰な要件: {なし|{要件リスト}}
-
-成果物の動作確認:
-  - 実行テスト: {実施済み|未実施}
-  - エッジケース: {考慮済み|未考慮}
 
 総合判定: {PASS|FAIL}
 
 {FAILの場合}
 修正が必要な項目:
-  1. {項目1}
-  2. {項目2}
+  1. {項目1}（subtask ID: p{N}.{M}）
+  2. {項目2}（subtask ID: p{N}.{M}）
+```
+
+### 判定ルール
+
+```yaml
+総合判定 PASS の条件:
+  - 全ての自動検証 subtask（executor != user）が PASS
+  - DEFERRED は許容（後続で確認）
+
+総合判定 FAIL の条件:
+  - 1つでも FAIL の subtask がある
+  - test_command が実行できない
+  - criterion と test_command が不一致
 ```
 
 ## 評価時の質問リスト
@@ -177,10 +241,11 @@ Skills FAIL:
 ## 参照ファイル
 
 - **.claude/frameworks/done-criteria-validation.md** - **必須**: 妥当性評価の固定フレームワーク
+- **docs/criterion-validation-rules.md** - criterion 検証ルール（禁止パターン）★V11
 - **.claude/skills/lint-checker/skill.md** - lint チェック手順
 - **.claude/skills/test-runner/skill.md** - テスト実行手順
 - state.md - 現在の goal.done_criteria
-- playbook - phase の done_criteria
+- playbook - phase の subtasks（V11: criterion + executor + test_command）
 
 ## 重要: 固定フレームワークの使用
 
