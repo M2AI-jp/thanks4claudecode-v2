@@ -87,33 +87,76 @@ done_when:
 
 ## phases
 
+> **V11: subtasks 構造を導入。criterion + executor + test_command を1セットで定義。**
+
 ```yaml
 - id: p1
   name: {フェーズ名}
   goal: {このフェーズの目標}
-  executor: {claudecode | codex | coderabbit | user}
-  executor_config: {}  # オプション: executor 固有の設定
-  done_criteria:
-    - {完了条件1}
-    - {完了条件2}
-    - 実際に動作確認済み（test_method 実行）  # ← 必須パターン
-  test_method: |
-    1. {検証手順1}
-    2. {検証手順2}
-    3. {期待結果の確認}
+
+  subtasks:
+    - id: p1.1
+      criterion: "{対象} が {状態} である"
+      executor: claudecode | codex | coderabbit | user
+      test_command: "{検証コマンド}"
+
+    - id: p1.2
+      criterion: "{コマンド} が {期待結果} を返す"
+      executor: claudecode
+      test_command: "{コマンド} && echo PASS || echo FAIL"
+
+    - id: p1.3
+      criterion: "ユーザーが {操作} を完了している"
+      executor: user
+      test_command: "手動確認: {具体的な確認手順}"
+
   status: pending  # pending | in_progress | done
+  max_iterations: 5
 
 - id: p2
   name: {フェーズ名}
   goal: {このフェーズの目標}
-  executor: {claudecode | codex | coderabbit | user}
   depends_on: [p1]
-  done_criteria:
-    - {完了条件1}
-    - 実際に動作確認済み
-  test_method: |
-    1. {検証手順}
+
+  subtasks:
+    - id: p2.1
+      criterion: "{前提条件} が満たされている"
+      executor: claudecode
+      test_command: "test -f {path} && echo PASS"
+
   status: pending
+```
+
+### subtask 構造（必須）
+
+```yaml
+subtask:
+  id: p{N}.{M}           # 必須: phase.subtask 形式の識別子
+  criterion: "..."        # 必須: 検証可能な完了条件
+  executor: ...           # 必須: claudecode | codex | coderabbit | user
+  test_command: "..."     # 必須: PASS/FAIL を返すコマンド
+  depends_on: [p1.2]      # オプション: 依存する subtask
+```
+
+### 旧形式（done_criteria）との互換性
+
+```yaml
+# 旧形式（非推奨）
+done_criteria:
+  - "README.md が存在する"
+  - "npm test が通る"
+
+# 新形式（推奨）
+subtasks:
+  - id: p1.1
+    criterion: "README.md が存在する"
+    executor: claudecode
+    test_command: "test -f README.md && echo PASS"
+
+  - id: p1.2
+    criterion: "npm test が exit code 0 で終了する"
+    executor: claudecode
+    test_command: "npm test && echo PASS || echo FAIL"
 ```
 
 ---
@@ -124,21 +167,27 @@ done_when:
 
 | 項目 | 説明 |
 |------|------|
-| id | Phase 識別子（p1, p2, ...） |
+| id | Phase 識別子（p0, p1, p2, ...） |
 | name | フェーズ名 |
 | goal | このフェーズの目標（1行） |
-| executor | 実行者（claudecode / codex / coderabbit / user） |
-| done_criteria | 完了条件のリスト |
+| subtasks | **V11** criterion + executor + test_command のリスト |
 | status | 状態（pending / in_progress / done） |
+
+### subtask 必須フィールド
+
+| 項目 | 説明 |
+|------|------|
+| id | subtask 識別子（p{N}.{M} 形式） |
+| criterion | 検証可能な完了条件（1文） |
+| executor | 実行者（claudecode / codex / coderabbit / user） |
+| test_command | PASS/FAIL を返す検証コマンド |
 
 ### オプション項目
 
 | 項目 | 説明 |
 |------|------|
-| executor_config | executor 固有の設定（model, reasoning, type, instruction など） |
-| depends_on | 依存する Phase の id リスト |
+| depends_on | 依存する Phase または subtask の id リスト |
 | prerequisites | 前提条件（環境、ツールなど） |
-| test_method | **推奨**: done_criteria を検証する具体的な手順 |
 | max_iterations | **推奨**: LOOP 回数上限（デフォルト: 10）。デッドロック防止 |
 | time_limit | **推奨**: 想定作業時間（例: 30min, 1h）。超過時は警告 |
 | priority | **推奨**: 優先度（high / medium / low）。LLM が実行順序を判断 |
@@ -164,31 +213,91 @@ depends_on: [p1, p2]  # 依存 Phase が未完了なら実行不可
 
 ---
 
-## done_criteria 記述ガイド
+## test_command パターン集
+
+> **V11: criterion ごとに test_command を紐付け。以下のパターンを参照。**
 
 ```yaml
-形式:
-  - "{対象} が {状態} である"
-  - "{コマンド} が {期待結果} を返す"
-  - "実際に動作確認済み"  # ← 推奨: 全 Phase に含める
+# ファイル存在チェック
+test_command: "test -f {path} && echo PASS || echo FAIL"
+test_command: "test -d {dir} && echo PASS || echo FAIL"
 
-良い例:
+# ファイル内容チェック
+test_command: "grep -q '{pattern}' {file} && echo PASS || echo FAIL"
+test_command: "grep -c '{pattern}' {file} | awk '{if($1>={N}) print \"PASS\"; else print \"FAIL\"}'"
+
+# コマンド実行結果
+test_command: "{command} && echo PASS || echo FAIL"
+test_command: "{command}; [ $? -eq 0 ] && echo PASS || echo FAIL"
+
+# 数値比較
+test_command: "wc -l {file} | awk '{if($1>={N}) print \"PASS\"; else print \"FAIL\"}'"
+test_command: "[ $(expr) -ge {N} ] && echo PASS || echo FAIL"
+
+# HTTP ステータス
+test_command: "curl -s -o /dev/null -w '%{http_code}' {url} | grep -q '200' && echo PASS || echo FAIL"
+
+# 複数条件
+test_command: |
+  test -f {file1} && \
+  grep -q '{pattern}' {file2} && \
+  echo PASS || echo FAIL
+
+# 手動確認（executor: user の場合）
+test_command: "手動確認: {具体的な確認手順を記述}"
+```
+
+### executor 別 test_command 例
+
+```yaml
+claudecode:
+  - "test -f docs/readme.md && echo PASS"
+  - "grep -q 'subtasks:' plan/active/*.md && echo PASS"
+  - "wc -l {file} | awk '{if($1>=50) print \"PASS\"}'"
+
+codex:
+  - "npm test && echo PASS"
+  - "pytest {path} && echo PASS"
+  - "go test ./... && echo PASS"
+
+coderabbit:
+  - "cr review --check && echo PASS"
+  - "手動確認: CodeRabbit の PR コメントに重大な指摘がないこと"
+
+user:
+  - "手動確認: Vercel ダッシュボードでデプロイ成功を確認"
+  - "手動確認: API キーが環境変数に設定されていること"
+```
+
+---
+
+## criterion 記述ガイド
+
+> **V11: criterion は subtask の一部。test_command と 1:1 で対応。**
+
+```yaml
+良い criterion（検証可能）:
   - "README.md が存在する"
+    → test_command: "test -f README.md && echo PASS"
   - "npm test が exit code 0 で終了する"
+    → test_command: "npm test && echo PASS"
   - "http://localhost:3000 が 200 を返す"
-  - "check-coherence.sh が PASS する"
-  - "実際に動作確認済み（test_method 実行）"  # ← 必須パターン
+    → test_command: "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000 | grep '200'"
+  - "禁止パターンが15個以上列挙されている"
+    → test_command: "grep -c '^- ' {file} | awk '{if($1>=15) print \"PASS\"}'"
 
-悪い例:
-  - "ドキュメントを書く" ← 状態が不明
-  - "テストする" ← 何をテストするか不明
-  - "完成させる" ← 検証不可能
-  - "設定した" ← 動くかどうか不明（要テスト）
+悪い criterion（曖昧・検証不可）:
+  - "ドキュメントを書く" ← 何を、どこに？
+  - "テストする" ← 何を、どうテスト？
+  - "完成させる" ← 完成の定義は？
+  - "適切に設定する" ← 「適切」とは？
+  - "正しく動作する" ← 「正しく」とは？
+  - "確認する" ← アクションであり状態でない
 
-⚠️ 注意:
-  - 「設定した」≠「動く」
-  - 必ず test_method を定義し、実際に実行すること
-  - 証拠なしの done は禁止
+⚠️ 禁止パターン（docs/criterion-validation-rules.md 参照）:
+  - 動詞で終わる（「〜する」「〜した」）
+  - 曖昧な形容詞（「適切」「正しく」「良い」）
+  - 検証方法が不明（test_command が書けない）
 ```
 
 ---
@@ -523,6 +632,7 @@ enforcement:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-13 | V11: subtasks 構造を導入。criterion + executor + test_command を1セット化。test_command パターン集追加。 |
 | 2025-12-09 | V10: 中間成果物の処理セクションを追加。stray files 防止。 |
 | 2025-12-08 | V9: derives_from と playbook 導出ガイドを追加。計画の連鎖対応。 |
 | 2025-12-08 | V8: executor を拡張（claudecode/codex/coderabbit/user）。executor_config 追加。 |
