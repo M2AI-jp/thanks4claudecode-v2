@@ -28,7 +28,7 @@ branch: feat/strict-criteria
 
 ```yaml
 milestone: M006  # 厳密な done_criteria 定義システム
-phase: p5
+phase: p6
 done_criteria:
   - done_criteria が Given/When/Then 形式で定義される
   - 各 criteria に test_command が紐付けられている
@@ -40,7 +40,7 @@ done_criteria:
 ## session
 
 ```yaml
-last_start: 2025-12-13 01:43:25
+last_start: 2025-12-13 01:58:01
 last_clear: 2025-12-13 00:30:00
 ```
 

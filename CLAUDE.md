@@ -160,7 +160,7 @@ git_branch_sync:
 
 ---
 
-## LOOP
+## LOOP（V11: subtasks 構造対応）
 
 ```
 iteration = 0
@@ -171,12 +171,22 @@ while true:
   if iteration > max: break  # デッドロック検出
 
   0. 根拠なし → ユーザーに質問
-  1. done_criteria を読む
-  2. 証拠あり → PASS、なし → EXEC()
-  3. 全 PASS → CRITIQUE()
-     PASS → playbook 更新 → 自動コミット → 次 phase
-     FAIL → 修正 → continue
-  4. 不明 → break
+  1. subtasks を読む（criterion + executor + test_command）
+  2. 各 subtask について:
+     - executor: claudecode/codex → 自動実行
+     - executor: coderabbit → レビュー実行
+     - executor: user → ユーザー確認待ち（DEFERRED）
+  3. test_command を実行して PASS/FAIL を判定
+  4. 全 subtask PASS → CRITIQUE()
+     - PASS → playbook 更新 → 自動コミット → 次 phase
+     - FAIL → 修正 → continue
+  5. 不明 → break
+
+executor 選択ガイドライン:
+  claudecode: ファイル作成、設計、軽量スクリプト
+  codex: 本格的なコード実装
+  coderabbit: コードレビュー
+  user: 手動確認、外部操作
 
 phase 完了時の自動コミット:
   条件: critic PASS 後
@@ -301,5 +311,6 @@ FAIL → 修正 → 再実行
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-13 | V11: subtasks 構造対応。LOOP に executor 選択ガイドライン追加。旧形式（done_criteria リスト）との互換性維持。 |
 | 2025-12-13 | V7.0: 3層構造（project→playbook→phase）の自動運用。用語統一（Macro廃止, layer廃止）。/clear タイミング明示。 |
 | 2025-12-10 | V6.0: コンテキスト・アーキテクチャ再設計。 |

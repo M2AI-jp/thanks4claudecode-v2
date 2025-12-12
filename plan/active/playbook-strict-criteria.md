@@ -269,7 +269,7 @@ subtasks:
     executor: claudecode
     test_command: "test -f docs/subtasks-migration-guide.md || grep -q '互換性' CLAUDE.md && echo PASS"
 
-status: pending
+status: done
 max_iterations: 5
 ```
 
