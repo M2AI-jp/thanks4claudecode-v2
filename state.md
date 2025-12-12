@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
+active: plan/active/playbook-state-injection.md
+branch: feat/state-injection
 ```
 
 ---
@@ -27,10 +27,14 @@ branch: main
 ## goal
 
 ```yaml
-milestone: M004  # 現在作業中の milestone ID
-phase: null      # 全 Phase 完了
-done_criteria: []
-self_complete: true  # playbook 完了フラグ
+milestone: M005  # 確実な初期化システム（StateInjection）
+phase: p0        # 現状分析と systemMessage 設計
+done_criteria:
+  - "prompt-guard.sh が systemMessage を JSON で返す仕組みを理解している"
+  - "state.md, project.md, playbook から注入すべき情報をリスト化している"
+  - "systemMessage の構造（focus, goal, phase, remaining）を設計している"
+  - "実際に prompt-guard.sh の実行結果を確認した"
+  - "実際に動作確認済み（test_method 実行）"
 ```
 
 ---
