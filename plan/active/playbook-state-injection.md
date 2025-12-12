@@ -136,23 +136,18 @@ max_iterations: 5
 time_limit: 30min
 
 done_criteria:
-  - "systemMessage に含まれる情報がフォーマットされている（readable）"
-  - "複数プロンプト送信時に毎回同じ形式で systemMessage が出力される"
-  - "systemMessage の構造が CLAUDE.md の INIT と一致している"
-  - "test-no-read.sh で LLM が Read せずに応答できることをシミュレート"
-  - "実際に動作確認済み（test_method 実行）"
+  - "test-injection.sh の Test 5 で readable なフォーマットが出力される"
+  - "test-injection.sh の Test 1-4 で同一形式の systemMessage が出力される"
+  - "systemMessage に project_summary, last_critic が含まれる（CLAUDE.md [自認] 一致）"
+  - "test-no-read.sh が [ALL PASS] を出力する"
+  - ".claude/logs/p3-test-results.md に全テスト結果が集約されている"
 
 test_method: |
-  1. systemMessage のフォーマットを確認（見やすいレイアウト）
+  1. test-injection.sh を実行し、フォーマットを確認
   2. test-no-read.sh を作成し、systemMessage を抽出・解析
-  3. systemMessage から以下を自動抽出:
-     - focus.current
-     - goal.milestone
-     - goal.phase
-     - remaining
-  4. 抽出結果が正しいことを確認
-  5. 複数のシナリオ（phase pending, in_progress, done）で動作確認
-status: pending
+  3. 9 フィールド全てが抽出できることを確認
+  4. 結果を .claude/logs/p3-test-results.md に集約
+status: done
 ```
 
 ### p4: ドキュメント更新とクリーンアップ

@@ -74,6 +74,21 @@ else
     SI_REMAINING_MS="?"
 fi
 
+# last_critic を取得（最新の p*-test-results.md から）
+LOGS_DIR=".claude/logs"
+if [ -d "$LOGS_DIR" ]; then
+    LATEST_CRITIC=$(ls -t "$LOGS_DIR"/p*-test-results.md 2>/dev/null | head -1)
+    if [ -n "$LATEST_CRITIC" ] && grep -q "ALL PASS" "$LATEST_CRITIC" 2>/dev/null; then
+        SI_LAST_CRITIC="PASS"
+    elif [ -n "$LATEST_CRITIC" ] && grep -q "FAIL" "$LATEST_CRITIC" 2>/dev/null; then
+        SI_LAST_CRITIC="FAIL"
+    else
+        SI_LAST_CRITIC="null"
+    fi
+else
+    SI_LAST_CRITIC="null"
+fi
+
 # playbook から残り phase 数をカウント
 if [ -n "$SI_PLAYBOOK" ] && [ "$SI_PLAYBOOK" != "null" ] && [ -f "$SI_PLAYBOOK" ]; then
     SI_REMAINING_PH=$(grep -E "status: (pending|in_progress)" "$SI_PLAYBOOK" 2>/dev/null | wc -l | tr -d ' ')
@@ -194,7 +209,7 @@ escape_json() {
     echo "$1" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/	/\\t/g'
 }
 
-# systemMessage を構築
+# systemMessage を構築（CLAUDE.md [自認] 形式と一致）
 SI_MESSAGE="━━━ State Injection ━━━\\n"
 SI_MESSAGE="${SI_MESSAGE}focus: $(escape_json "$SI_FOCUS")\\n"
 SI_MESSAGE="${SI_MESSAGE}milestone: $(escape_json "$SI_MILESTONE")\\n"
@@ -203,6 +218,8 @@ SI_MESSAGE="${SI_MESSAGE}playbook: $(escape_json "$SI_PLAYBOOK")\\n"
 SI_MESSAGE="${SI_MESSAGE}branch: $(escape_json "$SI_GIT_BRANCH")\\n"
 SI_MESSAGE="${SI_MESSAGE}git: $(escape_json "$SI_GIT_STATUS")\\n"
 SI_MESSAGE="${SI_MESSAGE}remaining: ${SI_REMAINING_PH} phases / ${SI_REMAINING_MS} milestones\\n"
+SI_MESSAGE="${SI_MESSAGE}project_summary: $(escape_json "$SI_PROJECT_GOAL")\\n"
+SI_MESSAGE="${SI_MESSAGE}last_critic: ${SI_LAST_CRITIC}\\n"
 SI_MESSAGE="${SI_MESSAGE}━━━━━━━━━━━━━━━━━━━━━━━━\\n"
 SI_MESSAGE="${SI_MESSAGE}done_criteria:\\n${SI_CRITERIA}"
 
