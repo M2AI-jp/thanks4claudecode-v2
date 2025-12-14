@@ -47,27 +47,28 @@ EXCLUDE_PATTERNS=(
 # ユーティリティ関数
 # ==============================================================================
 
-# ファイルから description を抽出
+# ファイルから description を抽出（200文字まで）
 extract_description() {
     local file="$1"
     local ext="${file##*.}"
     local desc=""
+    local MAX_LEN=200
 
     case "$ext" in
         sh)
             # シェルスクリプト: 最初の # コメント行から抽出
-            desc=$(grep -m1 "^# .*- " "$file" 2>/dev/null | sed 's/^# //' | head -c 80 || echo "")
+            desc=$(grep -m1 "^# .*- " "$file" 2>/dev/null | sed 's/^# //' | head -c $MAX_LEN || echo "")
             ;;
         md)
             # Markdown: > ブロックまたは最初の段落から抽出
-            desc=$(grep -m1 "^>" "$file" 2>/dev/null | sed 's/^> \*\*//' | sed 's/\*\*.*//' | head -c 80 || echo "")
+            desc=$(grep -m1 "^>" "$file" 2>/dev/null | sed 's/^> \*\*//' | sed 's/\*\*.*//' | head -c $MAX_LEN || echo "")
             if [[ -z "$desc" ]]; then
-                desc=$(sed -n '3p' "$file" 2>/dev/null | head -c 80 || echo "")
+                desc=$(sed -n '3p' "$file" 2>/dev/null | head -c $MAX_LEN || echo "")
             fi
             ;;
         yaml|yml|json)
             # YAML/JSON: description フィールドから抽出
-            desc=$(grep -m1 "description:" "$file" 2>/dev/null | sed 's/.*description: *//' | sed 's/"//g' | head -c 80 || echo "")
+            desc=$(grep -m1 "description:" "$file" 2>/dev/null | sed 's/.*description: *//' | sed 's/"//g' | head -c $MAX_LEN || echo "")
             ;;
         *)
             desc=""
@@ -84,20 +85,82 @@ get_hook_trigger() {
     local settings_file="$PROJECT_ROOT/.claude/settings.json"
 
     if [[ ! -f "$settings_file" ]]; then
-        echo ""
+        echo "unknown"
         return
     fi
 
     # jq がある場合は使用
     if command -v jq &> /dev/null; then
-        jq -r --arg name "$hook_name" '
+        local result
+        result=$(jq -r --arg name "$hook_name" '
             .hooks | to_entries[] |
-            select(.value[]?.command | contains($name)) |
-            .key + ":" + (.value[] | select(.command | contains($name)) | .matcher // "*")
-        ' "$settings_file" 2>/dev/null | head -1 || echo ""
+            .value[] |
+            select(.hooks != null) |
+            .hooks[] |
+            select(.command | contains($name)) |
+            empty
+        ' "$settings_file" 2>/dev/null)
+
+        # フォールバック: 直接マッチング
+        if [[ -z "$result" ]]; then
+            # PreToolUse チェック
+            if jq -e --arg name "$hook_name" '.hooks.PreToolUse[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                local matcher
+                matcher=$(jq -r --arg name "$hook_name" '
+                    .hooks.PreToolUse[] |
+                    select(.hooks[]?.command | contains($name)) |
+                    .matcher
+                ' "$settings_file" 2>/dev/null | head -1)
+                echo "PreToolUse:${matcher:-*}"
+                return
+            fi
+            # PostToolUse チェック
+            if jq -e --arg name "$hook_name" '.hooks.PostToolUse[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                local matcher
+                matcher=$(jq -r --arg name "$hook_name" '
+                    .hooks.PostToolUse[] |
+                    select(.hooks[]?.command | contains($name)) |
+                    .matcher
+                ' "$settings_file" 2>/dev/null | head -1)
+                echo "PostToolUse:${matcher:-*}"
+                return
+            fi
+            # SessionStart チェック
+            if jq -e --arg name "$hook_name" '.hooks.SessionStart[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                echo "SessionStart:*"
+                return
+            fi
+            # UserPromptSubmit チェック
+            if jq -e --arg name "$hook_name" '.hooks.UserPromptSubmit[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                echo "UserPromptSubmit:*"
+                return
+            fi
+            # SessionEnd チェック
+            if jq -e --arg name "$hook_name" '.hooks.SessionEnd[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                echo "SessionEnd:*"
+                return
+            fi
+            # Stop チェック
+            if jq -e --arg name "$hook_name" '.hooks.Stop[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                echo "Stop:*"
+                return
+            fi
+            # PreCompact チェック
+            if jq -e --arg name "$hook_name" '.hooks.PreCompact[]?.hooks[]? | select(.command | contains($name))' "$settings_file" &>/dev/null; then
+                echo "PreCompact:*"
+                return
+            fi
+        fi
+        echo "utility"
     else
         # jq がない場合は grep で簡易抽出
-        grep -B5 "$hook_name" "$settings_file" 2>/dev/null | grep -oE '"(PreToolUse|PostToolUse|SessionStart|Stop|PreCompact)"' | tr -d '"' | head -1 || echo ""
+        local event
+        event=$(grep -B10 "$hook_name" "$settings_file" 2>/dev/null | grep -oE '"(PreToolUse|PostToolUse|SessionStart|UserPromptSubmit|SessionEnd|Stop|PreCompact)"' | tr -d '"' | tail -1 || echo "")
+        if [[ -n "$event" ]]; then
+            echo "$event:*"
+        else
+            echo "utility"
+        fi
     fi
 }
 

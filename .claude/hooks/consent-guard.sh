@@ -74,6 +74,13 @@ if [ -f "$CONSENT_FILE" ]; then
     how: 以下の手順で進めます
     scope: 変更対象ファイル
     exclusions: 変更しないファイル
+    risks: |
+      リスク1_{カテゴリ}:
+        問題: {失敗の可能性}
+        影響: {影響度}
+        対策: {防止策}
+
+  ⚠️ risks は必須です。3-5個のリスクを分析してください。
 
   ユーザーが「OK」と応答したら:
     rm .claude/.session-init/consent

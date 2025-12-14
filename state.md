@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null  # M015 完了、main 復旧済み
-branch: main
+active: plan/active/playbook-m016-release-preparation.md
+branch: feat/final-release-preparation
 ```
 
 ---
@@ -27,8 +27,8 @@ branch: main
 ## goal
 
 ```yaml
-milestone: M015  # フォルダ管理ルール検証テスト（完了）
-phase: null  # 次タスク待機中
+milestone: M016  # リリース準備：自己認識システム完成
+phase: p0  # 状態不整合の修正
 self_complete: false
 last_completed_milestone: M015 (achieved: 2025-12-13)
 ```
@@ -38,7 +38,7 @@ last_completed_milestone: M015 (achieved: 2025-12-13)
 ## session
 
 ```yaml
-last_start: 2025-12-13 17:38:12
+last_start: 2025-12-14 10:29:19
 last_clear: 2025-12-13 00:30:00
 ```
 

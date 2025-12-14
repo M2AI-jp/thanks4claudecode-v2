@@ -156,15 +156,36 @@ success_criteria:
     2. 永続フォルダ（docs/）にも別途ファイルを生成
     3. playbook 完了時の cleanup-hook.sh 発火を確認
     4. tmp/ のファイルが削除され、永続ファイルは保持されることを検証
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-13
   depends_on: [M014]
   playbooks: [playbook-m015-folder-test.md]
   done_when:
-    - [ ] tmp/ にテストファイルが生成されている
-    - [ ] 永続フォルダにテストファイルが生成されている
-    - [ ] playbook 完了時に cleanup-hook.sh が発火している
-    - [ ] tmp/ のテストファイルが削除されている
-    - [ ] 永続ファイルは保持されている
+    - [x] tmp/ にテストファイルが生成されている
+    - [x] 永続フォルダにテストファイルが生成されている
+    - [x] playbook 完了時に cleanup-hook.sh が発火している
+    - [x] tmp/ のテストファイルが削除されている
+    - [x] 永続ファイルは保持されている
+
+- id: M016
+  name: "リリース準備：自己認識システム完成"
+  description: |
+    リポジトリの完成度を高め、リリース可能な状態にする。
+    1. repository-map.yaml の完全性（trigger・連鎖関係の明示）
+    2. SubAgents/Skills の description 完全化
+    3. コンテキスト保護の検証
+    4. [理解確認] に失敗リスク分析を恒常的に組み込み
+    5. 全体の整合性確認
+  status: in_progress
+  depends_on: [M015]
+  playbooks: [playbook-m016-release-preparation.md]
+  done_when:
+    - [ ] repository-map.yaml の全 Hook に trigger が明示されている
+    - [ ] Hook 間の連鎖関係が docs/ にドキュメント化されている
+    - [ ] SubAgents/Skills の description が完全化されている
+    - [ ] [理解確認] に失敗リスク分析が組み込まれている
+    - [ ] session-start.sh がコンテキスト汚染を自動防止している
+    - [ ] state.md / project.md / playbook の整合性が確認されている
 ```
 
 ---
