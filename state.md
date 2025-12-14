@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null  # M015 完了
-branch: feat/folder-management
+active: null  # M015 完了、main 復旧済み
+branch: main
 ```
 
 ---
@@ -28,14 +28,9 @@ branch: feat/folder-management
 
 ```yaml
 milestone: M015  # フォルダ管理ルール検証テスト（完了）
-phase: done
-self_complete: true
-done_criteria:
-  - tmp/ にテストファイルが生成されている ✓
-  - 永続フォルダにテストファイルが生成されている ✓
-  - cleanup-hook.sh が正常動作（手動検証済み）✓
-  - tmp/ のテストファイルが削除されている ✓
-  - 永続ファイルは保持されている ✓
+phase: null  # 次タスク待機中
+self_complete: false
+last_completed_milestone: M015 (achieved: 2025-12-13)
 ```
 
 ---
