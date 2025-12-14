@@ -8,6 +8,11 @@
 
 set -euo pipefail
 
+# ==============================================================================
+# state-schema.sh を source して state.md のスキーマを参照
+# ==============================================================================
+source .claude/schema/state-schema.sh
+
 # 状態管理ディレクトリ
 INIT_DIR=".claude/.session-init"
 PENDING_FILE="$INIT_DIR/pending"
@@ -23,7 +28,7 @@ TOOL_INPUT=$(echo "$INPUT" | jq -r '.tool_input // {}')
 # --------------------------------------------------
 SECURITY_MODE=""
 if [[ -f "state.md" ]]; then
-    SECURITY_MODE=$(grep -A5 "## security" state.md | grep "mode:" | head -1 | sed 's/.*: *//' | sed 's/ *#.*//' | tr -d ' ')
+    SECURITY_MODE=$(get_config_security)
 fi
 
 # admin モードは全ての制限をバイパス
@@ -34,10 +39,10 @@ fi
 # --------------------------------------------------
 # 必須ファイルの定義（focus 別に分岐）
 # --------------------------------------------------
-# focus を state.md から取得
+# focus を state-schema.sh から取得
 FOCUS=""
 if [[ -f "state.md" ]]; then
-    FOCUS=$(grep -A5 "## focus" state.md | grep "current:" | sed 's/.*: *//' | sed 's/ *#.*//')
+    FOCUS=$(get_focus_current)
 fi
 
 # 必須ファイル: mission.md（最上位概念）+ state.md

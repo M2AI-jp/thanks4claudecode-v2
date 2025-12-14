@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/active/playbook-m017-state-schema.md
+branch: feat/m017-state-schema
 last_archived: plan/archive/playbook-m015-folder-validation.md
 ```
 
@@ -28,10 +28,10 @@ last_archived: plan/archive/playbook-m015-folder-validation.md
 ## goal
 
 ```yaml
-milestone: null
-phase: null
+milestone: M017
+phase: p2
 self_complete: false
-last_completed_milestone: M015 (verified: 2025-12-14)
+last_completed_milestone: M016 (verified: 2025-12-14)
 ```
 
 ---

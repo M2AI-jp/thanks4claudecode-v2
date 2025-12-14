@@ -18,6 +18,11 @@
 
 set -e
 
+# ==============================================================================
+# state-schema.sh を source して state.md のスキーマを参照
+# ==============================================================================
+source .claude/schema/state-schema.sh
+
 # === stdin から JSON を読み込み、trigger を検出 ===
 INPUT=$(cat)
 TRIGGER=$(echo "$INPUT" | jq -r '.trigger // "startup"' 2>/dev/null || echo "startup")
