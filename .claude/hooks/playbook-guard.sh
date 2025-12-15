@@ -35,16 +35,6 @@ if [[ "$FILE_PATH" == *"state.md" ]]; then
     exit 0
 fi
 
-# --------------------------------------------------
-# security チェック（admin モードはバイパス）
-# --------------------------------------------------
-SECURITY_MODE=$(grep -A10 "^## config" "$STATE_FILE" | grep "^security:" | head -1 | sed 's/security: *//' | sed 's/ *#.*//' | tr -d ' ')
-
-# admin モードは playbook チェックをバイパス
-if [[ "$SECURITY_MODE" == "admin" ]]; then
-    exit 0
-fi
-
 # focus.current を取得
 FOCUS=$(grep -A6 "^## focus" "$STATE_FILE" | grep "^current:" | head -1 | sed 's/current: *//' | sed 's/ *#.*//' | tr -d ' ')
 
