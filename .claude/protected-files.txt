@@ -14,7 +14,7 @@
 #   strict    - HARD_BLOCK/BLOCK をブロック、WARN は警告
 #   trusted   - HARD_BLOCK をブロック、BLOCK を WARN に緩和
 #   developer - HARD_BLOCK をブロック、それ以外は通過
-#   admin     - 全て通過（ワークスペース開発者用）
+#   admin     - HARD_BLOCK/BLOCK 通過（ただし playbook 必須チェックは維持）
 
 # === HARD_BLOCK: 絶対守護（admin モードでのみ編集可能） ===
 # CONTEXT.md は .archive に退避済み（開発履歴）
@@ -33,12 +33,12 @@ HARD_BLOCK:.claude/hooks/playbook-guard.sh
 # === BLOCK: 運用でゆるめ可能（strict: ブロック / trusted: WARN） ===
 BLOCK:plan/template/playbook-format.md
 BLOCK:.claude/settings.json
-BLOCK:.claude/hooks/check-protected-edit.sh
 BLOCK:.claude/hooks/session-start.sh
 BLOCK:.claude/hooks/session-end.sh
 BLOCK:.claude/hooks/check-coherence.sh
 BLOCK:.claude/hooks/check-state-update.sh
 BLOCK:.claude/hooks/pre-bash-check.sh
+BLOCK:.claude/hooks/check-protected-edit.sh
 
 # === WARN: 警告のみ（慎重に扱うべきファイル） ===
 WARN:state.md

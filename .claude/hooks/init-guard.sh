@@ -47,10 +47,8 @@ if [[ -f "state.md" ]]; then
     FOCUS=$(get_focus_current)
 fi
 
-# 必須ファイル: mission.md（最上位概念）+ state.md
-# mission.md は全ての判断の基準。ユーザープロンプトに引っ張られないために必須。
+# 必須ファイル: state.md のみ（Single Source of Truth）
 REQUIRED_FILES=(
-    "plan/mission.md"
     "state.md"
 )
 
