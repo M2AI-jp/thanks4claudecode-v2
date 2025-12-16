@@ -87,100 +87,157 @@ done_when:
 
 ## phases
 
-> **V11: subtasks 構造を導入。criterion + executor + test_command を1セットで定義。**
+> **V12: チェックボックス形式を導入。報酬詐欺防止のため `- [ ]` / `- [x]` で進捗を明示。**
 
-```yaml
-- id: p1
-  name: {フェーズ名}
-  goal: {このフェーズの目標}
+### p1: {フェーズ名}
 
-  subtasks:
-    - id: p1.1
-      criterion: "{対象} が {状態} である"
-      executor: claudecode | codex | coderabbit | user
-      test_command: "{検証コマンド}"
+**goal**: {このフェーズの目標}
 
-    - id: p1.2
-      criterion: "{コマンド} が {期待結果} を返す"
-      executor: claudecode
-      test_command: "{コマンド} && echo PASS || echo FAIL"
+#### subtasks
 
-    - id: p1.3
-      criterion: "ユーザーが {操作} を完了している"
-      executor: user
-      test_command: "手動確認: {具体的な確認手順}"
+- [ ] **p1.1**: {対象} が {状態} である
+  - executor: claudecode | codex | coderabbit | user
+  - test_command: `{検証コマンド}`
+  - validations:
+    - technical: "{技術的に正しく動作するか}"
+    - consistency: "{他コンポーネントと整合性があるか}"
+    - completeness: "{必要な変更が全て完了しているか}"
 
-  status: pending  # pending | in_progress | done
-  max_iterations: 5
+- [ ] **p1.2**: {コマンド} が {期待結果} を返す
+  - executor: claudecode
+  - test_command: `{コマンド} && echo PASS || echo FAIL`
+  - validations:
+    - technical: "{...}"
+    - consistency: "{...}"
+    - completeness: "{...}"
 
-- id: p2
-  name: {フェーズ名}
-  goal: {このフェーズの目標}
-  depends_on: [p1]
+- [ ] **p1.3**: ユーザーが {操作} を完了している
+  - executor: user
+  - test_command: `手動確認: {具体的な確認手順}`
+  - validations:
+    - technical: "{...}"
+    - consistency: "{...}"
+    - completeness: "{...}"
 
-  subtasks:
-    - id: p2.1
-      criterion: "{前提条件} が満たされている"
-      executor: claudecode
-      test_command: "test -f {path} && echo PASS"
-
-  status: pending
-```
-
-### subtask 構造（必須）
-
-```yaml
-subtask:
-  id: p{N}.{M}           # 必須: phase.subtask 形式の識別子
-  criterion: "..."        # 必須: 検証可能な完了条件
-  executor: ...           # 必須: claudecode | codex | coderabbit | user
-  test_command: "..."     # 必須: PASS/FAIL を返すコマンド
-  depends_on: [p1.2]      # オプション: 依存する subtask
-```
-
-### 旧形式（done_criteria）との互換性
-
-```yaml
-# 旧形式（非推奨）
-done_criteria:
-  - "README.md が存在する"
-  - "npm test が通る"
-
-# 新形式（推奨）
-subtasks:
-  - id: p1.1
-    criterion: "README.md が存在する"
-    executor: claudecode
-    test_command: "test -f README.md && echo PASS"
-
-  - id: p1.2
-    criterion: "npm test が exit code 0 で終了する"
-    executor: claudecode
-    test_command: "npm test && echo PASS || echo FAIL"
-```
+**status**: pending | in_progress | done
+**max_iterations**: 5
 
 ---
 
-## Phase 記述ルール
+### p2: {フェーズ名}
 
-### 必須項目
+**goal**: {このフェーズの目標}
+**depends_on**: [p1]
 
-| 項目 | 説明 |
-|------|------|
-| id | Phase 識別子（p0, p1, p2, ...） |
-| name | フェーズ名 |
-| goal | このフェーズの目標（1行） |
-| subtasks | **V11** criterion + executor + test_command のリスト |
-| status | 状態（pending / in_progress / done） |
+#### subtasks
 
-### subtask 必須フィールド
+- [ ] **p2.1**: {前提条件} が満たされている
+  - executor: claudecode
+  - test_command: `test -f {path} && echo PASS`
+  - validations:
+    - technical: "{...}"
+    - consistency: "{...}"
+    - completeness: "{...}"
 
-| 項目 | 説明 |
-|------|------|
-| id | subtask 識別子（p{N}.{M} 形式） |
-| criterion | 検証可能な完了条件（1文） |
+**status**: pending
+
+---
+
+### チェックボックス完了時の記法
+
+```markdown
+# 完了した subtask（- [x] に変更 + validated タイムスタンプ追加）
+- [x] **p1.1**: README.md が存在する ✓
+  - executor: claudecode
+  - test_command: `test -f README.md && echo PASS`
+  - validations:
+    - technical: "PASS - ファイルが存在する"
+    - consistency: "PASS - 他ドキュメントと整合"
+    - completeness: "PASS - 内容が完全"
+  - validated: 2025-12-17T02:30:00
+```
+
+> **重要**: `- [ ]` → `- [x]` の変更は subtask-guard.sh がチェック。
+> validations の 3 点全てが PASS でなければ `[x]` への変更はブロックされる。
+
+### subtask 構造（V12: チェックボックス形式）
+
+```markdown
+- [ ] **p{N}.{M}**: {criterion}
+  - executor: claudecode | codex | coderabbit | user
+  - test_command: `{PASS/FAIL を返すコマンド}`
+  - validations:
+    - technical: "{技術的検証}"
+    - consistency: "{整合性検証}"
+    - completeness: "{完全性検証}"
+  - depends_on: [p1.2]  # オプション
+```
+
+### 必須フィールド
+
+| フィールド | 説明 |
+|-----------|------|
+| `- [ ]` / `- [x]` | チェックボックス（未完了/完了） |
+| `**p{N}.{M}**` | subtask ID（太字） |
+| criterion | 検証可能な完了条件（`:` の後に記述） |
 | executor | 実行者（claudecode / codex / coderabbit / user） |
 | test_command | PASS/FAIL を返す検証コマンド |
+| validations | 3 点検証（technical / consistency / completeness） |
+
+### 完了時の追加フィールド
+
+| フィールド | 説明 |
+|-----------|------|
+| validated | 検証完了日時（ISO 8601 形式） |
+
+### 旧形式との比較
+
+```markdown
+# V11 形式（廃止）
+- id: p1.1
+  criterion: "README.md が存在する"
+  executor: claudecode
+  test_command: "test -f README.md && echo PASS"
+  status: PASS  # ← 報酬詐欺が容易
+
+# V12 形式（現行）
+- [x] **p1.1**: README.md が存在する ✓
+  - executor: claudecode
+  - test_command: `test -f README.md && echo PASS`
+  - validations:
+    - technical: "PASS - ファイルが存在する"
+    - consistency: "PASS - .gitignore と整合"
+    - completeness: "PASS - 内容が完全"
+  - validated: 2025-12-17T02:30:00
+```
+
+> **報酬詐欺防止**: `- [ ]` → `- [x]` の変更は subtask-guard.sh がチェック。
+> チェックボックスの変更は Edit ツールで追跡可能。
+
+---
+
+## Phase 記述ルール（V12）
+
+### Phase 必須項目
+
+| 項目 | 形式 | 説明 |
+|------|------|------|
+| `### p{N}: {name}` | Markdown 見出し | Phase 識別子 + フェーズ名 |
+| `**goal**` | 太字 | このフェーズの目標（1行） |
+| `#### subtasks` | 小見出し | subtask リストの開始 |
+| `- [ ]` / `- [x]` | チェックボックス | subtask（後述） |
+| `**status**` | 太字 | 状態（pending / in_progress / done） |
+
+### subtask 必須フィールド（チェックボックス形式）
+
+| 項目 | 説明 |
+|------|------|
+| `- [ ]` / `- [x]` | チェックボックス（未完了/完了） |
+| `**p{N}.{M}**` | subtask ID（太字、行頭に配置） |
+| criterion | `:` の後に検証可能な完了条件（1文） |
+| executor | claudecode / codex / coderabbit / user |
+| test_command | PASS/FAIL を返す検証コマンド（バッククォートで囲む） |
+| validations | 3 点検証（technical / consistency / completeness） |
 
 ### オプション項目
 

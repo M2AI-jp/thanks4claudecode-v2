@@ -64,11 +64,45 @@ if [ "$DONE_PHASES" -ne "$TOTAL_PHASES" ]; then
     exit 0
 fi
 
+# ==============================================================================
+# V12: チェックボックス形式の完了判定
+# ==============================================================================
+# `- [x]` の数と `- [ ]` の数をカウントして完了率を確認
+# ==============================================================================
+CHECKED_COUNT=$(grep -c '\- \[x\]' "$FILE_PATH" 2>/dev/null || echo "0")
+UNCHECKED_COUNT=$(grep -c '\- \[ \]' "$FILE_PATH" 2>/dev/null || echo "0")
+TOTAL_CHECKBOX=$((CHECKED_COUNT + UNCHECKED_COUNT))
+
+if [ "$TOTAL_CHECKBOX" -gt 0 ]; then
+    if [ "$UNCHECKED_COUNT" -gt 0 ]; then
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "  ⚠️ 未完了の subtask があります（V12 形式）"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "  完了: $CHECKED_COUNT / 未完了: $UNCHECKED_COUNT"
+        echo ""
+        echo "  全ての subtask を完了させてください:"
+        echo "  - [ ] → - [x] に変更"
+        echo "  - validations を追加"
+        echo "  - validated タイムスタンプを追加"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        exit 0  # 未完了があれば提案しない
+    fi
+fi
+
 # M019: final_tasks チェック（存在する場合のみ）
 # playbook に final_tasks セクションがある場合、全て完了しているか確認
-if grep -q "^final_tasks:" "$FILE_PATH" 2>/dev/null; then
-    TOTAL_FINAL_TASKS=$(awk '/^final_tasks:/,/^[a-z_]+:/' "$FILE_PATH" | grep -c "^ *- " 2>/dev/null || echo "0")
-    DONE_FINAL_TASKS=$(awk '/^final_tasks:/,/^[a-z_]+:/' "$FILE_PATH" | grep -c "status: done" 2>/dev/null || echo "0")
+# V12 形式: `- [x] **ft1**` でチェック
+if grep -q "^## final_tasks" "$FILE_PATH" 2>/dev/null; then
+    # V12 形式: チェックボックスでカウント
+    TOTAL_FINAL_TASKS=$(grep -A 100 "^## final_tasks" "$FILE_PATH" | grep -c '\- \[.\] \*\*ft' 2>/dev/null || echo "0")
+    DONE_FINAL_TASKS=$(grep -A 100 "^## final_tasks" "$FILE_PATH" | grep -c '\- \[x\] \*\*ft' 2>/dev/null || echo "0")
+
+    # V11 形式（フォールバック）: status: done でカウント
+    if [ "$TOTAL_FINAL_TASKS" -eq 0 ]; then
+        TOTAL_FINAL_TASKS=$(awk '/^final_tasks:/,/^[a-z_]+:/' "$FILE_PATH" | grep -c "^ *- " 2>/dev/null || echo "0")
+        DONE_FINAL_TASKS=$(awk '/^final_tasks:/,/^[a-z_]+:/' "$FILE_PATH" | grep -c "status: done" 2>/dev/null || echo "0")
+    fi
 
     if [ "$TOTAL_FINAL_TASKS" -gt 0 ] && [ "$DONE_FINAL_TASKS" -lt "$TOTAL_FINAL_TASKS" ]; then
         echo ""

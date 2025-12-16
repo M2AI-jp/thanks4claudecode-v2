@@ -1,8 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# subtask-guard.sh - subtask の 3 検証を強制
+# subtask-guard.sh - subtask の 3 検証を強制（V12: チェックボックス形式対応）
 # ==============================================================================
-# 目的: subtask.status = done 変更時に 3 つの検証を実行
+# 目的: subtask の完了変更時に 3 つの検証を実行
 # トリガー: PreToolUse(Edit)
 #
 # 【単一責任原則 (SRP)】
@@ -13,7 +13,11 @@
 #   2. consistency: 他のコンポーネントと整合性があるか
 #   3. completeness: 必要な変更が全て完了しているか
 #
-# M056: final_tasks の status: done 変更は許可（スキップ）
+# V12 対応:
+#   - `- [ ]` → `- [x]` の変更を検出
+#   - final_tasks のチェックボックス変更はスキップ
+#
+# M056: final_tasks の変更は許可（スキップ）
 # ==============================================================================
 
 set -euo pipefail
@@ -34,46 +38,74 @@ if [[ "$FILE_PATH" != *"playbook-"* ]]; then
     exit 0
 fi
 
-# status: done への変更をチェック
+# old_string / new_string を取得
 OLD_STRING=$(echo "$TOOL_INPUT" | jq -r '.old_string // empty')
 NEW_STRING=$(echo "$TOOL_INPUT" | jq -r '.new_string // empty')
 
 # ==============================================================================
-# M056: final_tasks セクションの status: done 変更は許可（スキップ）
+# M056: final_tasks セクションの変更は許可（スキップ）
 # ==============================================================================
 # final_tasks は subtasks とは異なり、単純なチェックリストなので
-# validations は不要。status: done への変更を許可する。
-# 判定: old_string に "final_tasks" または "ft1\|ft2\|ft3" が含まれていれば final_tasks
+# validations は不要。変更を許可する。
+# 判定: old_string に "final_tasks" または "**ft" が含まれていれば final_tasks
 # ==============================================================================
-if [[ "$OLD_STRING" == *"final_tasks"* ]] || [[ "$OLD_STRING" == *"- id: ft"* ]]; then
-    # final_tasks の status 変更 → 許可（bypass）
+if [[ "$OLD_STRING" == *"final_tasks"* ]] || [[ "$OLD_STRING" == *"**ft"* ]] || [[ "$OLD_STRING" == *"- id: ft"* ]]; then
+    # final_tasks の変更 → 許可（bypass）
     exit 0
 fi
 
-# status が変更されていない場合はパス
+# ==============================================================================
+# V12: チェックボックス形式 `- [ ]` → `- [x]` の変更を検出
+# ==============================================================================
+CHECKBOX_CHANGE=false
+
+# パターン 1: `- [ ]` → `- [x]` の変更
+if [[ "$OLD_STRING" == *"- [ ]"* ]] && [[ "$NEW_STRING" == *"- [x]"* ]]; then
+    CHECKBOX_CHANGE=true
+fi
+
+# パターン 2: V11 形式（旧）status: pending/in_progress → status: done
 if [[ "$OLD_STRING" == *"status: pending"* || "$OLD_STRING" == *"status: in_progress"* ]]; then
     if [[ "$NEW_STRING" == *"status: done"* ]]; then
-        # subtask の status: done への変更を検出
-        # validations が含まれているかチェック
-        if [[ "$NEW_STRING" != *"validations:"* ]]; then
-            # validations がない場合はブロック
-            echo "[subtask-guard] ❌ BLOCKED: status: done への変更には validations が必須です。"
-            echo ""
-            echo "subtask に以下の 3 検証を追加してください:"
-            echo "  validations:"
-            echo "    technical: \"test_command の期待結果\""
-            echo "    consistency: \"関連ファイルとの整合性\""
-            echo "    completeness: \"必要な変更が全て完了\""
-            echo ""
-            echo "参照: plan/template/playbook-format.md"
-            exit 2
-        fi
-
-        # validations がある場合は警告のみで許可
-        echo "{\"decision\": \"allow\", \"systemMessage\": \"[subtask-guard] ⚠️ Phase を done にする前に、以下の 3 検証を確認してください:\\n\\n1. technical: test_command が PASS を返すか\\n2. consistency: 関連ファイルとの整合性があるか\\n3. completeness: 必要な変更が全て完了しているか\\n\\n critic SubAgent による検証を推奨します。\"}"
-        exit 0
+        CHECKBOX_CHANGE=true
     fi
 fi
 
-# その他の変更はパス
+# パターン 3: status: PASS への変更（旧形式の互換性）
+if [[ "$NEW_STRING" == *"status: PASS"* ]]; then
+    CHECKBOX_CHANGE=true
+fi
+
+# チェックボックス/status 変更がない場合はパス
+if [[ "$CHECKBOX_CHANGE" == "false" ]]; then
+    exit 0
+fi
+
+# ==============================================================================
+# validations チェック
+# ==============================================================================
+# V12 形式: - [x] の後に validations ブロックがあるか
+# V11 形式: status: done の後に validations があるか
+# ==============================================================================
+if [[ "$NEW_STRING" != *"validations:"* ]]; then
+    # validations がない場合はブロック
+    echo "[subtask-guard] ❌ BLOCKED: subtask 完了には validations が必須です。"
+    echo ""
+    echo "V12 形式（チェックボックス）で以下の 3 検証を追加してください:"
+    echo ""
+    echo "- [x] **p1.1**: criterion が満たされている ✓"
+    echo "  - executor: claudecode"
+    echo "  - test_command: \`...\`"
+    echo "  - validations:"
+    echo "    - technical: \"PASS - 技術的に正しい\""
+    echo "    - consistency: \"PASS - 整合性がある\""
+    echo "    - completeness: \"PASS - 完全に実装\""
+    echo "  - validated: $(date -u +%Y-%m-%dT%H:%M:%S)"
+    echo ""
+    echo "参照: plan/template/playbook-format.md"
+    exit 2
+fi
+
+# validations がある場合は警告のみで許可
+echo "{\"decision\": \"allow\", \"systemMessage\": \"[subtask-guard] ⚠️ subtask を完了にする前に、以下の 3 検証を確認してください:\\n\\n1. technical: test_command が PASS を返すか\\n2. consistency: 関連ファイルとの整合性があるか\\n3. completeness: 必要な変更が全て完了しているか\\n\\n validated タイムスタンプの追加を推奨します。\"}"
 exit 0

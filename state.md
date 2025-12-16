@@ -29,12 +29,13 @@ last_archived: M055 (achieved: 2025-12-17)
 
 ```yaml
 milestone: M056
-phase: p3
+phase: p_final (done)
 done_criteria:
-  - playbook-format.md に完了検証フェーズ（p_final）が必須として追加されている
-  - archive-playbook.sh が done_when の test_command を再実行して検証する
-  - subtask-guard が final_tasks の status: done をブロックしない
-  - 既存の achieved milestone の done_when が実際に満たされているか再検証完了
+  - playbook-format.md に完了検証フェーズ（p_final）が必須として追加されている ✓
+  - archive-playbook.sh が done_when の test_command を再実行して検証する ✓
+  - subtask-guard が final_tasks の status: done をブロックしない ✓
+  - 既存の achieved milestone の done_when が実際に満たされているか再検証完了 ✓
+  - V12 チェックボックス形式が全コンポーネントに適用されている ✓
 ```
 
 ---
@@ -42,7 +43,7 @@ done_criteria:
 ## session
 
 ```yaml
-last_start: 2025-12-16 23:57:53
+last_start: 2025-12-17 02:59:27
 last_clear: 2025-12-13 00:30:00
 ```
 

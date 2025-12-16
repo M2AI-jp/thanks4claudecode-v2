@@ -201,7 +201,7 @@ git_branch_sync:
 
 ---
 
-## LOOP（V11: subtasks 構造対応）
+## LOOP（V12: チェックボックス形式対応）
 
 ```
 iteration = 0
@@ -212,16 +212,28 @@ while true:
   if iteration > max: break  # デッドロック検出
 
   0. 根拠なし → ユーザーに質問
-  1. subtasks を読む（criterion + executor + test_command）
+  1. subtasks を読む（チェックボックス形式: `- [ ]` / `- [x]`）
   2. 各 subtask について:
+     - `- [ ]` → 未完了（実行対象）
+     - `- [x]` → 完了済み（スキップ）
+  3. executor で実行者を判定:
      - executor: claudecode/codex → 自動実行
      - executor: coderabbit → レビュー実行
      - executor: user → ユーザー確認待ち（DEFERRED）
-  3. test_command を実行して PASS/FAIL を判定
-  4. 全 subtask PASS → CRITIQUE()
+  4. test_command を実行して PASS/FAIL を判定
+  5. PASS の場合:
+     - `- [ ]` → `- [x]` に変更
+     - validations に PASS 結果を記録
+     - validated タイムスタンプを追加
+  6. 全 subtask が `[x]` → CRITIQUE()
      - PASS → playbook 更新 → 自動コミット → 次 phase
      - FAIL → 修正 → continue
-  5. 不明 → break
+  7. 不明 → break
+
+V12 チェックボックス形式:
+  完了前: - [ ] **p1.1**: criterion が状態である
+  完了後: - [x] **p1.1**: criterion が状態である ✓
+          - validated: 2025-12-17T02:30:00
 
 executor 選択ガイドライン:
   claudecode: ファイル作成、設計、軽量スクリプト
@@ -236,9 +248,9 @@ phase 完了時の自動コミット:
   git add -A && git commit -m "$(cat <<'EOF'
   feat({phase}): {summary}
 
-  done_criteria:
-  - {criteria_1}
-  - {criteria_2}
+  subtasks:
+  - [x] {subtask_1}
+  - [x] {subtask_2}
 
   critic: PASS
   playbook: {playbook_path}
@@ -601,6 +613,7 @@ SOLID対応:
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-17 | V12: チェックボックス形式 `- [ ]` / `- [x]` を導入。報酬詐欺防止の強化。subtask-guard/archive-playbook を V12 対応。 |
 | 2025-12-13 | V11: subtasks 構造対応。LOOP に executor 選択ガイドライン追加。旧形式（done_criteria リスト）との互換性維持。 |
 | 2025-12-13 | V7.0: 3層構造（project→playbook→phase）の自動運用。用語統一（Macro廃止, layer廃止）。/clear タイミング明示。 |
 | 2025-12-10 | V6.0: コンテキスト・アーキテクチャ再設計。 |
