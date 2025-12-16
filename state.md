@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m057-cli-migration.md
-branch: feat/m057-cli-migration
+active: plan/playbook-m058-system-correction.md
+branch: fix/m058-system-correction
 last_archived: M056 (achieved: 2025-12-17)
 ```
 
@@ -28,17 +28,16 @@ last_archived: M056 (achieved: 2025-12-17)
 ## goal
 
 ```yaml
-milestone: M057
-phase: p7 (done)
+milestone: M058
+phase: p1
 done_criteria:
-  - .mcp.json から codex エントリが削除されている
-  - docs/toolstack-patterns.md が CLI ベースに全面書き換えされている
-  - .claude/agents/codex-delegate.md が CLI ベースに修正されている
-  - .claude/hooks/executor-guard.sh が CLI ベースに修正されている
-  - plan/template/playbook-format.md の executor 説明が更新されている
-  - .claude/CLAUDE-ref.md が CLI ベースに修正されている
-  - setup/playbook-setup.md が CLI ベースに修正されている
-  - repository-map.yaml が更新されている
+  - archive-playbook.sh が state.md の正しい構造（playbook.active）を参照している
+  - plan/playbook-m057-cli-migration.md が削除されている
+  - plan/archive/playbook-m057-cli-migration.md のみが存在する
+  - state.md の playbook.active が null に更新されている
+  - project.md の M057 status が achieved に更新されている
+  - project.md の M058 が新規マイルストーンとして追加されている
+  - CLAUDE.md の「設計思想」セクションが Codex/CodeRabbit メインワーカーの方針に更新されている
 ```
 
 ---

@@ -343,47 +343,39 @@ success_criteria:
     Codex と CodeRabbit がサーバーとして誤設計されていた問題を根本修正。
     実際には両方とも CLI ツールとして存在しており、その仕様に合わせて
     全ドキュメント・SubAgent・Hook を一括更新する。
-  status: not_started
+  status: achieved
+  achieved_at: 2025-12-17
   depends_on: [M056]
+  playbooks:
+    - playbook-m057-cli-migration.md
+  done_when:
+    - "[x] .mcp.json から codex エントリが削除されている"
+    - "[x] docs/toolstack-patterns.md が CLI ベースに全面書き換えされている"
+    - "[x] .claude/agents/codex-delegate.md が CLI ベースに修正されている"
+    - "[x] .claude/hooks/executor-guard.sh が CLI ベースに修正されている"
+    - "[x] plan/template/playbook-format.md の executor 説明が更新されている"
+    - "[x] .claude/CLAUDE-ref.md が CLI ベースに修正されている"
+    - "[x] setup/playbook-setup.md が CLI ベースに修正されている"
+    - "[x] repository-map.yaml が更新されている"
+
+- id: M058
+  name: "System Correction: archive-playbook.sh バグ修正 & 設計誤りの根本修正"
+  description: |
+    archive-playbook.sh が state.md の誤った構造を参照する問題を修正。
+    M057 playbook のデータ不整合（plan/ と archive/ に重複）をクリーンアップ。
+    根本的な設計誤り（Claude Code がワーカー）を修正し、Codex/CodeRabbit を
+    メインワーカーとする本来の設計に統一する。
+  status: pending
+  depends_on: [M057]
   playbooks: []
   done_when:
-    - "[ ] .mcp.json から codex エントリが削除されている"
-    - "[ ] docs/toolstack-patterns.md が CLI ベースに全面書き換えされている"
-    - "[ ] .claude/agents/codex-delegate.md が CLI ベースに修正されている"
-    - "[ ] .claude/hooks/executor-guard.sh が CLI ベースに修正されている"
-    - "[ ] plan/template/playbook-format.md の executor 説明が更新されている"
-    - "[ ] .claude/CLAUDE-ref.md が CLI ベースに修正されている"
-    - "[ ] setup/playbook-setup.md が CLI ベースに修正されている"
-    - "[ ] repository-map.yaml が更新されている"
-  decomposition:
-    playbook_summary: |
-      Codex/CodeRabbit を CLI 実装に統一し、全システムを一貫性のある CLI 構成にする。
-    phase_hints:
-      - name: "設定削除 & CLI 実装確認"
-        what: |
-          .mcp.json を確認し codex エントリを削除。
-          CLI パスの確認（/Users/amano/.asdf/installs/nodejs/24.4.1/bin/codex 等）
-      - name: "toolstack-patterns.md 書き換え"
-        what: |
-          旧仕様の説明を CLI ベースに全面書き換え。
-          Codex/CodeRabbit の CLI 使用法を明記。
-      - name: "codex-delegate.md 修正"
-        what: |
-          SubAgent を Bash CLI ベースに修正。
-          Task call から Bash call への転換。
-      - name: "Hook & template 一括更新"
-        what: |
-          executor-guard.sh、playbook-format.md、.claude/CLAUDE-ref.md を修正。
-          全参照を CLI ベースに統一。
-      - name: "setup ドキュメント & repository-map 更新"
-        what: |
-          setup/playbook-setup.md の設定を修正。
-          repository-map.yaml を自動更新。
-    success_indicators:
-      - .mcp.json に codex エントリがない
-      - docs/toolstack-patterns.md で CLI 使用法が明確
-      - executor-guard.sh が CLI ベースで動作
-      - 全コンポーネントが CLI 仕様に統一
+    - "[ ] archive-playbook.sh が state.md の正しい構造（playbook.active）を参照している"
+    - "[ ] plan/playbook-m057-cli-migration.md が削除されている"
+    - "[ ] plan/archive/playbook-m057-cli-migration.md のみが存在する"
+    - "[ ] state.md の playbook.active が null に更新されている"
+    - "[ ] project.md の M057 status が achieved に更新されている"
+    - "[ ] project.md の M058 が新規マイルストーンとして追加されている"
+    - "[ ] CLAUDE.md の「設計思想」セクションが Codex/CodeRabbit メインワーカーの方針に更新されている"
 
 ```
 
