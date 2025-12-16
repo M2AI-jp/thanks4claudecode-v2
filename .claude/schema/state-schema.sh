@@ -36,7 +36,7 @@ FIELD_LAST_ARCHIVED="last_archived:"
 # --------------------------------------------------
 STATE_FILE="${STATE_FILE:-state.md}"
 PROJECT_FILE="plan/project.md"
-PLAYBOOK_DIR="plan/active"
+PLAYBOOK_DIR="plan"
 ARCHIVE_DIR="plan/archive"
 
 # --------------------------------------------------

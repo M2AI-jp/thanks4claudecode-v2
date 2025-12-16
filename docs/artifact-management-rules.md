@@ -115,9 +115,9 @@ playbook 作成時のチェック:
 
 ```yaml
 常に真であるべき条件:
-  - active_playbooks に設定されている playbook は plan/active/ に存在する
-  - plan/active/ の playbook は全 Phase done でない（進行中）
-  - .archive/plan/ の playbook は全 Phase done（完了済み）
+  - playbook.active に設定されている playbook は plan/ に存在する
+  - plan/ の playbook は全 Phase done でない（進行中）
+  - plan/archive/ の playbook は全 Phase done（完了済み）
 
 不整合発生時:
   - health-checker SubAgent で検出
@@ -155,9 +155,9 @@ playbook 作成時のチェック:
 
 ### 定期的なヘルスチェック
 
-- [ ] plan/active/ に完了済み playbook がないか？
-- [ ] plan/active/ に stray files（phase-*.md 等）がないか？
-- [ ] state.md と plan/active/ の整合性は取れているか？
+- [ ] plan/ に完了済み playbook がないか？
+- [ ] plan/ に stray files（phase-*.md 等）がないか？
+- [ ] state.md と plan/ の整合性は取れているか？
 
 ---
 

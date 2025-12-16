@@ -57,7 +57,7 @@ pm 経由の強制:
 │ Step 4: playbook 作成                                       │
 │   - derives_from: {done_when.id} を必須設定                 │
 │   - decomposition を参照して Phase を構成                   │
-│   - plan/active/playbook-{name}.md を作成                   │
+│   - plan/playbook-{name}.md を作成                          │
 └─────────────────────────────────────────────────────────────┘
                          │
                          ▼

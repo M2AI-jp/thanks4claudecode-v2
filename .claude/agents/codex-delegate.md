@@ -1,6 +1,6 @@
 # codex-delegate SubAgent
 
-> **Codex MCP をラップし、コンテキスト膨張を防止する SubAgent**
+> **Codex CLI をラップし、コンテキスト膨張を防止する SubAgent**
 
 ---
 
@@ -9,12 +9,12 @@
 ```yaml
 name: codex-delegate
 description: |
-  Codex MCP を呼び出し、結果を要約して返す SubAgent。
-  直接 MCP を呼び出すとコンテキストが膨張するため、
+  Codex CLI を Bash で呼び出し、結果を要約して返す SubAgent。
+  直接 CLI を呼び出すとコンテキストが膨張するため、
   この SubAgent を経由することで結果を圧縮する。
 
 trigger: executor: codex の Phase、または大規模コード生成が必要な場合
-tools: mcp__codex__codex
+tools: Bash（CLI 呼び出し）
 ```
 
 ---
@@ -54,10 +54,9 @@ tools: mcp__codex__codex
    - 実装内容を理解
    - 必要に応じて追加情報を収集
 
-2. Codex MCP 呼び出し:
-   - mcp__codex__codex(prompt='{実装内容}')
-   - model: gpt-5.1-codex（デフォルト）
-   - reasoningEffort: medium
+2. Codex CLI 呼び出し（Bash）:
+   - codex exec "実装内容"
+   - または codex review（レビュー時）
 
 3. 結果の要約:
    - 生成されたコードの概要を抽出
@@ -68,6 +67,24 @@ tools: mcp__codex__codex
    - 5 行以内の要約
    - ファイル一覧
    - 注意点
+```
+
+---
+
+## CLI コマンド
+
+```bash
+# 非インタラクティブ実行（推奨）
+codex exec "ユーザー認証機能を実装してください"
+
+# コードレビュー
+codex review
+
+# モデル指定
+codex exec -m o3 "複雑なアルゴリズムを実装"
+
+# diff の適用
+codex apply
 ```
 
 ---
@@ -139,6 +156,9 @@ prompt: |
   - POST /api/auth/logout（トークン無効化）
   - GET /api/auth/me（ユーザー情報取得）
 
+SubAgent 内部実行:
+  Bash: codex exec "ユーザー認証 API を作成..."
+
 期待される戻り値:
   summary: |
     JWT 認証 API を 3 エンドポイントで実装。
@@ -154,26 +174,24 @@ prompt: |
     - "JWT_SECRET を環境変数に設定必要"
 ```
 
-### 例 2: コンポーネント作成
+### 例 2: コードレビュー
 
 ```yaml
 prompt: |
-  React コンポーネントを作成:
-  - DataTable（ソート、フィルター、ページネーション付き）
-  - TypeScript 使用
-  - TailwindCSS でスタイリング
+  現在の変更をレビュー
+
+SubAgent 内部実行:
+  Bash: codex review
 
 期待される戻り値:
   summary: |
-    汎用 DataTable コンポーネントを作成。
-    ソート、フィルター、ページネーションを Props で制御可能。
+    5 ファイルをレビュー。2 件の改善提案。
   files:
-    - path: "src/components/DataTable.tsx"
-      action: "created"
-    - path: "src/components/DataTable.test.tsx"
-      action: "created"
+    - path: "src/utils/auth.ts"
+      action: "reviewed"
+      description: "セキュリティ改善の提案あり"
   notes:
-    - "@tanstack/react-table を依存に追加"
+    - "パスワードハッシュの強度を上げることを推奨"
 ```
 
 ---
@@ -182,4 +200,5 @@ prompt: |
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-17 | CLI ベースに全面書き換え（M057） |
 | 2025-12-17 | 初版作成（M053） |

@@ -309,7 +309,7 @@ test_command: "手動確認: {具体的な確認手順を記述}"
 ```yaml
 claudecode:
   - "test -f docs/readme.md && echo PASS"
-  - "grep -q 'subtasks:' plan/active/*.md && echo PASS"
+  - "grep -q 'subtasks:' plan/playbook-*.md && echo PASS"
   - "wc -l {file} | awk '{if($1>=50) print \"PASS\"}'"
 
 codex:
@@ -373,7 +373,7 @@ executor の種類:
     config: なし
 
   codex:
-    説明: Codex MCP に委譲してコード生成
+    説明: Codex CLI（Bash 経由）でコード生成
     用途:
       - 本格的なコード実装
       - 複雑なロジック
@@ -633,7 +633,7 @@ enforcement:
 対照的に「最終成果物」:
   - docs/*.md（統合されたドキュメント）
   - .claude/hooks/*.sh（実装されたスクリプト）
-  - plan/active/playbook-*.md（進行中の playbook）
+  - plan/playbook-*.md（進行中の playbook）
 ```
 
 ### 判定フローチャート

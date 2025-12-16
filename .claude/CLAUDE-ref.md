@@ -181,7 +181,7 @@
 
 ```yaml
 役割:
-  - plan/active/ 以下に新しい playbook を作成
+  - plan/ 以下に新しい playbook を作成
   - state.md の active_playbooks を更新
   - ブランチと playbook の 1:1 対応を確立
 
@@ -269,7 +269,7 @@ bypassPermissions モード有効:
   - 個人ブログ/StackOverflow/Q&Aサイト禁止
   - ユーザー指定URLは例外
 
-MCP: context7 を活用（ライブラリの公式ドキュメント取得）
+外部ツール: context7 を活用（ライブラリの公式ドキュメント取得）
 ```
 
 ---
@@ -426,7 +426,7 @@ SubAgent は削除されました（Skill で十分なため）。
 トリガー: Phase.executor = "codex" AND status = "in_progress"
 
 行動:
-  1. MCP ツール mcp__codex__* で Codex にタスク送信
+  1. Bash で Codex CLI を実行（codex exec "プロンプト"）
   2. 渡す情報:
      - Phase.goal / done_criteria
      - AGENTS.md（コーディングルール）

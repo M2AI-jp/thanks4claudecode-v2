@@ -35,7 +35,7 @@ playbook の全 Phase が done
    - 以下を実行:
      ```bash
      mkdir -p .archive/plan
-     mv plan/active/playbook-{name}.md .archive/plan/
+     mv plan/playbook-{name}.md plan/archive/
      ```
    - state.md の active_playbooks.{layer} を null に更新
    - 注意: アーカイブ前に git add/commit を完了すること
@@ -97,7 +97,7 @@ playbook の全 Phase が done
 
 6. 残タスクあり:
    - ブランチ作成: `git checkout -b feat/{next-task}`
-   - pm が playbook 作成: plan/active/playbook-{next-task}.md
+   - pm が playbook 作成: plan/playbook-{next-task}.md
    - pm が state.md 更新: active_playbooks を更新
    - 即座に LOOP に入る
 

@@ -97,10 +97,10 @@ echo ""
 echo "--- Design Document Tests ---"
 
 # 14. 設計ドキュメント存在確認
-test_case "rollback-design.md exists" $([ -f "plan/active/rollback-design.md" ] && echo 0 || echo 1)
+test_case "rollback-design.md exists" $([ -f "plan/rollback-design.md" ] && echo 0 || echo 1)
 
 # 15. playbook 存在確認
-test_case "playbook-rollback.md exists" $([ -f "plan/active/playbook-rollback.md" ] && echo 0 || echo 1)
+test_case "playbook-rollback.md exists" $([ -f "plan/playbook-rollback.md" ] && echo 0 || echo 1)
 
 echo ""
 

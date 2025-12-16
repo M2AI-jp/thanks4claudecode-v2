@@ -10,9 +10,9 @@
 
 ```bash
 echo "=== Step -1: 再実行チェック ===" && \
-echo "1. 既存の playbook:" && ls plan/active/playbook-*.md 2>/dev/null || echo "(なし)" && \
-echo "2. playbook の branch:" && grep "^branch:" plan/active/playbook-*.md 2>/dev/null | head -1 || echo "(なし)" && \
-echo "3. in_progress の Phase:" && grep -A1 "status: in_progress" plan/active/playbook-*.md 2>/dev/null | head -3 || echo "(なし)"
+echo "1. 既存の playbook:" && ls plan/playbook-*.md 2>/dev/null || echo "(なし)" && \
+echo "2. playbook の branch:" && grep "^branch:" plan/playbook-*.md 2>/dev/null | head -1 || echo "(なし)" && \
+echo "3. in_progress の Phase:" && grep -A1 "status: in_progress" plan/playbook-*.md 2>/dev/null | head -3 || echo "(なし)"
 ```
 
 ### 判定フロー
@@ -28,7 +28,7 @@ echo "3. in_progress の Phase:" && grep -A1 "status: in_progress" plan/active/p
 ユーザーに以下を確認せよ：
 
 ```
-既存の playbook が見つかりました: plan/active/playbook-{name}.md
+既存の playbook が見つかりました: plan/playbook-{name}.md
 
 選択肢:
 1. 既存の playbook を上書きする（現在のタスクを破棄）

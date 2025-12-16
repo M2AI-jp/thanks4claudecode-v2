@@ -48,7 +48,7 @@ RELATIVE_PATH="${FILE_PATH#$PROJECT_DIR/}"
 IS_PLAYBOOK=false
 IS_PROJECT=false
 
-if [[ "$RELATIVE_PATH" == plan/active/playbook-*.md ]] || [[ "$RELATIVE_PATH" == *playbook*.md ]]; then
+if [[ "$RELATIVE_PATH" == plan/playbook-*.md ]] || [[ "$RELATIVE_PATH" == *playbook*.md ]]; then
     IS_PLAYBOOK=true
 elif [[ "$RELATIVE_PATH" == "$PROJECT_FILE" ]]; then
     IS_PROJECT=true

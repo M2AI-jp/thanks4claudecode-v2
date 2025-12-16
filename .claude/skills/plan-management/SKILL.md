@@ -27,7 +27,7 @@ roadmap (最上位)
 
 ```yaml
 1. Determine task scope
-2. Check existing playbooks in plan/active/
+2. Check existing playbooks in plan/
 3. Create playbook using plan/template/playbook-format.md
 4. Update state.md:
    - active_playbooks.{layer}: path/to/playbook
@@ -58,7 +58,7 @@ Phase 完了条件:
 四つ組:
   - focus.current (state.md)
   - layer.state (state.md)
-  - playbook (plan/active/*.md)
+  - playbook (plan/playbook-*.md)
   - branch (git)
 
 整合性ルール:

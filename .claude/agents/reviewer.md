@@ -129,7 +129,7 @@ model: haiku
 ```
 /review src/index.ts
 /review .claude/hooks/
-/review plan/active/playbook-*.md
+/review plan/playbook-*.md
 ```
 
 ## 参照ファイル

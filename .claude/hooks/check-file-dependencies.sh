@@ -154,8 +154,8 @@ search_dependencies() {
     fi
 
     # playbook-*.md パターンでマッチ
-    if [[ "$file" == plan/active/playbook-*.md ]]; then
-        result=$(find_dependencies "plan/active/playbook-*.md")
+    if [[ "$file" == plan/playbook-*.md ]]; then
+        result=$(find_dependencies "plan/playbook-*.md")
         if [ -n "$result" ]; then
             echo "$result"
             return 0

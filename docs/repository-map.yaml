@@ -115,7 +115,7 @@ agents:
   count: 8
   files:
     - name: "codex-delegate"
-      description: "Codex MCP をラップし、コンテキスト膨張を防止する SubAgent"
+      description: "Codex CLI をラップし、コンテキスト膨張を防止する SubAgent"
     - name: "critic"
       description: "各 subtask の test_command を実行し、PASS/FAIL を判定する"
     - name: "health-checker"
@@ -152,7 +152,7 @@ skills:
     - name: "post-loop"
       description: "POST_LOOP - playbook 完了後の自動処理"
     - name: "state"
-      description: "description: このワークスペースの state.md 管理、playbook 運用、レイヤー構造の専門知識。state.md の更新、focus の切り替え、done_criteria の判定、CRITIQUE の�"
+      description: "description: このワークスペースの state.md 管理、playbook 運用、レイヤー構造の専門知識。state.md の更新、focus の切り替え、done_criteria の判定、CRITIQUE の�"
     - name: "test-runner"
       description: "テスト実行・検証専門スキル"
 

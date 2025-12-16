@@ -77,7 +77,7 @@ playbook リセットのトリガー:
 
 ```yaml
 1. playbook から subtasks を抽出
-   → grep -A10 'subtasks:' plan/active/*.md
+   → grep -A10 'subtasks:' plan/playbook-*.md
 
 2. 各 subtask について:
    a. criterion を確認

@@ -29,7 +29,7 @@ milestone:
 
 playbook:
   定義: milestone を達成するための実行計画（一時的）
-  ファイル: plan/active/playbook-{name}.md
+  ファイル: plan/playbook-{name}.md
   完了後: アーカイブ + project.milestone 自動更新
   子要素: phase
 
@@ -568,7 +568,7 @@ SOLID対応:
 
 あるべき姿:
   - archive-playbook.sh の ARCHIVE_DIR が plan/archive/ を指す
-  - plan/active/ に完了済み playbook が残存しない
+  - plan/ に完了済み playbook が残存しない（アーカイブ済み）
   - playbook 完了時に自動でアーカイブ提案
 
 SOLID対応:
@@ -576,7 +576,7 @@ SOLID対応:
 
 検証コマンド:
   - grep -q 'ARCHIVE_DIR.*plan/archive' .claude/hooks/archive-playbook.sh
-  - ls plan/active/playbook-m01[4-9]*.md 2>/dev/null | wc -l == 0
+  - ls plan/playbook-*.md 2>/dev/null | wc -l  # 進行中のみ存在すべき
 ```
 
 ### M021: init-guard.sh デッドロック修正

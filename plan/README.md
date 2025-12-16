@@ -10,8 +10,8 @@
 plan/
 ├── README.md                    # このファイル
 ├── project.md                   # 根幹計画（vision, tech_decisions, milestones）
-├── active/                      # アクティブな playbook（進行中）
-│   └── playbook-{name}.md
+├── playbook-{name}.md           # アクティブな playbook（直下に配置）
+├── archive/                     # 完了した playbook のアーカイブ
 ├── design/                      # 設計ドキュメント
 │   ├── mission.md               # 最上位概念（vision の詳細）
 │   ├── self-healing-system.md   # Self-Healing System 設計
@@ -36,11 +36,11 @@ plan/
 - **milestones**（達成すべきマイルストーン）
 - playbook 作成時の参照元
 
-### active/（進行中 playbook）
+### playbook-{name}.md（進行中 playbook）
 
-- 現在進行中の playbook を配置
+- 現在進行中の playbook を plan/ 直下に配置
 - 1 playbook = 1 branch の原則
-- 完了後は `.archive/plan/` に移動
+- 完了後は `plan/archive/` に移動
 
 ### design/（設計ドキュメント）
 
@@ -60,7 +60,7 @@ plan/
 
 ```
 1. 作成
-   pm SubAgent → plan/active/playbook-{name}.md を作成
+   pm SubAgent → plan/playbook-{name}.md を作成（直下に配置）
    state.md の playbook.active を更新
 
 2. 実行
@@ -72,8 +72,8 @@ plan/
    state.md の playbook.active を null に
 
 4. アーカイブ
-   plan/active/playbook-{name}.md → .archive/plan/playbook-{name}.md
-   学習用に保存（learning Skill が参照）
+   plan/playbook-{name}.md → plan/archive/playbook-{name}.md
+   学習用に保存
 ```
 
 ---

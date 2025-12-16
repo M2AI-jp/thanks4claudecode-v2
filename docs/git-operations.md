@@ -179,7 +179,7 @@ feat(phase-1): タスク開始プロセス標準化 完了
 - タスク開始フロー図が作成
 
 critic: PASS
-playbook: plan/active/playbook-system-completion.md
+playbook: plan/playbook-system-completion.md
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 

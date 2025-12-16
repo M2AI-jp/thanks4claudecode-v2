@@ -147,7 +147,7 @@ examples:
     why: 定量的な基準、測定可能
 
   - criterion: "全 subtask に executor フィールドが存在する"
-    test_command: "grep -c 'executor:' plan/active/*.md | awk -F: '{sum+=$2} END {if(sum>=10) print \"PASS\"}'"
+    test_command: "grep -c 'executor:' plan/playbook-*.md | awk -F: '{sum+=$2} END {if(sum>=10) print \"PASS\"}'"
     why: 構造的な要件、grep で検証可能
 ```
 

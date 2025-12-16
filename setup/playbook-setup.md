@@ -1491,7 +1491,7 @@ Claude Code が直接実行すべきタスク:
   - playbook / state.md の管理
 
 委譲方法:
-  mcp__codex__codex ツールを使用
+  Codex CLI を Bash で実行（codex exec "プロンプト"）
   渡す情報: 目標、done_criteria、コーディングルール
   渡さない情報: state.md 全体、playbook 全体
 

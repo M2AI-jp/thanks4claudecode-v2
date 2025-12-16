@@ -52,7 +52,7 @@ Claude が POST_LOOP で以下を実行:
 mkdir -p .archive/plan
 
 # 2. playbook を移動
-mv plan/active/playbook-{name}.md .archive/plan/
+mv plan/playbook-{name}.md plan/archive/
 
 # 3. state.md 更新
 # active_playbooks.{layer} を null に
@@ -64,14 +64,14 @@ archive-playbook.sh の提案を見逃した場合:
 
 ```bash
 # 1. 完了した playbook を確認
-ls plan/active/playbook-*.md
+ls plan/playbook-*.md
 
 # 2. 全 Phase が done か確認
-grep "status:" plan/active/playbook-{name}.md
+grep "status:" plan/playbook-{name}.md
 
 # 3. 手動でアーカイブ
-mkdir -p .archive/plan
-mv plan/active/playbook-{name}.md .archive/plan/
+mkdir -p plan/archive
+mv plan/playbook-{name}.md plan/archive/
 
 # 4. state.md を更新
 # active_playbooks.{layer}: null
@@ -88,10 +88,10 @@ git add -A && git commit -m "chore: archive playbook-{name}"
 
 ```bash
 # 1. アーカイブから復元
-mv .archive/plan/playbook-{name}.md plan/active/
+mv plan/archive/playbook-{name}.md plan/
 
 # 2. state.md を更新
-# active_playbooks.{layer}: plan/active/playbook-{name}.md
+# playbook.active: plan/playbook-{name}.md
 
 # 3. git 記録
 git add -A && git commit -m "chore: restore playbook-{name} from archive"
@@ -101,7 +101,7 @@ git add -A && git commit -m "chore: restore playbook-{name} from archive"
 
 ```bash
 # git 履歴から復元
-git checkout HEAD~1 -- plan/active/playbook-{name}.md
+git checkout HEAD~1 -- plan/playbook-{name}.md
 ```
 
 ---
@@ -112,12 +112,12 @@ git checkout HEAD~1 -- plan/active/playbook-{name}.md
 
 ```yaml
 # 変更前
-active_playbooks:
-  product: plan/active/playbook-{name}.md
+playbook:
+  active: plan/playbook-{name}.md
 
 # 変更後
-active_playbooks:
-  product: null
+playbook:
+  active: null
 ```
 
 ### 5.2 変更履歴への記録

@@ -9,6 +9,8 @@
 Claude Code は 3 つの Toolstack パターンをサポートしています。
 ユーザーの環境と要件に応じて最適なパターンを選択してください。
 
+**全ツールは CLI で呼び出します。**
+
 ---
 
 ## パターン一覧
@@ -16,8 +18,18 @@ Claude Code は 3 つの Toolstack パターンをサポートしています。
 | パターン | 構成 | 推奨ユースケース |
 |----------|------|------------------|
 | **A** | Claude Code のみ | シンプルさ重視、初心者 |
-| **B** | Claude Code + Codex | 大規模コード生成、パフォーマンス重視 |
-| **C** | Claude Code + Codex + CodeRabbit | フルスタック、品質重視 |
+| **B** | Claude Code + Codex CLI | 大規模コード生成、パフォーマンス重視 |
+| **C** | Claude Code + Codex CLI + CodeRabbit CLI | フルスタック、品質重視 |
+
+---
+
+## CLI ツール一覧
+
+| ツール | コマンド | 用途 |
+|--------|---------|------|
+| Codex CLI | `codex exec "プロンプト"` | 大規模コード生成 |
+| Codex CLI | `codex review` | コードレビュー |
+| CodeRabbit CLI | `coderabbit review` | AI コードレビュー |
 
 ---
 
@@ -30,7 +42,7 @@ Claude Code は 3 つの Toolstack パターンをサポートしています。
   - Claude Code（コード作成・レビュー）
 
 設定不要:
-  - .mcp.json は context7 のみ
+  - 追加の CLI ツール不要
   - 追加の API キー不要
 
 executor 許可:
@@ -54,32 +66,20 @@ config:
   toolstack: A
 ```
 
-```json
-// .mcp.json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"]
-    }
-  }
-}
-```
-
 ---
 
-## パターン B: Claude Code + Codex
+## パターン B: Claude Code + Codex CLI
 
 ### 概要
 
 ```yaml
 ツール:
   - Claude Code（設計・小規模コード・レビュー）
-  - Codex（大規模コード生成）
+  - Codex CLI（大規模コード生成）
 
 必要な設定:
-  - .mcp.json に codex を追加
-  - OpenAI API キー（Codex 用）
+  - Codex CLI インストール済み
+  - OpenAI API キー（OPENAI_API_KEY 環境変数）
 
 executor 許可:
   - claudecode
@@ -102,50 +102,51 @@ config:
   toolstack: B
 ```
 
-```json
-// .mcp.json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"]
-    },
-    "codex": {
-      "command": "npx",
-      "args": ["-y", "codex-mcp-server"]
-    }
-  }
-}
+### Codex CLI の使用方法
+
+```bash
+# 非インタラクティブ実行（推奨）
+codex exec "ユーザー認証機能を実装してください"
+
+# コードレビュー
+codex review
+
+# モデル指定
+codex exec -m o3 "複雑なアルゴリズムを実装"
+
+# インタラクティブモード（対話式）
+codex "何か作りたいものを教えてください"
 ```
 
-### Codex の使用方法
+### SubAgent 経由の使用（推奨）
 
 ```yaml
-直接呼び出し（非推奨）:
-  mcp__codex__codex(prompt='実装内容')
-  ⚠️ コンテキストが膨張する可能性
+呼び出し方:
+  Task(subagent_type='codex-delegate', prompt='実装内容を説明')
 
-SubAgent 経由（推奨）:
-  Task(subagent_type='codex-delegate', prompt='実装内容')
-  ✓ 結果が要約され、コンテキスト膨張を防止
+効果:
+  - SubAgent として別コンテキストで実行
+  - 結果が要約され、コンテキスト膨張を防止
+  - Bash で CLI を呼び出し
 ```
 
 ---
 
-## パターン C: Claude Code + Codex + CodeRabbit
+## パターン C: Claude Code + Codex CLI + CodeRabbit CLI
 
 ### 概要
 
 ```yaml
 ツール:
   - Claude Code（設計・小規模コード）
-  - Codex（大規模コード生成）
-  - CodeRabbit（自動コードレビュー）
+  - Codex CLI（大規模コード生成）
+  - CodeRabbit CLI（自動コードレビュー）
 
 必要な設定:
-  - .mcp.json に codex を追加
-  - OpenAI API キー（Codex 用）
-  - CodeRabbit GitHub App インストール
+  - Codex CLI インストール済み
+  - CodeRabbit CLI インストール済み
+  - OpenAI API キー
+  - CodeRabbit 認証
 
 executor 許可:
   - claudecode
@@ -169,35 +170,17 @@ config:
   toolstack: C
 ```
 
-```json
-// .mcp.json（パターン B と同じ）
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"]
-    },
-    "codex": {
-      "command": "npx",
-      "args": ["-y", "codex-mcp-server"]
-    }
-  }
-}
-```
+### CodeRabbit CLI の使用方法
 
-### CodeRabbit 設定
+```bash
+# 認証（初回のみ）
+coderabbit auth
 
-```yaml
-1. GitHub App インストール:
-   - https://github.com/apps/coderabbit-ai にアクセス
-   - リポジトリにインストール
+# コードレビュー実行
+coderabbit review
 
-2. 設定ファイル（オプション）:
-   - .coderabbit.yaml をリポジトリルートに配置
-   - レビュールールをカスタマイズ
-
-3. 動作確認:
-   - PR を作成すると自動でレビューコメントが付く
+# 特定ファイルのレビュー
+coderabbit review --files src/main.ts
 ```
 
 ---
@@ -206,7 +189,7 @@ config:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ Q1: 外部 API の設定は問題ありませんか？                    │
+│ Q1: 外部 CLI ツールの設定は問題ありませんか？            │
 │                                                         │
 │   NO  ──────────────────────────> パターン A             │
 │   YES                                                   │
@@ -216,7 +199,7 @@ config:
 │   NO  ──────────────────────────> パターン A             │
 │   YES                                                   │
 │    ↓                                                    │
-│ Q3: PR ごとに自動レビューが欲しいですか？                 │
+│ Q3: AI によるコードレビューが欲しいですか？               │
 │                                                         │
 │   NO  ──────────────────────────> パターン B             │
 │   YES ─────────────────────────> パターン C             │
@@ -232,11 +215,12 @@ config:
    config:
      toolstack: B  # A, B, C のいずれか
 
-2. .mcp.json を更新（B または C の場合）:
-   - codex MCP サーバーを追加
+2. CLI ツールをインストール（B または C の場合）:
+   - Codex CLI: npm install -g @openai/codex
+   - CodeRabbit CLI: npm install -g coderabbit
 
-3. CodeRabbit を設定（C の場合）:
-   - GitHub App をインストール
+3. 環境変数を設定:
+   - OPENAI_API_KEY（Codex 用）
 ```
 
 ---
@@ -253,8 +237,55 @@ config:
 
 ---
 
+## CLI インストール確認
+
+```bash
+# Codex CLI
+which codex && codex --version
+
+# CodeRabbit CLI
+which coderabbit && coderabbit --help
+```
+
+---
+
+## トラブルシューティング
+
+### Codex CLI が見つからない
+
+```bash
+# npm でインストール
+npm install -g @openai/codex
+
+# パスを確認
+which codex
+```
+
+### CodeRabbit CLI が見つからない
+
+```bash
+# npm でインストール
+npm install -g coderabbit
+
+# パスを確認
+which coderabbit
+```
+
+### API キーエラー
+
+```bash
+# 環境変数を設定
+export OPENAI_API_KEY="your-api-key"
+
+# または .env ファイルに記載
+echo 'OPENAI_API_KEY=your-api-key' >> ~/.env
+```
+
+---
+
 ## 変更履歴
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-17 | CLI ベースに全面書き換え（M057） |
 | 2025-12-17 | 初版作成（M053） |

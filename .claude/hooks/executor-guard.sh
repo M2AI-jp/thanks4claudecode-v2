@@ -9,7 +9,7 @@
 #   2. in_progress の Phase を特定
 #   3. その Phase の executor を取得
 #   4. executor が claudecode 以外の場合:
-#      - codex: Codex MCP 使用を促す
+#      - codex: Codex CLI 使用を促す
 #      - coderabbit: CodeRabbit CLI 使用を促す
 #      - user: ユーザー作業であることを通知
 #   5. コードファイル編集をブロック
@@ -203,19 +203,20 @@ case "$EXECUTOR" in
     codex)
         cat >&2 << 'EOF'
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ⛔ executor: codex - Codex MCP を使用してください
+  ⛔ executor: codex - Codex CLI を使用してください
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   この Phase は Codex が担当です。
   Claude Code が直接コードを編集することは許可されていません。
 
   正しい手順:
-    1. Codex MCP を呼び出す:
-       mcp__codex__codex(prompt='実装内容を説明')
+    1. Codex CLI を実行:
+       codex exec "実装内容を説明"
 
     2. Codex の出力を確認
 
-    3. 必要に応じて修正を依頼
+    3. 必要に応じて修正を依頼:
+       codex apply
 
   playbook の executor を変更したい場合:
     pm エージェントに依頼してください。

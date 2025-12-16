@@ -67,7 +67,7 @@ notification: # アラート、ステータス更新送信
   完全一致: "Write"           # Write ツールのみ
   正規表現: "Edit|Write"      # Edit または Write
   ワイルドカード: "*" または "" # 全ツール
-  MCP: "mcp__server__tool"    # MCP ツール指定
+  外部ツール: "mcp__server__tool"    # 外部ツール指定
 ```
 
 ### 1.4 入力データ（stdin JSON）

@@ -57,7 +57,7 @@
 
 | フォルダ | 区分 | 役割 | 削除タイミング |
 |----------|------|------|----------------|
-| `plan/active/` | 一時 | 進行中の playbook | playbook 完了後に archive へ移動 |
+| `plan/playbook-*.md` | 一時 | 進行中の playbook（直下に配置） | playbook 完了後に archive へ移動 |
 | `plan/archive/` | 永続 | 完了した playbook のアーカイブ | - |
 | `plan/template/` | 永続 | playbook テンプレート | - |
 | `plan/project.md` | 永続 | プロジェクト計画 | - |
@@ -214,7 +214,7 @@
 | Hook スクリプト | `.claude/hooks/` |
 | SubAgent 定義 | `.claude/agents/` |
 | Skill 定義 | `.claude/skills/*/` |
-| playbook | `plan/active/` |
+| playbook | `plan/` |
 | 完了した playbook | `plan/archive/` |
 | アーカイブ（過去のファイル） | `.archive/` |
 
