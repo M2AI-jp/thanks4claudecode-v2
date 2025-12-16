@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m056-completion-verification.md
-branch: feat/m056-completion-verification
-last_archived: M055 (achieved: 2025-12-17)
+active: null
+branch: main
+last_archived: M056 (achieved: 2025-12-17)
 ```
 
 ---
@@ -28,14 +28,9 @@ last_archived: M055 (achieved: 2025-12-17)
 ## goal
 
 ```yaml
-milestone: M056
-phase: p_final (done)
-done_criteria:
-  - playbook-format.md に完了検証フェーズ（p_final）が必須として追加されている ✓
-  - archive-playbook.sh が done_when の test_command を再実行して検証する ✓
-  - subtask-guard が final_tasks の status: done をブロックしない ✓
-  - 既存の achieved milestone の done_when が実際に満たされているか再検証完了 ✓
-  - V12 チェックボックス形式が全コンポーネントに適用されている ✓
+milestone: null
+phase: null
+done_criteria: []
 ```
 
 ---

@@ -318,6 +318,24 @@ success_criteria:
     - [x] setup フローに toolstack 選択 Phase がある
     - [x] executor-guard.sh が toolstack に応じて制御する
     - [x] Codex が SubAgent 化されコンテキスト分離されている
+
+- id: M056
+  name: "playbook 完了検証システム + V12 チェックボックス形式"
+  description: |
+    報酬詐欺（done_when 未達成で achieved）を構造的に防止する。
+    1. playbook 完了時に done_when を自動検証
+    2. subtask 単位で `- [ ]` / `- [x]` で進捗を明示
+  status: achieved
+  achieved_at: 2025-12-17
+  depends_on: [M053]
+  playbooks:
+    - playbook-m056-completion-verification.md
+  done_when:
+    - [x] playbook-format.md に完了検証フェーズ（p_final）が必須として追加されている
+    - [x] archive-playbook.sh が done_when の test_command を再実行して検証する
+    - [x] subtask-guard が final_tasks の status: done をブロックしない
+    - [x] 既存の achieved milestone の done_when が実際に満たされているか再検証完了
+    - [x] V12 チェックボックス形式が全コンポーネントに適用されている
 ```
 
 ---
