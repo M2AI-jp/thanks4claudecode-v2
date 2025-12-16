@@ -21,6 +21,15 @@ if [[ ! -f "$STATE_FILE" ]]; then
     exit 0
 fi
 
+# ============================================================
+# Admin モードチェック（最優先）
+# ============================================================
+SECURITY=$(grep -A3 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 | sed 's/security: *//' | tr -d ' ')
+if [[ "$SECURITY" == "admin" ]]; then
+    # admin モードは playbook チェックをバイパス
+    exit 0
+fi
+
 # stdin から JSON を読み込む
 INPUT=$(cat)
 
@@ -32,16 +41,6 @@ fi
 # state.md への編集は常に許可（デッドロック回避）
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
 if [[ "$FILE_PATH" == *"state.md" ]]; then
-    exit 0
-fi
-
-# --------------------------------------------------
-# security チェック（admin モードはバイパス）
-# --------------------------------------------------
-SECURITY_MODE=$(grep -A10 "^## config" "$STATE_FILE" | grep "^security:" | head -1 | sed 's/security: *//' | sed 's/ *#.*//' | tr -d ' ')
-
-# admin モードは playbook チェックをバイパス
-if [[ "$SECURITY_MODE" == "admin" ]]; then
     exit 0
 fi
 

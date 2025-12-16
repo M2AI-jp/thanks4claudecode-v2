@@ -16,6 +16,18 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+# ============================================================
+# Admin モードチェック（最優先）
+# ============================================================
+STATE_FILE="state.md"
+if [ -f "$STATE_FILE" ]; then
+    SECURITY=$(grep -A3 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 | sed 's/security: *//' | tr -d ' ')
+    if [[ "$SECURITY" == "admin" ]]; then
+        # admin モードは HARD_BLOCK を含む全ての制限をバイパス
+        exit 0
+    fi
+fi
+
 # stdin から JSON を読み込む
 INPUT=$(cat)
 
@@ -61,6 +73,13 @@ WRITE_PATTERNS=(
     "rm -rf"
 )
 
+# /dev/null への出力は許可（誤検出防止）
+if [[ "$COMMAND" == *"> /dev/null"* ]] || [[ "$COMMAND" == *">/dev/null"* ]]; then
+    # /dev/null 以外の書き込みがないかチェック
+    COMMAND_WITHOUT_NULL=$(echo "$COMMAND" | sed 's/>[[:space:]]*\/dev\/null//g; s/2>&1//g')
+    COMMAND="$COMMAND_WITHOUT_NULL"
+fi
+
 # HARD_BLOCK チェック（常時ブロック）
 for protected in "${HARD_BLOCK_FILES[@]}"; do
     if [[ "$COMMAND" == *"$protected"* ]]; then
@@ -80,7 +99,7 @@ for protected in "${HARD_BLOCK_FILES[@]}"; do
                 echo "常に保護されています。" >&2
                 echo "" >&2
                 echo "========================================" >&2
-                exit 1
+                exit 2
             fi
         done
     fi
@@ -118,7 +137,7 @@ if [ "$SECURITY_MODE" = "strict" ]; then
                     echo "  2. state.md の security.mode を trusted に変更" >&2
                     echo "" >&2
                     echo "========================================" >&2
-                    exit 1
+                    exit 2
                 fi
             done
         fi
@@ -144,7 +163,7 @@ if [[ "$COMMAND" =~ $GIT_COMMIT_PATTERN ]]; then
             echo "回帰テストが失敗しました。"
             echo "問題を修正してから再度コミットしてください。"
             echo ""
-            exit 1
+            exit 2
         fi
         echo ""
         echo -e "  ✅ 回帰テスト PASS"

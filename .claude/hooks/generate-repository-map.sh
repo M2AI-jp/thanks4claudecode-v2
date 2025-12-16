@@ -172,6 +172,154 @@ count_files() {
 }
 
 # ==============================================================================
+# M025: system_specification 生成関数
+# ==============================================================================
+
+# CLAUDE.md から INIT フローを抽出
+extract_init_flow() {
+    local claude_md="$PROJECT_ROOT/CLAUDE.md"
+    if [[ ! -f "$claude_md" ]]; then
+        echo "      - state.md"
+        echo "      - plan/project.md"
+        echo "      - playbook (from state.md)"
+        echo "      - docs/repository-map.yaml"
+        return
+    fi
+
+    # INIT セクションから必須 Read を抽出
+    grep -A50 "^## INIT" "$claude_md" 2>/dev/null | \
+        grep -E "^\s+[0-9]+\. Read:" | \
+        sed 's/.*Read: */      - /' | \
+        head -5 || echo "      - state.md"
+}
+
+# Hook 連鎖を抽出（settings.json から同一トリガーの Hook を連鎖として出力）
+extract_hook_chain() {
+    local settings_file="$PROJECT_ROOT/.claude/settings.json"
+    local trigger="$1"
+
+    if [[ ! -f "$settings_file" ]] || ! command -v jq &> /dev/null; then
+        echo "      - unknown"
+        return
+    fi
+
+    # 指定トリガーの Hook 一覧を取得
+    jq -r --arg trigger "$trigger" '
+        .hooks[$trigger][]? |
+        .hooks[]? |
+        .command |
+        split("/") | .[-1]
+    ' "$settings_file" 2>/dev/null | while read -r hook; do
+        [[ -n "$hook" ]] && echo "        - $hook"
+    done
+}
+
+# CLAUDE.md から禁止事項を抽出
+extract_behavior_rules() {
+    local claude_md="$PROJECT_ROOT/CLAUDE.md"
+    if [[ ! -f "$claude_md" ]]; then
+        echo "      - playbook=null で Edit/Write 禁止"
+        return
+    fi
+
+    # 禁止事項セクションから抽出
+    grep -A20 "^## 禁止事項" "$claude_md" 2>/dev/null | \
+        grep "^❌" | \
+        sed 's/❌ /      - /' | \
+        head -10 || echo "      - (抽出失敗)"
+}
+
+# system_specification セクションを生成
+generate_system_specification() {
+    cat >> "$TEMP_FILE" << 'SPEC_HEADER'
+
+# ==============================================================================
+# System Specification (M025)
+# Claude の行動ルールと自己認識に必要な情報
+# ==============================================================================
+
+system_specification:
+  description: "Claude の行動ルールと Hook 連鎖の Single Source of Truth"
+
+  init_flow:
+    description: "セッション開始時の必須フロー"
+    required_reads:
+SPEC_HEADER
+
+    # INIT フローの必須 Read を出力
+    extract_init_flow >> "$TEMP_FILE"
+
+    cat >> "$TEMP_FILE" << 'SPEC_STEPS'
+    steps:
+      - "必須ファイル Read"
+      - "git branch/status 取得"
+      - "playbook=null → pm SubAgent"
+      - "[自認] 出力"
+      - "LOOP 開始"
+
+  loop_flow:
+    description: "作業ループのフロー"
+    steps:
+      - "subtasks を読む"
+      - "executor に応じて実行"
+      - "test_command で PASS/FAIL 判定"
+      - "全 PASS → CRITIQUE()"
+      - "PASS → 次 phase、FAIL → 修正"
+
+  post_loop_flow:
+    description: "playbook 完了後のフロー"
+    steps:
+      - "自動コミット"
+      - "playbook アーカイブ"
+      - "project.milestone 更新"
+      - "/clear 推奨アナウンス"
+      - "次 milestone → pm"
+
+  hook_chains:
+    description: "Hook の発火順序と連鎖関係"
+SPEC_STEPS
+
+    # Hook 連鎖を出力
+    cat >> "$TEMP_FILE" << 'HOOK_CHAINS'
+    PreToolUse_Edit:
+      trigger: "PreToolUse:Edit"
+      order:
+HOOK_CHAINS
+    extract_hook_chain "PreToolUse" >> "$TEMP_FILE"
+
+    cat >> "$TEMP_FILE" << 'HOOK_CHAINS2'
+    PostToolUse_Edit:
+      trigger: "PostToolUse:Edit"
+      order:
+HOOK_CHAINS2
+    extract_hook_chain "PostToolUse" >> "$TEMP_FILE"
+
+    cat >> "$TEMP_FILE" << 'HOOK_CHAINS3'
+    SessionStart:
+      trigger: "SessionStart"
+      order:
+HOOK_CHAINS3
+    extract_hook_chain "SessionStart" >> "$TEMP_FILE"
+
+    cat >> "$TEMP_FILE" << 'BEHAVIOR'
+
+  behavior_rules:
+    description: "CLAUDE.md から抽出した行動ルール"
+    core_principles:
+      - "pdca_autonomy: playbook 完了 → milestone 更新 → 次 playbook 自動作成"
+      - "tdd_first: done_criteria = テスト仕様、根拠必須"
+      - "validation: critic は frameworks/ を参照"
+      - "plan_based: playbook=null で Edit/Write → ブロック"
+      - "git_branch_sync: 1 playbook = 1 branch"
+    mandatory_outputs:
+      - "[自認]: セッション開始時"
+      - "[理解確認]: Edit/Write 前"
+    prohibited_actions:
+BEHAVIOR
+    extract_behavior_rules >> "$TEMP_FILE"
+}
+
+# ==============================================================================
 # メイン処理
 # ==============================================================================
 
@@ -472,6 +620,15 @@ summary:
   plan_archive: $ARCHIVE_COUNT
   plan_template: $TEMPLATE_COUNT
   total: $TOTAL_FILES
+EOF
+
+# ==============================================================================
+# System Specification (M025)
+# ==============================================================================
+echo "  Generating system specification..."
+generate_system_specification
+
+cat >> "$TEMP_FILE" << EOF
 
 # ==============================================================================
 # 変更履歴

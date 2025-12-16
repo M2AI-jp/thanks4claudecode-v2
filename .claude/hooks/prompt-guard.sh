@@ -209,19 +209,28 @@ escape_json() {
     echo "$1" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/	/\\t/g'
 }
 
-# systemMessage を構築（CLAUDE.md [自認] 形式と一致）
+# systemMessage を構築（簡素化版）
 SI_MESSAGE="━━━ State Injection ━━━\\n"
 SI_MESSAGE="${SI_MESSAGE}focus: $(escape_json "$SI_FOCUS")\\n"
 SI_MESSAGE="${SI_MESSAGE}milestone: $(escape_json "$SI_MILESTONE")\\n"
-SI_MESSAGE="${SI_MESSAGE}phase: $(escape_json "$SI_PHASE")\\n"
-SI_MESSAGE="${SI_MESSAGE}playbook: $(escape_json "$SI_PLAYBOOK")\\n"
+
+# playbook がある場合のみ詳細を出力
+if [ -n "$SI_PLAYBOOK" ] && [ "$SI_PLAYBOOK" != "null" ]; then
+    SI_MESSAGE="${SI_MESSAGE}phase: $(escape_json "$SI_PHASE")\\n"
+    SI_MESSAGE="${SI_MESSAGE}playbook: $(escape_json "$SI_PLAYBOOK")\\n"
+    SI_MESSAGE="${SI_MESSAGE}remaining: ${SI_REMAINING_PH} phases\\n"
+    # done_criteria は playbook があり、かつ内容がある場合のみ
+    if [ -n "$SI_CRITERIA" ]; then
+        SI_MESSAGE="${SI_MESSAGE}done_criteria:\\n${SI_CRITERIA}\\n"
+    fi
+else
+    SI_MESSAGE="${SI_MESSAGE}playbook: null\\n"
+fi
+
 SI_MESSAGE="${SI_MESSAGE}branch: $(escape_json "$SI_GIT_BRANCH")\\n"
 SI_MESSAGE="${SI_MESSAGE}git: $(escape_json "$SI_GIT_STATUS")\\n"
-SI_MESSAGE="${SI_MESSAGE}remaining: ${SI_REMAINING_PH} phases / ${SI_REMAINING_MS} milestones\\n"
-SI_MESSAGE="${SI_MESSAGE}project_summary: $(escape_json "$SI_PROJECT_GOAL")\\n"
-SI_MESSAGE="${SI_MESSAGE}last_critic: ${SI_LAST_CRITIC}\\n"
-SI_MESSAGE="${SI_MESSAGE}━━━━━━━━━━━━━━━━━━━━━━━━\\n"
-SI_MESSAGE="${SI_MESSAGE}done_criteria:\\n${SI_CRITERIA}"
+SI_MESSAGE="${SI_MESSAGE}remaining_milestones: ${SI_REMAINING_MS}\\n"
+SI_MESSAGE="${SI_MESSAGE}━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # 警告があれば追加
 if [ -n "$WARNINGS" ]; then

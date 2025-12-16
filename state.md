@@ -18,8 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/active/playbook-m016-release-preparation.md
-branch: feat/final-release-preparation
+active: null
+branch: feat/m053-multi-toolstack
+last_archived: M053 (achieved: 2025-12-17)
 ```
 
 ---
@@ -27,10 +28,8 @@ branch: feat/final-release-preparation
 ## goal
 
 ```yaml
-milestone: M016  # リリース準備：自己認識システム完成（完了）
-phase: done  # 全 phase 完了
-self_complete: true
-last_completed_milestone: M016 (achieved: 2025-12-14)
+milestone: M053
+phase: p0
 ```
 
 ---
@@ -38,7 +37,7 @@ last_completed_milestone: M016 (achieved: 2025-12-14)
 ## session
 
 ```yaml
-last_start: 2025-12-14 10:29:19
+last_start: 2025-12-16 23:57:53
 last_clear: 2025-12-13 00:30:00
 ```
 
@@ -48,9 +47,7 @@ last_clear: 2025-12-13 00:30:00
 
 ```yaml
 security: admin
-learning:
-  operator: hybrid
-  expertise: intermediate
+toolstack: A  # A: Claude Code only | B: +Codex | C: +Codex+CodeRabbit
 ```
 
 ---

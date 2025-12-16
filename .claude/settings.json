@@ -78,6 +78,11 @@
             "type": "command",
             "command": "bash .claude/hooks/executor-guard.sh",
             "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/subtask-guard.sh",
+            "timeout": 3000
           }
         ]
       },
@@ -117,6 +122,11 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/executor-guard.sh",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/subtask-guard.sh",
             "timeout": 3000
           }
         ]

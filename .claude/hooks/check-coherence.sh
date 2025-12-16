@@ -3,6 +3,11 @@
 
 set -e
 
+# ==============================================================================
+# state-schema.sh を source して state.md のスキーマを参照
+# ==============================================================================
+source .claude/schema/state-schema.sh
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -21,8 +26,8 @@ if [ ! -f "state.md" ]; then
     exit 2
 fi
 
-# focus.current を取得
-CURRENT=$(grep -A5 "## focus" state.md | grep "current:" | sed 's/.*current: *//' | sed 's/ *#.*//')
+# focus.current を state-schema.sh から取得
+CURRENT=$(get_focus_current)
 echo -e "  Focus: ${GREEN}$CURRENT${NC}"
 echo ""
 
