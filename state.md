@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m058-system-correction.md
-branch: fix/m058-system-correction
-last_archived: M057 (achieved: 2025-12-17)
+active: null
+branch: main
+last_archived: M058 (achieved: 2025-12-17)
 ```
 
 ---
@@ -28,8 +28,8 @@ last_archived: M057 (achieved: 2025-12-17)
 ## goal
 
 ```yaml
-milestone: M058
-phase: p_final (done)
+milestone: null
+phase: null
 done_criteria:
   - archive-playbook.sh が state.md の正しい構造（playbook.active）を参照している
   - archive-playbook.sh の構文エラーが修正されている

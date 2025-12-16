@@ -365,9 +365,11 @@ success_criteria:
     M057 playbook のデータ不整合（plan/ と archive/ に重複）をクリーンアップ。
     根本的な設計誤り（Claude Code がワーカー）を修正し、Codex/CodeRabbit を
     メインワーカーとする本来の設計に統一する。
-  status: pending
+  status: achieved
+  achieved_at: 2025-12-17
   depends_on: [M057]
-  playbooks: []
+  playbooks:
+    - playbook-m058-system-correction.md
   done_when:
     - "[ ] archive-playbook.sh が state.md の正しい構造（playbook.active）を参照している"
     - "[ ] plan/playbook-m057-cli-migration.md が削除されている"
@@ -429,7 +431,8 @@ playbook (一時的)
 phase (作業単位)
 ├── done_criteria[]: 完了条件
 ├── test_method: 検証手順
-└── status: pending | in_progress | done
+└── status: achieved | in_progress | done
+  achieved_at: 2025-12-17
 ```
 
 ---
