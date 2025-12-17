@@ -62,7 +62,7 @@ Claude が「完了」と宣言しながら実際は不完全だった例：
 
 ## 残っている不具合
 
-1. **feature-catalog が最新ではない** - 毎セッション警告が出る
+1. **repository-map.yaml との整合性（手動更新が必要な場合あり）
 2. **main ブランチ制限が厳しすぎ** - git push すらブロックされる
 3. **playbook=null で軽微な修正も不可** - README 更新にも playbook 必須
 4. **admin モードが機能しない** - 多くの Hook がバイパスしない

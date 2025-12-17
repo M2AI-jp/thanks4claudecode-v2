@@ -721,7 +721,7 @@ enforcement:
 
 実行内容:
   - tmp/ 内のファイルを自動削除
-  - tmp/CLAUDE.md と tmp/README.md は保持
+  - tmp/README.md は保持
 
 実装:
   - .claude/hooks/cleanup-hook.sh が PostToolUse:Edit で発火
@@ -743,7 +743,6 @@ enforcement:
 
 ### 参照ドキュメント
 
-- tmp/CLAUDE.md - tmp/ フォルダの役割説明
 - docs/folder-management.md - フォルダ管理ルール全般
 
 ---
@@ -960,7 +959,7 @@ enforcement:
   - status: pending
 
 - [ ] **ft2**: tmp/ 内の一時ファイルを削除する
-  - command: `find tmp/ -type f ! -name 'CLAUDE.md' ! -name 'README.md' -delete`
+  - command: `find tmp/ -type f ! -name 'README.md' -delete`
   - status: pending
 
 - [ ] **ft3**: 変更を全てコミットする
@@ -1010,7 +1009,7 @@ status 更新:
   - status: pending
 
 - [ ] **ft2**: tmp/ 内の一時ファイルを削除する
-  - command: `find tmp/ -type f ! -name 'CLAUDE.md' ! -name 'README.md' -delete 2>/dev/null || true`
+  - command: `find tmp/ -type f ! -name 'README.md' -delete 2>/dev/null || true`
   - status: pending
 
 - [ ] **ft3**: 変更を全てコミットする

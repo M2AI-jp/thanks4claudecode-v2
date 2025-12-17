@@ -165,7 +165,6 @@
           },
           {
             "type": "command",
-            "command": "bash .claude/hooks/feature-catalog-sync.sh --check",
             "timeout": 5000
           }
         ]

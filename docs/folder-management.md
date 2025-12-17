@@ -66,7 +66,6 @@
 
 | ファイル | 区分 | 役割 |
 |----------|------|------|
-| `CLAUDE.md` | 永続 | フォルダ役割説明 |
 | `repository-map.yaml` | 永続 | 全ファイルマッピング（★自動生成） |
 | `extension-system.md` | 永続 | Claude Code 公式リファレンス |
 | `criterion-validation-rules.md` | 永続 | done_criteria 検証ルール |
@@ -100,7 +99,6 @@
 
 | ファイル | 区分 | 役割 |
 |----------|------|------|
-| `CLAUDE.md` | 永続 | フォルダ役割説明（削除しない） |
 | `README.md` | 永続 | 使い方説明（削除しない） |
 | その他 | テンポラリ | 一時ファイル（playbook 完了時に自動削除） |
 
@@ -144,7 +142,7 @@
 トリガー: playbook の全 Phase が done
 実行者: .claude/hooks/cleanup-hook.sh
 対象:
-  - tmp/ 内のファイル（CLAUDE.md, README.md を除く）
+  - tmp/ 内のファイル（README.md を除く）
   - 空のサブディレクトリ
 ```
 
@@ -287,7 +285,6 @@ du -sh .archive/
 ## 連携ドキュメント
 
 - `CLAUDE.md` - LLM の振る舞いルール
-- `tmp/CLAUDE.md` - tmp/ フォルダの詳細説明
 - `docs/archive-operation-rules.md` - アーカイブ操作ルール
 - `.claude/hooks/cleanup-hook.sh` - クリーンアップ Hook
 - `plan/template/playbook-format.md` - playbook テンプレート

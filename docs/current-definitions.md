@@ -71,7 +71,6 @@ check-main-branch.sh より：
 | depends-check.sh | PreToolUse:Edit | Phase 依存チェック |
 | executor-guard.sh | PreToolUse:Edit | executor 強制 |
 | failure-logger.sh | utility | 失敗ログ記録 |
-| feature-catalog-sync.sh | SessionStart | 機能カタログ同期 |
 | generate-repository-map.sh | utility | マップ生成 |
 | init-guard.sh | PreToolUse:* | 必須ファイル Read 強制 |
 | lint-check.sh | PreToolUse:Bash | 静的解析チェック |

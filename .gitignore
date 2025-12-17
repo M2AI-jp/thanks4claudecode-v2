@@ -40,7 +40,6 @@ Thumbs.db
 out/
 tmp/
 tmp/*
-!tmp/CLAUDE.md
 !tmp/README.md
 
 # Coverage

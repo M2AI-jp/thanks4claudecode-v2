@@ -6,13 +6,12 @@
 #
 # 設計思想:
 #   - playbook 完了を自動検出（archive-playbook.sh と同様のロジック）
-#   - tmp/ 内のファイルを削除（CLAUDE.md と README.md は保持）
+#   - tmp/ 内のファイルを削除（README.md は保持）
 #   - 削除されたファイル数を systemMessage で通知
 #   - dry-run モードはなし（tmp/ は一時ファイル専用なので安全）
 #
 # 連携:
 #   - archive-playbook.sh: playbook 完了検出ロジックを共有
-#   - tmp/CLAUDE.md: フォルダ役割を定義
 #
 # 参照: docs/folder-management.md
 
@@ -67,16 +66,16 @@ if [ ! -d "tmp" ]; then
     exit 0
 fi
 
-# tmp/ 内のファイルをカウント（CLAUDE.md と README.md を除く）
-TMP_FILES=$(find tmp -type f ! -name "CLAUDE.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
+# tmp/ 内のファイルをカウント（README.md を除く）
+TMP_FILES=$(find tmp -type f ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
 
 # 削除対象がない場合はスキップ
 if [ "$TMP_FILES" -eq 0 ]; then
     exit 0
 fi
 
-# tmp/ 内のファイルを削除（CLAUDE.md と README.md を除く）
-find tmp -type f ! -name "CLAUDE.md" ! -name "README.md" -delete 2>/dev/null || true
+# tmp/ 内のファイルを削除（README.md を除く）
+find tmp -type f ! -name "README.md" -delete 2>/dev/null || true
 
 # 空のサブディレクトリを削除
 find tmp -type d -empty -delete 2>/dev/null || true
