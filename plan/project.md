@@ -603,7 +603,7 @@ success_criteria:
     2. codex-delegate SubAgent を MCP ツール呼び出しに変更
     3. ドキュメントを更新
     4. 動作確認
-  status: in_progress
+  status: achieved
   depends_on: [M076]
   playbooks:
     - playbook-m078-codex-mcp.md

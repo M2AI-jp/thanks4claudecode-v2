@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m078-codex-mcp.md
+active: null
 branch: research/codex-mcp
-last_archived: M076 playbook-m076-orchestration-e2e-test.md (2025-12-18)
+last_archived: M078 playbook-m078-codex-mcp.md (2025-12-18)
 ```
 
 ---
@@ -29,7 +29,7 @@ last_archived: M076 playbook-m076-orchestration-e2e-test.md (2025-12-18)
 
 ```yaml
 milestone: M078
-phase: p1
+phase: null
 done_criteria:
   - .claude/mcp.json が存在し、codex mcp-server が登録されている
   - codex-delegate.md が MCP ツール mcp__codex__codex を使用する形式に更新されている
