@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
-last_archived: M062 playbook-m062-fraud-investigation-e2e.md (2025-12-17)
+active: plan/playbook-m073-ai-orchestration.md
+branch: feat/m073-ai-orchestration
+last_archived: M072 playbook-m072-fix.md (2025-12-17)
 ```
 
 ---
@@ -28,10 +28,15 @@ last_archived: M062 playbook-m062-fraud-investigation-e2e.md (2025-12-17)
 ## goal
 
 ```yaml
-milestone: 全 milestone 完了（M001-M071）
-phase: null
+milestone: M073 AI エージェントオーケストレーション
+phase: p_final
 done_criteria:
-  - 全 27 milestone が achieved
+  - state.md の config セクションに roles マッピングが追加されている
+  - playbook-format.md に meta.roles セクションの説明が追加されている
+  - role-resolver.sh が存在し、役割 -> executor 解決ロジックが実装されている
+  - executor-guard.sh が role-resolver.sh を呼び出している
+  - pm SubAgent が roles セクションについて記述している
+  - docs/ai-orchestration.md が存在し、50行以上で文書化されている
 ```
 
 ---
@@ -39,7 +44,7 @@ done_criteria:
 ## session
 
 ```yaml
-last_start: 2025-12-17 21:44:12
+last_start: 2025-12-17 23:00:26
 last_clear: 2025-12-13 00:30:00
 ```
 
@@ -50,6 +55,11 @@ last_clear: 2025-12-13 00:30:00
 ```yaml
 security: admin
 toolstack: A  # A: Claude Code only | B: +Codex | C: +Codex+CodeRabbit
+roles:
+  orchestrator: claudecode  # 監督・調整・設計（常に claudecode）
+  worker: claudecode        # 実装担当（A: claudecode, B/C: codex）
+  reviewer: claudecode      # レビュー担当（A/B: claudecode, C: coderabbit）
+  human: user               # 人間の介入（常に user）
 ```
 
 ---

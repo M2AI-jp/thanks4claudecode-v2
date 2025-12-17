@@ -540,6 +540,35 @@ success_criteria:
     - "test -x .claude/hooks/feature-catalog-sync.sh && echo PASS || echo FAIL"
     - "grep -q 'feature-catalog-sync.sh' .claude/settings.json && echo PASS || echo FAIL"
 
+- id: M073
+  name: "AI エージェントオーケストレーション - 役割ベース executor 抽象化"
+  description: |
+    現在の executor は具体的なツール名（claudecode, codex, coderabbit, user）を直接指定している。
+    これを抽象的な役割名（orchestrator, worker, reviewer, human）に変更し、
+    実行時に toolstack に応じて解決する仕組みを実装する。
+
+    目的:
+    1. playbook の再利用性向上（toolstack 変更時に playbook 書き換え不要）
+    2. 役割と実装の疎結合化（SOLID 原則）
+    3. AI エージェントオーケストレーションの基盤構築
+  status: not_started
+  depends_on: [M072]
+  playbooks: []
+  done_when:
+    - "[ ] state.md の config セクションに roles マッピングが追加されている"
+    - "[ ] playbook-format.md に meta.roles セクションの説明が追加されている"
+    - "[ ] role-resolver.sh が .claude/hooks/ に存在し、役割 -> executor 解決ロジックが実装されている"
+    - "[ ] executor-guard.sh が role-resolver.sh を呼び出して解決後の executor をチェックする"
+    - "[ ] pm SubAgent が playbook 作成時に roles セクションを自動生成する"
+    - "[ ] docs/ai-orchestration.md が存在し、設計・使用方法が文書化されている"
+  test_commands:
+    - "grep -q 'roles:' state.md && grep -q 'orchestrator:' state.md && echo PASS || echo FAIL"
+    - "grep -q 'meta.roles' plan/template/playbook-format.md && echo PASS || echo FAIL"
+    - "test -x .claude/hooks/role-resolver.sh && bash -n .claude/hooks/role-resolver.sh && echo PASS || echo FAIL"
+    - "grep -q 'role-resolver.sh' .claude/hooks/executor-guard.sh && echo PASS || echo FAIL"
+    - "grep -q 'roles' .claude/agents/pm.md && echo PASS || echo FAIL"
+    - "test -f docs/ai-orchestration.md && wc -l docs/ai-orchestration.md | awk '{if($1>=50) print \"PASS\"; else print \"FAIL\"}'"
+
 ```
 
 ---

@@ -102,6 +102,17 @@ for i in $(seq "$LINE_NUM" -1 1); do
     fi
 done
 
+# ==============================================================
+# role-resolver.sh で役割名を具体的な executor に解決
+# ==============================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -x "$SCRIPT_DIR/role-resolver.sh" && -n "$EXECUTOR" ]]; then
+    RESOLVED_EXECUTOR=$(TOOLSTACK="$TOOLSTACK" bash "$SCRIPT_DIR/role-resolver.sh" "$EXECUTOR" 2>/dev/null || echo "$EXECUTOR")
+    if [[ -n "$RESOLVED_EXECUTOR" ]]; then
+        EXECUTOR="$RESOLVED_EXECUTOR"
+    fi
+fi
+
 # executor が空または claudecode ならスキップ
 if [[ -z "$EXECUTOR" || "$EXECUTOR" == "claudecode" ]]; then
     exit 0

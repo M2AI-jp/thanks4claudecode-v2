@@ -14,16 +14,41 @@ playbook の作成・管理・進捗追跡を行うプロジェクトマネー�
 
 ---
 
-## 役割定義（固定）
+## 役割定義（M073: AI エージェントオーケストレーション）
 
-> **AI エージェントオーケストレーションの役割分担。playbook 作成時に参照。**
+> **抽象的な役割名で executor を指定し、実行時に具体的なツールに解決する。**
+> **詳細: docs/ai-orchestration.md**
 
 ```yaml
+# 標準役割定義（抽象 → 具体）
 roles:
-  orchestrator: claudecode      # 監督・調整・設計
-  worker: codex                 # 本格的なコード実装
-  code_reviewer: coderabbit     # コードレビュー（PR 時）
-  playbook_reviewer: reviewer   # playbook レビュー（SubAgent opus）
+  orchestrator: claudecode      # 監督・調整・設計（常に claudecode）
+  worker: codex                 # 本格的なコード実装（toolstack A: claudecode, B/C: codex）
+  reviewer: coderabbit          # コードレビュー（toolstack A/B: claudecode, C: coderabbit）
+  human: user                   # 人間の介入（常に user）
+```
+
+### 役割ベース executor の使用
+
+playbook の subtask で抽象的な役割名を使用できます：
+
+```yaml
+# 従来の方法（具体的な executor）
+- executor: codex
+
+# 新しい方法（役割名）
+- executor: worker  # toolstack に応じて解決
+```
+
+### playbook での roles override
+
+特定の playbook で役割の割り当てを変更する場合：
+
+```yaml
+# playbook meta セクション
+meta:
+  roles:
+    worker: claudecode  # この playbook では worker = claudecode
 ```
 
 ### executor への対応

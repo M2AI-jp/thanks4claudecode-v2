@@ -16,11 +16,15 @@ created: {作成日}
 issue: {Issue 番号 or null}
 derives_from: {project.done_when の id}  # 例: DW-001
 reviewed: false  # reviewer SubAgent による検証済みフラグ
+roles:  # オプション: 役割の override（state.md のデフォルトを上書き）
+  worker: claudecode  # この playbook では worker = claudecode
 ```
 
 > **branch フィールド**: playbook とブランチは 1:1 で紐づく。
 > **derives_from フィールド**: この playbook が対応する project.done_when の ID。
 > 計画の連鎖（project → playbook）を追跡可能にする。
+> **roles フィールド（M073 新規）**: 役割の override。未指定の場合は state.md config.roles が使用される。
+> 詳細: docs/ai-orchestration.md
 
 ---
 
