@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
-last_archived: M058 (achieved: 2025-12-17)
+active: plan/playbook-m062-fraud-investigation-e2e.md
+branch: feat/m062-fraud-investigation-e2e
+last_archived: M061 playbook-m061-done-when-correction.md (2025-12-17)
 ```
 
 ---
@@ -28,17 +28,13 @@ last_archived: M058 (achieved: 2025-12-17)
 ## goal
 
 ```yaml
-milestone: null
-phase: null
+milestone: M062
+phase: p1
 done_criteria:
-  - archive-playbook.sh が state.md の正しい構造（playbook.active）を参照している
-  - archive-playbook.sh の構文エラーが修正されている
-  - plan/playbook-m057-cli-migration.md が削除されている
-  - plan/archive/playbook-m057-cli-migration.md のみが存在する
-  - project.md の M057 status が achieved に更新されている
-  - project.md の M058 が新規マイルストーンとして追加されている
-  - playbook-guard.sh が admin モードでも playbook チェックをバイパスしない
-  - CLAUDE.md の「設計思想」セクションが Codex/CodeRabbit メインワーカーの方針に更新されている
+  - M001-M061 の全 milestone に対して done_when の達成状況が検証されている
+  - archive-playbook.sh に subtask 単位の完了チェックが追加されている
+  - docs/e2e-simulation-log.md に全 Hook/SubAgent/Skill の動作確認ログが記録されている
+  - 発見された報酬詐欺（done_when 未達成）が 0 件、または修正済みである
 ```
 
 ---

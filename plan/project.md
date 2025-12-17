@@ -379,6 +379,31 @@ success_criteria:
     - "[ ] project.md の M058 が新規マイルストーンとして追加されている"
     - "[ ] CLAUDE.md の「設計思想」セクションが Codex/CodeRabbit メインワーカーの方針に更新されている"
 
+- id: M062
+  name: "報酬詐欺徹底調査 + 全機能 E2E シミュレーション"
+  description: |
+    報酬詐欺があるという前提で全 milestone を1から再調査し、
+    M061 の playbook プロセス違反を修正する。
+    archive-playbook.sh に subtask 完了チェックを追加し、
+    架空ユーザーとの会話形式で全機能の E2E シミュレーションを実施する。
+  status: in_progress
+  depends_on: [M061]
+  playbooks:
+    - playbook-m062-fraud-investigation-e2e.md
+  done_when:
+    完了条件:
+      - "[ ] M001-M061 の全 milestone に対して done_when の達成状況が検証されている"
+      - "[ ] archive-playbook.sh に subtask 単位の完了チェックが追加されている"
+      - "[ ] docs/e2e-simulation-log.md に全 Hook/SubAgent/Skill の動作確認ログが記録されている"
+      - "[ ] 発見された報酬詐欺（done_when 未達成）が 0 件、または修正済みである"
+    未完了条件:
+      - "上記のいずれかが満たされていない"
+    test_commands:
+      - "test -f docs/fraud-investigation-report.md && grep -q 'M001' docs/fraud-investigation-report.md && grep -q 'M061' docs/fraud-investigation-report.md && echo PASS"
+      - "grep -q 'CHECKED_COUNT' .claude/hooks/archive-playbook.sh && grep -q 'UNCHECKED_COUNT' .claude/hooks/archive-playbook.sh && echo PASS"
+      - "test -f docs/e2e-simulation-log.md && wc -l docs/e2e-simulation-log.md | awk '{if($1>=200) print \"PASS\"}'"
+      - "grep -c '未修正' docs/fraud-investigation-report.md 2>/dev/null | awk '{if($1==0) print \"PASS\"}' || echo PASS"
+
 ```
 
 ---
