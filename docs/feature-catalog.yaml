@@ -1,0 +1,531 @@
+# Feature Catalog
+#
+# 「全機能」の定義 - このファイルが Single Source of Truth
+# 作成日: 2025-12-17
+# 目的: 全 Hook/SubAgent/Skill を列挙し、各機能の責任とトリガーを明示する
+
+---
+
+meta:
+  version: "1.0.0"
+  last_updated: "2025-12-17"
+  total_hooks: 29
+  total_agents: 6
+  total_skills: 9
+  total_features: 44
+
+---
+
+hooks:
+  # ================================================
+  # PreToolUse:* (全ツール共通)
+  # ================================================
+  - id: H001
+    name: init-guard.sh
+    purpose: "必須ファイル Read 強制（state.md, project.md）"
+    trigger: "PreToolUse:*"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+      2: "ブロック（必須ファイル未読み込み）"
+
+  - id: H002
+    name: check-main-branch.sh
+    purpose: "main ブランチでの直接作業を禁止"
+    trigger: "PreToolUse:*"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過（main 以外のブランチ）"
+      2: "ブロック（main ブランチ）"
+
+  # ================================================
+  # PreToolUse:Edit
+  # ================================================
+  - id: H003
+    name: consent-guard.sh
+    purpose: "合意ファイルの有無を確認、未承認なら Edit/Write をブロック"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過（合意済み）"
+      2: "ブロック（未承認）"
+
+  - id: H004
+    name: check-protected-edit.sh
+    purpose: "保護対象ファイルの編集を検出・警告"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies:
+      - ".claude/protected-files.txt"
+    exit_codes:
+      0: "通過（保護対象外 or 確認済み）"
+      2: "ブロック（保護対象）"
+
+  - id: H005
+    name: playbook-guard.sh
+    purpose: "playbook=null で Edit/Write をブロック"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies:
+      - "state.md"
+    exit_codes:
+      0: "通過（playbook あり）"
+      2: "ブロック（playbook なし）"
+
+  - id: H006
+    name: depends-check.sh
+    purpose: "phase の依存関係をチェック"
+    trigger: "PreToolUse:Edit"
+    registered: true
+    dependencies:
+      - "active playbook"
+    exit_codes:
+      0: "通過（依存関係満たす）"
+      2: "ブロック（依存関係未満足）"
+
+  - id: H007
+    name: critic-guard.sh
+    purpose: "critic なしで phase 完了をブロック"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+      2: "ブロック（critic 未実行）"
+
+  - id: H008
+    name: scope-guard.sh
+    purpose: "スコープ外のファイル編集を検出"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies:
+      - "active playbook"
+    exit_codes:
+      0: "通過（スコープ内）"
+      2: "ブロック（スコープ外）"
+
+  - id: H009
+    name: executor-guard.sh
+    purpose: "executor に基づいて実行者を制御"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies:
+      - "state.md (toolstack)"
+    exit_codes:
+      0: "通過"
+      2: "ブロック（executor 不一致）"
+
+  - id: H010
+    name: subtask-guard.sh
+    purpose: "subtask 単位の検証を強制"
+    trigger: "PreToolUse:Edit, PreToolUse:Write"
+    registered: true
+    dependencies:
+      - "active playbook"
+    exit_codes:
+      0: "通過"
+      2: "ブロック（検証未完了）"
+
+  # ================================================
+  # PreToolUse:Bash
+  # ================================================
+  - id: H011
+    name: pre-bash-check.sh
+    purpose: "危険なコマンドを検出・ブロック"
+    trigger: "PreToolUse:Bash"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+      2: "ブロック（危険なコマンド）"
+
+  - id: H012
+    name: check-coherence.sh
+    purpose: "state.md と playbook の整合性を確認"
+    trigger: "PreToolUse:Bash"
+    registered: true
+    dependencies:
+      - "state.md"
+      - "active playbook"
+    exit_codes:
+      0: "通過（整合性あり）"
+      2: "ブロック（整合性なし）"
+
+  - id: H013
+    name: lint-check.sh
+    purpose: "コード品質チェック（ESLint 等）"
+    trigger: "PreToolUse:Bash"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+      1: "警告（lint エラーあり）"
+
+  # ================================================
+  # UserPromptSubmit
+  # ================================================
+  - id: H014
+    name: prompt-guard.sh
+    purpose: "ユーザープロンプトの検証、状態注入"
+    trigger: "UserPromptSubmit:*"
+    registered: true
+    dependencies:
+      - "state.md"
+      - "plan/project.md"
+    exit_codes:
+      0: "通過"
+
+  # ================================================
+  # SessionStart
+  # ================================================
+  - id: H015
+    name: session-start.sh
+    purpose: "セッション開始時の初期化、consent ファイル作成"
+    trigger: "SessionStart:*"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+
+  # ================================================
+  # PostToolUse
+  # ================================================
+  - id: H016
+    name: log-subagent.sh
+    purpose: "SubAgent 呼び出しをログに記録"
+    trigger: "PostToolUse:Task"
+    registered: true
+    dependencies:
+      - ".claude/logs/"
+    exit_codes:
+      0: "通過"
+
+  - id: H017
+    name: archive-playbook.sh
+    purpose: "完了した playbook をアーカイブに移動"
+    trigger: "PostToolUse:Edit"
+    registered: true
+    dependencies:
+      - "plan/archive/"
+      - "active playbook"
+    exit_codes:
+      0: "通過"
+
+  - id: H018
+    name: cleanup-hook.sh
+    purpose: "tmp/ 内の一時ファイルを削除"
+    trigger: "PostToolUse:Edit"
+    registered: true
+    dependencies:
+      - "tmp/"
+    exit_codes:
+      0: "通過"
+
+  - id: H019
+    name: create-pr-hook.sh
+    purpose: "PR 作成条件を検出し、create-pr.sh を呼び出す"
+    trigger: "PostToolUse:Edit"
+    registered: true
+    dependencies:
+      - ".claude/hooks/create-pr.sh"
+    exit_codes:
+      0: "通過"
+
+  # ================================================
+  # SessionEnd
+  # ================================================
+  - id: H020
+    name: session-end.sh
+    purpose: "セッション終了時の後処理"
+    trigger: "SessionEnd:*"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+
+  # ================================================
+  # Stop
+  # ================================================
+  - id: H021
+    name: stop-summary.sh
+    purpose: "中断時のサマリー出力"
+    trigger: "Stop:*"
+    registered: true
+    dependencies: []
+    exit_codes:
+      0: "通過"
+
+  # ================================================
+  # PreCompact
+  # ================================================
+  - id: H022
+    name: pre-compact.sh
+    purpose: "compact 前の状態保存"
+    trigger: "PreCompact:*"
+    registered: true
+    dependencies:
+      - "state.md"
+    exit_codes:
+      0: "通過"
+
+  # ================================================
+  # ユーティリティスクリプト（settings.json 未登録）
+  # ================================================
+  - id: H023
+    name: create-pr.sh
+    purpose: "PR を作成するユーティリティスクリプト"
+    trigger: "manual"
+    registered: false
+    dependencies:
+      - "gh CLI"
+    exit_codes:
+      0: "成功"
+      1: "失敗"
+
+  - id: H024
+    name: merge-pr.sh
+    purpose: "PR をマージするユーティリティスクリプト"
+    trigger: "manual"
+    registered: false
+    dependencies:
+      - "gh CLI"
+    exit_codes:
+      0: "成功"
+      1: "失敗"
+
+  - id: H025
+    name: generate-repository-map.sh
+    purpose: "repository-map.yaml を自動生成"
+    trigger: "manual"
+    registered: false
+    dependencies: []
+    exit_codes:
+      0: "成功"
+      1: "失敗"
+
+  - id: H026
+    name: system-health-check.sh
+    purpose: "システム全体の健全性チェック"
+    trigger: "manual"
+    registered: false
+    dependencies:
+      - "state.md"
+      - "plan/project.md"
+    exit_codes:
+      0: "健全"
+      1: "異常あり"
+
+  - id: H027
+    name: failure-logger.sh
+    purpose: "失敗パターンをログに記録"
+    trigger: "manual (from other hooks)"
+    registered: false
+    dependencies:
+      - ".claude/logs/failures.log"
+    exit_codes:
+      0: "成功"
+
+  - id: H028
+    name: test-hooks.sh
+    purpose: "全 Hook のテストを実行"
+    trigger: "manual"
+    registered: false
+    dependencies: []
+    exit_codes:
+      0: "全 PASS"
+      1: "一部 FAIL"
+
+  - id: H029
+    name: feature-catalog-sync.sh
+    purpose: "機能カタログと実ファイルの整合性チェック"
+    trigger: "SessionStart:*"
+    registered: true
+    dependencies:
+      - "docs/feature-catalog.yaml"
+    exit_codes:
+      0: "整合（OK）"
+      1: "不整合（OUTDATED）"
+
+---
+
+agents:
+  - id: A001
+    name: pm
+    file: ".claude/agents/pm.md"
+    subagent_type: pm
+    purpose: "プロジェクト管理、playbook 作成、milestone 管理"
+    invocation: "Task(subagent_type='pm')"
+    auto_invoke: true
+    triggers:
+      - "playbook=null でタスク開始時"
+      - "milestone 完了時に次 playbook 作成"
+
+  - id: A002
+    name: critic
+    file: ".claude/agents/critic.md"
+    subagent_type: critic
+    purpose: "done_criteria の検証、報酬詐欺防止"
+    invocation: "Task(subagent_type='critic')"
+    auto_invoke: false
+    triggers:
+      - "phase 完了前"
+      - "playbook 完了前"
+
+  - id: A003
+    name: reviewer
+    file: ".claude/agents/reviewer.md"
+    subagent_type: reviewer
+    purpose: "コード・設計レビュー"
+    invocation: "Task(subagent_type='reviewer')"
+    auto_invoke: false
+    triggers:
+      - "PR 作成前"
+      - "playbook レビュー時"
+
+  - id: A004
+    name: codex-delegate
+    file: ".claude/agents/codex-delegate.md"
+    subagent_type: codex-delegate
+    purpose: "Codex CLI のラップ、コンテキスト分離"
+    invocation: "Task(subagent_type='codex-delegate')"
+    auto_invoke: false
+    triggers:
+      - "executor: codex 指定時"
+
+  - id: A005
+    name: health-checker
+    file: ".claude/agents/health-checker.md"
+    subagent_type: health-checker
+    purpose: "システム状態の定期監視"
+    invocation: "Task(subagent_type='health-checker')"
+    auto_invoke: false
+    triggers:
+      - "システム健全性チェック要求時"
+
+  - id: A006
+    name: setup-guide
+    file: ".claude/agents/setup-guide.md"
+    subagent_type: setup-guide
+    purpose: "セットアップ支援、環境構築ガイド"
+    invocation: "Task(subagent_type='setup-guide')"
+    auto_invoke: true
+    triggers:
+      - "focus.current=setup 時"
+
+---
+
+skills:
+  - id: S001
+    name: consent-process
+    directory: ".claude/skills/consent-process/"
+    skill_dir: ".claude/skills/consent-process/"
+    purpose: "ユーザープロンプトの誤解釈防止、[理解確認] ブロック強制"
+    invocation: "Skill(skill='consent-process')"
+    auto_invoke: false
+    triggers:
+      - "playbook=null で新規タスク開始時"
+      - "Edit/Write 前の合意取得時"
+
+  - id: S002
+    name: context-management
+    directory: ".claude/skills/context-management/"
+    skill_dir: ".claude/skills/context-management/"
+    purpose: "/compact 最適化と履歴要約のガイドライン"
+    invocation: "Skill(skill='context-management')"
+    auto_invoke: false
+    triggers:
+      - "compact 実行時"
+
+  - id: S003
+    name: deploy-checker
+    directory: ".claude/skills/deploy-checker/"
+    skill_dir: ".claude/skills/deploy-checker/"
+    purpose: "デプロイ準備・検証（git push 前チェック）"
+    invocation: "Skill(skill='deploy-checker')"
+    auto_invoke: false
+    triggers:
+      - "git push 前"
+      - "デプロイ準備時"
+
+  - id: S004
+    name: frontend-design
+    directory: ".claude/skills/frontend-design/"
+    skill_dir: ".claude/skills/frontend-design/"
+    purpose: "プロダクション品質の UI/UX デザインガイドライン"
+    invocation: "Skill(skill='frontend-design')"
+    auto_invoke: false
+    triggers:
+      - "フロントエンド実装時"
+
+  - id: S005
+    name: lint-checker
+    directory: ".claude/skills/lint-checker/"
+    skill_dir: ".claude/skills/lint-checker/"
+    purpose: "コード品質チェック（ESLint, TypeScript）"
+    invocation: "Skill(skill='lint-checker')"
+    auto_invoke: false
+    triggers:
+      - "コード品質チェック要求時"
+
+  - id: S006
+    name: plan-management
+    directory: ".claude/skills/plan-management/"
+    skill_dir: ".claude/skills/plan-management/"
+    purpose: "Multi-layer planning と playbook 管理"
+    invocation: "Skill(skill='plan-management')"
+    auto_invoke: false
+    triggers:
+      - "plan/playbook/phase キーワード使用時"
+
+  - id: S007
+    name: post-loop
+    directory: ".claude/skills/post-loop/"
+    skill_dir: ".claude/skills/post-loop/"
+    purpose: "playbook 完了後の処理フロー"
+    invocation: "Skill(skill='post-loop')"
+    auto_invoke: false
+    triggers:
+      - "playbook 完了時"
+
+  - id: S008
+    name: state
+    directory: ".claude/skills/state/"
+    skill_dir: ".claude/skills/state/"
+    purpose: "state.md 管理、focus 切り替え、done_criteria 判定"
+    invocation: "Skill(skill='state')"
+    auto_invoke: false
+    triggers:
+      - "state.md 更新時"
+      - "focus 切り替え時"
+
+  - id: S009
+    name: test-runner
+    directory: ".claude/skills/test-runner/"
+    skill_dir: ".claude/skills/test-runner/"
+    purpose: "テスト実行・検証（Unit, E2E, 型チェック）"
+    invocation: "Skill(skill='test-runner')"
+    auto_invoke: false
+    triggers:
+      - "テスト実行要求時"
+
+---
+
+# 凡例
+#
+# trigger:
+#   - "PreToolUse:*" - 全ツール実行前
+#   - "PreToolUse:Edit" - Edit ツール実行前
+#   - "manual" - 手動実行のみ
+#   - "SessionStart:*" - セッション開始時
+#
+# registered:
+#   - true: settings.json に登録済み
+#   - false: ユーティリティスクリプト（手動実行）
+#
+# exit_codes:
+#   - 0: 通過（正常）
+#   - 1: 警告（処理は継続）
+#   - 2: ブロック（処理を中止）

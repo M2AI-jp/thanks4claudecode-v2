@@ -38,7 +38,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p1.1**: docs/feature-catalog.yaml の構造設計が完了している
+- [x] **p1.1**: docs/feature-catalog.yaml の構造設計が完了している
   - executor: claudecode
   - test_command: `echo "PASS - 設計は次の subtask で検証"`
   - validations:
@@ -46,7 +46,7 @@ done_when:
     - consistency: "repository-map.yaml と重複せず補完関係にある"
     - completeness: "Hook/SubAgent/Skill/Command の全カテゴリを網羅"
 
-- [ ] **p1.2**: docs/feature-catalog.yaml が存在し、YAML として有効である
+- [x] **p1.2**: docs/feature-catalog.yaml が存在し、YAML として有効である
   - executor: claudecode
   - test_command: `test -f docs/feature-catalog.yaml && python3 -c "import yaml; yaml.safe_load(open('docs/feature-catalog.yaml'))" && echo PASS || echo FAIL`
   - validations:
@@ -54,7 +54,7 @@ done_when:
     - consistency: "repository-map.yaml のカウントと一致"
     - completeness: "全コンポーネントの詳細情報を含む"
 
-- [ ] **p1.3**: feature-catalog.yaml に全 Hook（31個）の詳細情報が含まれている
+- [x] **p1.3**: feature-catalog.yaml に全 Hook（31個）の詳細情報が含まれている
   - executor: claudecode
   - test_command: `grep -c "^    - name:" docs/feature-catalog.yaml | awk '{if($1>=31) print "PASS"; else print "FAIL"}'`
   - validations:
@@ -62,7 +62,7 @@ done_when:
     - consistency: ".claude/hooks/*.sh と一致"
     - completeness: "各 Hook に purpose/trigger/dependencies が定義"
 
-- [ ] **p1.4**: feature-catalog.yaml に全 SubAgent（6個以上）の詳細情報が含まれている
+- [x] **p1.4**: feature-catalog.yaml に全 SubAgent（6個以上）の詳細情報が含まれている
   - executor: claudecode
   - test_command: `grep -c "subagent_type:" docs/feature-catalog.yaml | awk '{if($1>=6) print "PASS"; else print "FAIL"}'`
   - validations:
@@ -70,7 +70,7 @@ done_when:
     - consistency: ".claude/agents/*.md と一致"
     - completeness: "各 SubAgent に purpose/invocation が定義"
 
-- [ ] **p1.5**: feature-catalog.yaml に全 Skill（9個以上）の詳細情報が含まれている
+- [x] **p1.5**: feature-catalog.yaml に全 Skill（9個以上）の詳細情報が含まれている
   - executor: claudecode
   - test_command: `grep -c "skill_dir:" docs/feature-catalog.yaml | awk '{if($1>=9) print "PASS"; else print "FAIL"}'`
   - validations:
@@ -91,7 +91,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p2.1**: .claude/hooks/feature-catalog-sync.sh が存在し実行可能である
+- [x] **p2.1**: .claude/hooks/feature-catalog-sync.sh が存在し実行可能である
   - executor: claudecode
   - test_command: `test -x .claude/hooks/feature-catalog-sync.sh && echo PASS || echo FAIL`
   - validations:
@@ -99,7 +99,7 @@ done_when:
     - consistency: "generate-repository-map.sh と連携"
     - completeness: "全コンポーネントタイプをスキャン"
 
-- [ ] **p2.2**: feature-catalog-sync.sh が新規 Hook を検出できる
+- [x] **p2.2**: feature-catalog-sync.sh が新規 Hook を検出できる
   - executor: claudecode
   - test_command: `bash .claude/hooks/feature-catalog-sync.sh --dry-run 2>&1 | grep -q "Scanning" && echo PASS || echo FAIL`
   - validations:
@@ -107,7 +107,7 @@ done_when:
     - consistency: "実際のファイル構成と一致"
     - completeness: "追加・削除・変更を検出"
 
-- [ ] **p2.3**: feature-catalog-sync.sh が削除された機能を検出できる
+- [x] **p2.3**: feature-catalog-sync.sh が削除された機能を検出できる
   - executor: claudecode
   - test_command: `bash .claude/hooks/feature-catalog-sync.sh --check 2>&1 | grep -qE "(OK|OUTDATED)" && echo PASS || echo FAIL`
   - validations:
@@ -115,7 +115,7 @@ done_when:
     - consistency: "カタログと実ファイルの差分を検出"
     - completeness: "全カテゴリで削除検出"
 
-- [ ] **p2.4**: settings.json に feature-catalog-sync.sh が SessionStart Hook として登録されている
+- [x] **p2.4**: settings.json に feature-catalog-sync.sh が SessionStart Hook として登録されている
   - executor: claudecode
   - test_command: `grep -q "feature-catalog-sync.sh" .claude/settings.json && echo PASS || echo FAIL`
   - validations:
@@ -136,7 +136,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p3.1**: session-start.sh が feature-catalog.yaml を読み込む処理を含む
+- [x] **p3.1**: session-start.sh が feature-catalog.yaml を読み込む処理を含む
   - executor: claudecode
   - test_command: `grep -q "feature-catalog.yaml" .claude/hooks/session-start.sh && echo PASS || echo FAIL`
   - validations:
@@ -144,7 +144,7 @@ done_when:
     - consistency: "既存の session-start.sh と整合"
     - completeness: "全カテゴリを読み込み"
 
-- [ ] **p3.2**: session-start.sh の出力に機能カウントサマリーが含まれる
+- [x] **p3.2**: session-start.sh の出力に機能カウントサマリーが含まれる
   - executor: claudecode
   - test_command: `bash .claude/hooks/session-start.sh 2>&1 | grep -qE "Hooks|SubAgents|Skills" && echo PASS || echo FAIL`
   - validations:
@@ -152,7 +152,7 @@ done_when:
     - consistency: "feature-catalog.yaml のカウントと一致"
     - completeness: "全カテゴリのカウントを表示"
 
-- [ ] **p3.3**: 機能変更があった場合に警告が出力される
+- [x] **p3.3**: 機能変更があった場合に警告が出力される
   - executor: claudecode
   - test_command: `test -f .claude/hooks/session-start.sh && grep -q "OUTDATED\|変更\|WARNING" .claude/hooks/session-start.sh && echo PASS || echo FAIL`
   - validations:
@@ -173,7 +173,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p4.1**: docs/test-spec-feature-catalog.md が存在する
+- [x] **p4.1**: docs/test-spec-feature-catalog.md が存在する
   - executor: claudecode
   - test_command: `test -f docs/test-spec-feature-catalog.md && echo PASS || echo FAIL`
   - validations:
@@ -181,7 +181,7 @@ done_when:
     - consistency: "M064 の test-spec 形式と統一"
     - completeness: "全シナリオを網羅"
 
-- [ ] **p4.2**: テスト仕様に新規機能追加シナリオが含まれる
+- [x] **p4.2**: テスト仕様に新規機能追加シナリオが含まれる
   - executor: claudecode
   - test_command: `grep -q "新規.*追加\|追加.*検出" docs/test-spec-feature-catalog.md && echo PASS || echo FAIL`
   - validations:
@@ -189,7 +189,7 @@ done_when:
     - consistency: "実際の動作と一致"
     - completeness: "Hook/SubAgent/Skill 全てで追加検出"
 
-- [ ] **p4.3**: テスト仕様に機能削除シナリオが含まれる
+- [x] **p4.3**: テスト仕様に機能削除シナリオが含まれる
   - executor: claudecode
   - test_command: `grep -q "削除.*検出\|存在しない" docs/test-spec-feature-catalog.md && echo PASS || echo FAIL`
   - validations:
@@ -197,7 +197,7 @@ done_when:
     - consistency: "実際の動作と一致"
     - completeness: "全カテゴリで削除検出"
 
-- [ ] **p4.4**: E2E テストが成功する（全テスト PASS）
+- [x] **p4.4**: E2E テストが成功する（全テスト PASS）
   - executor: claudecode
   - test_command: `bash .claude/hooks/test-hooks.sh feature-catalog 2>&1 | grep -q "PASS" && echo PASS || echo FAIL`
   - validations:
@@ -218,7 +218,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p_final.1**: docs/feature-catalog.yaml が存在し、全 Hook/SubAgent/Skill の詳細情報を含む
+- [x] **p_final.1**: docs/feature-catalog.yaml が存在し、全 Hook/SubAgent/Skill の詳細情報を含む
   - executor: claudecode
   - test_command: `test -f docs/feature-catalog.yaml && grep -c "purpose:" docs/feature-catalog.yaml | awk '{if($1>=40) print "PASS"; else print "FAIL"}'`
   - validations:
@@ -226,7 +226,7 @@ done_when:
     - consistency: "repository-map.yaml と整合"
     - completeness: "40 個以上の purpose 定義"
 
-- [ ] **p_final.2**: session-start.sh が feature-catalog.yaml を読み込み、機能サマリーを出力する
+- [x] **p_final.2**: session-start.sh が feature-catalog.yaml を読み込み、機能サマリーを出力する
   - executor: claudecode
   - test_command: `bash .claude/hooks/session-start.sh 2>&1 | grep -qE "[0-9]+ Hooks" && echo PASS || echo FAIL`
   - validations:
@@ -234,7 +234,7 @@ done_when:
     - consistency: "feature-catalog.yaml のカウントと一致"
     - completeness: "Hook/SubAgent/Skill 全カテゴリ"
 
-- [ ] **p_final.3**: 機能の追加・削除を自動検出する仕組みが実装されている
+- [x] **p_final.3**: 機能の追加・削除を自動検出する仕組みが実装されている
   - executor: claudecode
   - test_command: `test -x .claude/hooks/feature-catalog-sync.sh && bash .claude/hooks/feature-catalog-sync.sh --check 2>&1 | grep -qE "(OK|changes)" && echo PASS || echo FAIL`
   - validations:
@@ -242,7 +242,7 @@ done_when:
     - consistency: "実ファイルと同期"
     - completeness: "全カテゴリで検出"
 
-- [ ] **p_final.4**: 機能カタログが自動更新され、常に最新が保証されている
+- [x] **p_final.4**: 機能カタログが自動更新され、常に最新が保証されている
   - executor: claudecode
   - test_command: `grep -q "feature-catalog-sync.sh" .claude/settings.json && echo PASS || echo FAIL`
   - validations:
@@ -257,15 +257,15 @@ done_when:
 
 ## final_tasks
 
-- [ ] **ft1**: repository-map.yaml を更新する
+- [x] **ft1**: repository-map.yaml を更新する
   - command: `bash .claude/hooks/generate-repository-map.sh`
   - status: pending
 
-- [ ] **ft2**: tmp/ 内の一時ファイルを削除する
+- [x] **ft2**: tmp/ 内の一時ファイルを削除する
   - command: `find tmp/ -type f ! -name 'CLAUDE.md' ! -name 'README.md' -delete 2>/dev/null || true`
   - status: pending
 
-- [ ] **ft3**: 変更を全てコミットする
+- [x] **ft3**: 変更を全てコミットする
   - command: `git add -A && git status`
   - status: pending
 

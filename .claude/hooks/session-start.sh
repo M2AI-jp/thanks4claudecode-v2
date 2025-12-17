@@ -274,6 +274,38 @@ $SEP
 EOF
 fi
 
+# === 機能カタログサマリー（feature-catalog.yaml）===
+CATALOG_FILE="docs/feature-catalog.yaml"
+if [ -f "$CATALOG_FILE" ]; then
+    HOOKS_COUNT=$(grep -c "^  - id: H" "$CATALOG_FILE" 2>/dev/null || echo "0")
+    AGENTS_COUNT=$(grep -c "subagent_type:" "$CATALOG_FILE" 2>/dev/null || echo "0")
+    SKILLS_COUNT=$(grep -c "skill_dir:" "$CATALOG_FILE" 2>/dev/null || echo "0")
+
+    # 実際のファイル数を取得して比較
+    HOOKS_ACTUAL=$(find .claude/hooks -maxdepth 1 -name "*.sh" -type f 2>/dev/null | wc -l | tr -d ' ')
+    AGENTS_ACTUAL=$(find .claude/agents -maxdepth 1 -name "*.md" -type f ! -name "CLAUDE.md" 2>/dev/null | wc -l | tr -d ' ')
+    SKILLS_ACTUAL=$(find .claude/skills -maxdepth 1 -type d ! -path ".claude/skills" 2>/dev/null | wc -l | tr -d ' ')
+
+    # 変更検出
+    CATALOG_STATUS="OK"
+    if [ "$HOOKS_ACTUAL" -ne "$HOOKS_COUNT" ] || [ "$AGENTS_ACTUAL" -ne "$AGENTS_COUNT" ] || [ "$SKILLS_ACTUAL" -ne "$SKILLS_COUNT" ]; then
+        CATALOG_STATUS="OUTDATED"
+    fi
+
+    cat <<EOF
+$SEP
+  📦 Feature Catalog Summary
+$SEP
+  $HOOKS_COUNT Hooks | $AGENTS_COUNT SubAgents | $SKILLS_COUNT Skills
+EOF
+
+    if [ "$CATALOG_STATUS" = "OUTDATED" ]; then
+        echo -e "  ⚠️ WARNING: 機能カタログが最新ではありません（変更検出）"
+        echo "  → bash .claude/hooks/generate-repository-map.sh で更新"
+    fi
+    echo ""
+fi
+
 # === CORE（最小限の行動ルール）===
 cat <<EOF
 $SEP
