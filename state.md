@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/playbook-m079-golden-path-fix.md
+branch: cleanup/architecture-audit
 last_archived: M078 playbook-m078-codex-mcp.md (2025-12-18)
 ```
 
@@ -28,9 +28,13 @@ last_archived: M078 playbook-m078-codex-mcp.md (2025-12-18)
 ## goal
 
 ```yaml
-milestone: null
-phase: null
-done_criteria: []
+milestone: M079
+phase: p1
+done_criteria:
+  - CLAUDE.md に Golden Path セクション（## 11）が追加されている
+  - prompt-guard.sh の playbook=null 警告が pm 必須を明示している
+  - playbook-guard.sh の admin バイパス（29-32行）が削除されている
+  - pre-bash-check.sh が playbook=null で変更系 Bash をブロックする
 ```
 
 ---
@@ -38,7 +42,7 @@ done_criteria: []
 ## session
 
 ```yaml
-last_start: 2025-12-18 03:27:25
+last_start: 2025-12-18 18:43:03
 last_clear: 2025-12-13 00:30:00
 ```
 

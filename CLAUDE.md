@@ -2,7 +2,7 @@
 
 ```yaml
 Status: FROZEN
-Version: 1.0.0
+Version: 1.1.0
 Owner: Repo Maintainers
 Last Updated: 2025-12-18
 ```
@@ -197,6 +197,52 @@ For procedures, tool-specific instructions, and frequently-changing content:
 
 ---
 
+## 11. Core Contract
+
+以下のルールは admin モードでも回避不可の絶対ルール:
+
+```yaml
+golden_path:
+  rule: タスク依頼を受けたら、返答を始める前に pm を呼ぶ
+  trigger: "作って/実装して/修正して/追加して" 等のタスク要求パターン
+  action: |
+    playbook=null の場合:
+      Task(subagent_type='pm', prompt='playbook を作成')
+    直接 Edit/Write してはいけない
+
+playbook_gate:
+  rule: playbook 必須
+  block: state.md の playbook.active が null の場合、Edit/Write をブロック
+  bash: 変更系 Bash コマンド（cat >, tee, sed -i, git add/commit 等）も同様にブロック
+
+reviewer_gate:
+  rule: playbook は reviewer の PASS なしに確定しない
+  warn: reviewed: false の playbook には警告を表示
+```
+
+---
+
+## 12. Admin Mode Contract
+
+admin モードの権限境界:
+
+```yaml
+admin_is_not_bypass:
+  rule: admin は「全てをバイパス」ではない
+  principle: コア契約は admin でも回避不可
+
+admin_cannot_bypass:
+  - Golden Path（pm 必須）
+  - Playbook Gate（playbook=null での Edit/Write/Bash 変更系）
+  - HARD_BLOCK ファイル保護（CLAUDE.md, protected-files.txt 等）
+
+admin_can_relax:
+  - BLOCK レベルの保護（→ WARN に緩和）
+  - 必須ファイル Read チェック（init-guard）
+```
+
+---
+
 ## References
 
 | File | Purpose |
@@ -212,4 +258,5 @@ For procedures, tool-specific instructions, and frequently-changing content:
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1.0 | 2025-12-18 | Core Contract + Admin Mode Contract 追加（M079） |
 | 1.0.0 | 2025-12-18 | Initial frozen constitution. Extracted procedures to RUNBOOK.md. |

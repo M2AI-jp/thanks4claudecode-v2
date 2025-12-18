@@ -29,16 +29,12 @@ set -euo pipefail
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 
 # ============================================================
-# Admin モードチェック（最優先）
+# Admin モードチェック（M079: コア契約は回避不可）
 # ============================================================
 STATE_FILE="${REPO_ROOT}/state.md"
-if [ -f "$STATE_FILE" ]; then
-    SECURITY=$(grep -A3 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 | sed 's/security: *//' | tr -d ' ')
-    if [[ "$SECURITY" == "admin" ]]; then
-        # admin モードは全ての制限をバイパス
-        exit 0
-    fi
-fi
+# admin モードでも consent チェックは維持
+# CLAUDE.md Core Contract: タスク開始時の合意プロセスは回避不可
+# 注: consent ファイルが存在しない場合は通過するため、実質的な影響は最小
 
 # ============================================================
 # 設定（リポジトリルートから相対パス）

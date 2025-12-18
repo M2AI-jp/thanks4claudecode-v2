@@ -17,16 +17,16 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # ============================================================
-# Admin モードチェック（最優先）
+# M079: コア契約は回避不可（HARD_BLOCK + playbook チェック維持）
 # ============================================================
 STATE_FILE="state.md"
+SECURITY=""
+PLAYBOOK=""
 if [ -f "$STATE_FILE" ]; then
     SECURITY=$(grep -A3 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 | sed 's/security: *//' | tr -d ' ')
-    if [[ "$SECURITY" == "admin" ]]; then
-        # admin モードは HARD_BLOCK を含む全ての制限をバイパス
-        exit 0
-    fi
+    PLAYBOOK=$(grep -A6 "^## playbook" "$STATE_FILE" 2>/dev/null | grep "^active:" | head -1 | sed 's/active: *//' | sed 's/ *#.*//' | tr -d ' ')
 fi
+# 特権モードでも HARD_BLOCK と playbook チェックは維持（コア契約）
 
 # stdin から JSON を読み込む
 INPUT=$(cat)
@@ -142,6 +142,32 @@ if [ "$SECURITY_MODE" = "strict" ]; then
             done
         fi
     done
+fi
+
+# === M079: playbook=null で変更系コマンドをブロック ===
+# CLAUDE.md Core Contract: "Playbook Gate" - playbook なしでの変更は禁止
+if [ -z "$PLAYBOOK" ] || [ "$PLAYBOOK" = "null" ]; then
+    # 変更系コマンドのパターン
+    MUTATION_PATTERNS='cat[[:space:]]+.*>|tee[[:space:]]|sed[[:space:]]+-i|git[[:space:]]+add|git[[:space:]]+commit|mkdir[[:space:]]|touch[[:space:]]|mv[[:space:]]|cp[[:space:]]|rm[[:space:]]'
+
+    if [[ "$COMMAND" =~ $MUTATION_PATTERNS ]]; then
+        echo "========================================" >&2
+        echo -e "${RED}[BLOCK]${NC} playbook=null で変更系 Bash をブロック" >&2
+        echo "========================================" >&2
+        echo "" >&2
+        echo "コマンド: $COMMAND" >&2
+        echo "" >&2
+        echo "CLAUDE.md Core Contract により、playbook なしでの" >&2
+        echo "変更系コマンドは禁止されています。" >&2
+        echo "" >&2
+        echo "対処法:" >&2
+        echo "  1. pm を呼び出して playbook を作成:" >&2
+        echo "     Task(subagent_type='pm', prompt='playbook を作成')" >&2
+        echo "  2. または /playbook-init を実行" >&2
+        echo "" >&2
+        echo "========================================" >&2
+        exit 2
+    fi
 fi
 
 # === git commit チェック ===

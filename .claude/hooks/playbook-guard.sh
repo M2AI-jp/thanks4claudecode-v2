@@ -22,6 +22,14 @@ if [[ ! -f "$STATE_FILE" ]]; then
     exit 0
 fi
 
+# --------------------------------------------------
+# M079: コア契約は回避不可
+# --------------------------------------------------
+# security モードに関係なく playbook 必須チェックは維持
+# CLAUDE.md Core Contract: "Playbook Gate" は常に有効
+SECURITY=$(grep -A3 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 | sed 's/security: *//' | tr -d ' ')
+# 特権モードでも playbook チェックは維持（コア契約）
+
 # stdin から JSON を読み込む
 INPUT=$(cat)
 

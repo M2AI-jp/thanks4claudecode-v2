@@ -78,13 +78,10 @@ while IFS= read -r line || [ -n "$line" ]; do
     fi
 done < "$PROTECTED_LIST"
 
-# HARD_BLOCK の処理
+# HARD_BLOCK の処理（M079: admin でも回避不可）
 if [ "$IS_HARD_BLOCK" = true ]; then
-    # admin モード: HARD_BLOCK でも編集可能（リポジトリ完成のため）
-    if [ "$SECURITY_MODE" = "admin" ]; then
-        exit 0
-    fi
-
+    # M079: HARD_BLOCK は security_mode に関係なく常に保護
+    # CLAUDE.md Core Contract: "HARD_BLOCK ファイル保護" は回避不可
     echo "" >&2
     echo "========================================" >&2
     echo -e "${RED}[HARD_BLOCK]${NC} 絶対守護ファイル" >&2
@@ -93,12 +90,13 @@ if [ "$IS_HARD_BLOCK" = true ]; then
     echo "ファイル: $RELATIVE_PATH" >&2
     echo "モード: $SECURITY_MODE" >&2
     echo "" >&2
-    echo "このファイルは security_mode=admin 以外では" >&2
-    echo "常に保護されています。" >&2
+    echo "このファイルは security_mode に関係なく" >&2
+    echo "常に保護されています（M079 Core Contract）。" >&2
     echo "" >&2
     echo "編集するには:" >&2
-    echo "  1. state.md の security.mode を admin に変更" >&2
-    echo "  2. または直接手動で編集してください" >&2
+    echo "  1. 直接手動で編集してください" >&2
+    echo "  2. または .claude/protected-files.txt から" >&2
+    echo "     HARD_BLOCK エントリを削除してください" >&2
     echo "" >&2
     echo "========================================"  >&2
     exit 2

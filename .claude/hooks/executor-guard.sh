@@ -19,14 +19,11 @@ set -euo pipefail
 STATE_FILE="${STATE_FILE:-state.md}"
 
 # ============================================================
-# Admin モードチェック（最優先）
+# Admin モードチェック（M079: コア契約は回避不可）
 # ============================================================
-if [ -f "$STATE_FILE" ]; then
-    SECURITY=$(grep -A3 "^## config" "$STATE_FILE" 2>/dev/null | grep "security:" | head -1 | sed 's/security: *//' | tr -d ' ')
-    if [[ "$SECURITY" == "admin" ]]; then
-        exit 0
-    fi
-fi
+# admin モードでも executor 強制は維持
+# CLAUDE.md Core Contract: AIエージェントオーケストレーションは回避不可
+# 注: admin は「executor の変更」を許可するが「executor 無視」は不可
 
 # ============================================================
 # Toolstack 取得

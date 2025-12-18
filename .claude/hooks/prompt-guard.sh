@@ -174,7 +174,11 @@ if [ -z "$PLAYBOOK" ] || [ "$PLAYBOOK" = "null" ]; then
     WORK_PATTERNS="(作って|実装して|追加して|修正して|変更して|削除して|create|implement|add|fix|change|delete|update|edit|write)"
 
     if echo "$PROMPT" | grep -iE "$WORK_PATTERNS" > /dev/null 2>&1; then
-        WARNINGS="${WARNINGS}\\n\\n🚨 playbook がありません。Edit/Write 時にブロックされます。"
+        WARNINGS="${WARNINGS}\\n\\n🚨 【pm 必須】playbook がありません。"
+        WARNINGS="${WARNINGS}\\n⛔ 返答を始めてはいけない。まず pm を呼び出してください。"
+        WARNINGS="${WARNINGS}\\n\\n実行すべきアクション:"
+        WARNINGS="${WARNINGS}\\n  Task(subagent_type='pm', prompt='playbook を作成')"
+        WARNINGS="${WARNINGS}\\n\\n理由: CLAUDE.md Core Contract により、playbook なしでの作業は禁止されています。"
     fi
 fi
 
