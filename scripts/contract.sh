@@ -41,8 +41,63 @@ MAINTENANCE_WHITELIST=(
     "plan/archive/*"
 )
 
-# 変更系 Bash パターン
-MUTATION_PATTERNS='cat[[:space:]]+.*>|tee[[:space:]]|sed[[:space:]]+-i|git[[:space:]]+add|git[[:space:]]+commit|mkdir[[:space:]]|touch[[:space:]]|mv[[:space:]]|cp[[:space:]]|rm[[:space:]]'
+# 変更系 Git コマンド（read-only の status/diff/log/show/branch/remote -v 等は除外）
+GIT_MUTATION_CMDS='add|commit|push|pull|fetch|reset|checkout|clean|rebase|merge|cherry-pick|revert|stash|apply|am|tag|branch[[:space:]]+-[dDmM]'
+
+# 変更系 Bash パターン（リダイレクトは has_file_redirect で別途検出）
+# 注意: このパターンは normalize_command() で前処理された後に適用される
+MUTATION_PATTERNS="tee[[:space:]]|sed[[:space:]]+-i|git[[:space:]]+(${GIT_MUTATION_CMDS})|mkdir[[:space:]]|touch[[:space:]]|mv[[:space:]]|cp[[:space:]]|rm[[:space:]]"
+
+# 複合コマンド検出パターン（admin maintenance でも禁止）
+COMPOUND_PATTERNS='&&|;|\|\||[|]'
+
+# ==============================================================================
+# ヘルパー関数
+# ==============================================================================
+
+# コマンドを正規化（誤検出防止）
+# /dev/null へのリダイレクトと FD リダイレクト（2>&1, 1>&2）のみを除去
+normalize_command() {
+    local cmd="$1"
+    # /dev/null へのリダイレクトのみ除去（絶対パスは残す）
+    # 2>/dev/null, 1>/dev/null, >/dev/null, &>/dev/null, &>>/dev/null
+    cmd=$(echo "$cmd" | sed 's/[0-9]*>[[:space:]]*\/dev\/null//g')
+    cmd=$(echo "$cmd" | sed 's/&>>[[:space:]]*\/dev\/null//g')
+    cmd=$(echo "$cmd" | sed 's/&>[[:space:]]*\/dev\/null//g')
+    # FD リダイレクト（2>&1, 1>&2 等）は無害なので除去
+    cmd=$(echo "$cmd" | sed 's/[0-9]*>&[0-9]*//g')
+    echo "$cmd"
+}
+
+# 複合コマンドか判定（&&, ;, ||, | を含む）
+is_compound_command() {
+    local cmd="$1"
+    # パイプ（|）、AND（&&）、OR（||）、セミコロン（;）を検出
+    # 注意: 文字列リテラル内の | は誤検出するが、安全側に倒す
+    [[ "$cmd" =~ \&\& ]] && return 0
+    [[ "$cmd" =~ \|\| ]] && return 0
+    [[ "$cmd" == *";"* ]] && return 0
+    [[ "$cmd" == *"|"* ]] && return 0
+    return 1
+}
+
+# ファイルへのリダイレクトがあるか判定（/dev/null以外）
+# >, >>, &>, &>> でファイルに書き込む場合を検出
+has_file_redirect() {
+    local cmd="$1"
+    # まず /dev/null へのリダイレクトを除去
+    local normalized
+    normalized=$(normalize_command "$cmd")
+    # 残ったリダイレクト（>, >>, &>, &>>）があれば書き込み
+    # パターン: 数字?>、数字?>>、&>、&>>
+    if [[ "$normalized" =~ [0-9]*\>[^\>] ]] || \
+       [[ "$normalized" =~ [0-9]*\>\> ]] || \
+       [[ "$normalized" =~ \&\>[^\>] ]] || \
+       [[ "$normalized" =~ \&\>\> ]]; then
+        return 0
+    fi
+    return 1
+}
 
 # ==============================================================================
 # 状態取得関数
@@ -199,6 +254,34 @@ EOF
     return 0
 }
 
+# Admin Maintenance 許可パターン（全体一致 ^...$ で判定）
+# 注意: 複合コマンドは事前にブロックされるため、ここは単一コマンドのみ
+ADMIN_MAINTENANCE_PATTERNS=(
+    # mkdir -p plan/archive（オプション付きも許可）
+    '^mkdir[[:space:]]+(-p[[:space:]]+)?plan/archive/?$'
+    # mv plan/playbook-*.md plan/archive/（1ファイルのみ）
+    '^mv[[:space:]]+plan/playbook-[^[:space:]]+\.md[[:space:]]+plan/archive/?$'
+    # git add state.md（単独）
+    '^git[[:space:]]+add[[:space:]]+state\.md$'
+    # git add plan/archive/（単独またはファイル指定）
+    '^git[[:space:]]+add[[:space:]]+plan/archive(/[^[:space:]]*)?$'
+    # git add state.md plan/archive/（2つ同時）
+    '^git[[:space:]]+add[[:space:]]+state\.md[[:space:]]+plan/archive/?$'
+    # git commit -m "..." (maintenance メッセージ)
+    '^git[[:space:]]+commit[[:space:]]+-m[[:space:]]+'
+)
+
+# Admin Maintenance allowlist に一致するか判定
+is_admin_maintenance_allowed() {
+    local cmd="$1"
+    for pattern in "${ADMIN_MAINTENANCE_PATTERNS[@]}"; do
+        if [[ "$cmd" =~ $pattern ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Bash コマンドの契約チェック
 # Returns: 0=ALLOW, 1=WARN, 2=BLOCK
 contract_check_bash() {
@@ -237,38 +320,75 @@ EOF
         fi
     done
 
-    # 2. 変更系コマンドでない場合は許可
-    if ! [[ "$command" =~ $MUTATION_PATTERNS ]]; then
+    # 2. コマンドを正規化（誤検出防止）
+    local normalized_cmd
+    normalized_cmd=$(normalize_command "$command")
+
+    # 3. ファイルへのリダイレクト検出（/dev/null 以外）
+    local has_redirect=false
+    if has_file_redirect "$command"; then
+        has_redirect=true
+    fi
+
+    # 4. 変更系コマンドでない、かつリダイレクトもない場合は許可
+    if ! [[ "$normalized_cmd" =~ $MUTATION_PATTERNS ]] && [[ "$has_redirect" == "false" ]]; then
         return 0
     fi
 
-    # 3. playbook=null の場合
+    # 5. playbook=null の場合
     if [[ -z "$playbook" || "$playbook" == "null" ]]; then
-        # 3a. admin + Maintenance ホワイトリスト内なら許可
+        # 5a. 複合コマンドは admin でも禁止（注入対策）
+        if is_compound_command "$command"; then
+            cat >&2 <<EOF
+========================================
+  [BLOCK] 複合コマンド禁止
+========================================
+
+  コマンド: $command
+
+  &&, ;, ||, | を含むコマンドは
+  playbook=null では許可されません。
+  （admin モードでも禁止）
+
+  対処法:
+    コマンドを分割して個別に実行するか、
+    playbook を作成してください。
+
+========================================
+EOF
+            return 2
+        fi
+
+        # 5b. ファイルリダイレクト（/dev/null 以外）は admin でも禁止
+        if [[ "$has_redirect" == "true" ]]; then
+            cat >&2 <<EOF
+========================================
+  [BLOCK] ファイルリダイレクト禁止
+========================================
+
+  コマンド: $command
+
+  ファイルへの書き込みリダイレクト（>, >>）は
+  playbook=null では許可されません。
+  （/dev/null へのリダイレクトは許可）
+
+  対処法:
+    playbook を作成してください。
+
+========================================
+EOF
+            return 2
+        fi
+
+        # 5c. admin + Maintenance allowlist なら許可
         if [[ "$security" == "admin" ]]; then
-            # mv plan/playbook-*.md plan/archive/ パターン
-            if [[ "$command" =~ mv[[:space:]]+plan/playbook-.*\.md[[:space:]]+plan/archive/ ]]; then
-                echo "[ADMIN-MAINTENANCE] 許可: playbook アーカイブ" >&2
-                return 0
-            fi
-            # mkdir plan/archive パターン
-            if [[ "$command" =~ mkdir.*plan/archive ]]; then
-                echo "[ADMIN-MAINTENANCE] 許可: archive ディレクトリ作成" >&2
-                return 0
-            fi
-            # git add state.md または plan/archive
-            if [[ "$command" =~ git[[:space:]]+add[[:space:]]+(state\.md|plan/archive) ]]; then
-                echo "[ADMIN-MAINTENANCE] 許可: git add (maintenance)" >&2
-                return 0
-            fi
-            # git commit (内容は別途検証が必要だが基本許可)
-            if [[ "$command" =~ git[[:space:]]+commit ]]; then
-                echo "[ADMIN-MAINTENANCE] 許可: git commit (maintenance)" >&2
+            if is_admin_maintenance_allowed "$command"; then
+                echo "[ADMIN-MAINTENANCE] 許可: $command" >&2
                 return 0
             fi
         fi
 
-        # 3b. それ以外はブロック
+        # 5d. それ以外はブロック
         cat >&2 <<EOF
 ========================================
   [BLOCK] playbook=null で変更系 Bash をブロック
@@ -288,7 +408,7 @@ EOF
         return 2
     fi
 
-    # 4. playbook=active なら許可
+    # 6. playbook=active なら許可
     return 0
 }
 
@@ -296,10 +416,14 @@ EOF
 # エクスポート（source された場合に使用可能にする）
 # ==============================================================================
 
+export -f normalize_command
+export -f is_compound_command
+export -f has_file_redirect
 export -f get_state_value
 export -f is_hard_block
 export -f is_maintenance_allowed
 export -f is_playbook_file
 export -f is_state_file
+export -f is_admin_maintenance_allowed
 export -f contract_check_edit
 export -f contract_check_bash
