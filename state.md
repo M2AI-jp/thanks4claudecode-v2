@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m079-golden-path-fix.md
-branch: cleanup/architecture-audit
-last_archived: M078 playbook-m078-codex-mcp.md (2025-12-18)
+active: plan/playbook-contract-consolidation.md
+branch: refactor/contract-consolidation
+last_archived: null
 ```
 
 ---
@@ -28,13 +28,13 @@ last_archived: M078 playbook-m078-codex-mcp.md (2025-12-18)
 ## goal
 
 ```yaml
-milestone: M079
+milestone: Contract-Consolidation
 phase: p1
 done_criteria:
-  - CLAUDE.md に Golden Path セクション（## 11）が追加されている
-  - prompt-guard.sh の playbook=null 警告が pm 必須を明示している
-  - playbook-guard.sh の admin バイパス（29-32行）が削除されている
-  - pre-bash-check.sh が playbook=null で変更系 Bash をブロックする
+  - docs/core-contract.md と docs/admin-contract.md が作成されている
+  - scripts/contract.sh が作成され、Hook が統合されている
+  - E2E シナリオ A/B/C が全て PASS する
+  - セッション終了処理が手動なしで完遂できる
 ```
 
 ---
@@ -42,7 +42,7 @@ done_criteria:
 ## session
 
 ```yaml
-last_start: 2025-12-18 18:43:03
+last_start: 2025-12-18 22:03:24
 last_clear: 2025-12-13 00:30:00
 ```
 

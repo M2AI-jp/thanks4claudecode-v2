@@ -142,6 +142,57 @@ mv plan/playbook-{name}.md plan/archive/
 
 ---
 
+## Admin Maintenance Mode
+
+### When to Use
+
+Admin mode is for **operational tasks only**, not for bypassing safety checks.
+
+```yaml
+allowed_operations:
+  - Session end: archive playbook, update state.md
+  - State recovery: fix corrupted state.md
+  - Maintenance commits: state + archive files only
+
+not_allowed_even_in_admin:
+  - Editing code files without playbook
+  - Modifying HARD_BLOCK files (CLAUDE.md, protected-files.txt, critical hooks)
+  - Bypassing Core Contract (playbook requirement for semantic changes)
+```
+
+### Enabling Admin Mode
+
+```bash
+# In state.md, under ## config:
+security: admin
+
+# Remember to restore to strict when done:
+security: strict
+```
+
+### Session End Procedure (Golden Path)
+
+```bash
+# 1. Enable admin mode (if not already)
+# Edit state.md: security: admin
+
+# 2. Archive the playbook
+mkdir -p plan/archive
+mv plan/playbook-{name}.md plan/archive/
+
+# 3. Update state.md
+# Edit: playbook.active: null
+
+# 4. Commit maintenance changes
+git add state.md plan/archive/
+git commit -m "chore: session end - archive playbook"
+
+# 5. Restore strict mode (optional but recommended)
+# Edit state.md: security: strict
+```
+
+---
+
 ## Troubleshooting
 
 ### Hook Blocking Edit
@@ -149,9 +200,9 @@ mv plan/playbook-{name}.md plan/archive/
 ```yaml
 problem: "playbook 必須" error
 solutions:
-  1. Create a playbook first
-  2. Set admin mode in state.md (security: admin)
-  3. Use Bash commands instead of Edit tool
+  1. Create a playbook: Task(subagent_type='pm', prompt='playbook を作成')
+  2. For maintenance only: Set security: admin in state.md
+  3. Note: Admin does NOT bypass playbook requirement for code changes
 ```
 
 ### Context Too Long
@@ -170,6 +221,51 @@ solutions:
 problem: Can't edit on main
 solution:
   git checkout -b {type}/{description}
+```
+
+### Fail-Closed Recovery
+
+When hooks block operations due to fail-closed behavior:
+
+```yaml
+problem: "[FAIL-CLOSED] state.md not found" or similar
+causes:
+  - state.md deleted or corrupted
+  - Required files missing
+  - jq not installed
+
+solutions:
+  1. Restore state.md from git:
+     git checkout HEAD -- state.md
+
+  2. Create minimal state.md manually:
+     cat > state.md << 'EOF'
+     # state.md
+     ## playbook
+     ```yaml
+     active: null
+     ```
+     ## config
+     ```yaml
+     security: admin
+     ```
+     EOF
+
+  3. Install missing tools:
+     brew install jq  # macOS
+     apt-get install jq  # Linux
+```
+
+### HARD_BLOCK File Needs Editing
+
+```yaml
+problem: Cannot edit CLAUDE.md or other HARD_BLOCK files
+reason: HARD_BLOCK files are protected even in admin mode (by design)
+
+solutions:
+  1. Edit the file manually (outside Claude Code)
+  2. Temporarily remove from .claude/protected-files.txt (not recommended)
+  3. Follow Change Control process for CLAUDE.md modifications
 ```
 
 ---
@@ -201,4 +297,4 @@ No approval required - this file is designed to evolve.
 
 ## Version
 
-Last updated: 2025-12-18
+Last updated: 2025-12-18 (Contract Consolidation update)
