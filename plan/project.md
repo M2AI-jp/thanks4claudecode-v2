@@ -645,6 +645,31 @@ success_criteria:
     - "! grep -q 'admin.*exit 0' .claude/hooks/playbook-guard.sh && echo PASS || echo FAIL"
     - "grep -q 'playbook.*null.*変更系' .claude/hooks/pre-bash-check.sh && echo PASS || echo FAIL"
 
+- id: M080
+  name: "README 実態同期 + 公開準備"
+  description: |
+    README が実態と乖離している問題を解決。
+    - 「複雑性爆発」「未実装」等の古い記述を削除
+    - 現在の実装状況（32 Hooks, 6 SubAgents, 9 Skills, 52 E2E）を正確に反映
+    - クイックスタートセクションを追加
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M079]
+  playbooks:
+    - playbook-m080-readme-sync.md
+  done_when:
+    - "[x] README.md に「複雑性爆発」「未実装」等の古い表記が存在しない"
+    - "[x] README.md の Hook 数が 32 個と記載されている"
+    - "[x] README.md の CLAUDE.md 行数が実態（約262行）と一致している"
+    - "[x] README.md に「クイックスタート」セクションが存在する"
+    - "[x] README.md の E2E テスト数が 52 と記載されている"
+  test_commands:
+    - "! grep -qE '複雑性の?爆発|未実装' README.md && echo PASS || echo FAIL"
+    - "grep -q '32' README.md && echo PASS || echo FAIL"
+    - "grep -qE '26[0-9]行|約260行|約270行' README.md && echo PASS || echo FAIL"
+    - "grep -q 'クイックスタート' README.md && echo PASS || echo FAIL"
+    - "grep -q '52' README.md && echo PASS || echo FAIL"
+
 ```
 
 ---

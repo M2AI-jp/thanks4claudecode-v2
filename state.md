@@ -20,7 +20,7 @@ project: plan/project.md
 ```yaml
 active: null
 branch: null
-last_archived: plan/archive/playbook-contract-consolidation.md
+last_archived: plan/archive/playbook-m080-readme-sync.md
 ```
 
 ---
@@ -28,7 +28,7 @@ last_archived: plan/archive/playbook-contract-consolidation.md
 ## goal
 
 ```yaml
-milestone: null  # M079 completed
+milestone: null  # M079, M080 completed
 phase: null
 done_criteria: []
 ```
