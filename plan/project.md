@@ -670,6 +670,32 @@ success_criteria:
     - "grep -q 'クイックスタート' README.md && echo PASS || echo FAIL"
     - "grep -q '52' README.md && echo PASS || echo FAIL"
 
+- id: M081
+  name: "全機能動作検証ドキュメント作成"
+  description: |
+    リポジトリの全機能が正常に動作することを証明するドキュメントを作成。
+    1. 架空のユーザーとの対話シミュレーション形式
+    2. 全コンポーネント（32 Hooks, 6 SubAgents, 9 Skills）の動作確認
+    3. E2E テスト 52件の実行結果を記録
+    4. tmp/ に成果物を配置（テンポラリドキュメント）
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M080]
+  playbooks:
+    - playbook-m081-full-verification.md
+  done_when:
+    - "[x] tmp/full-system-verification.md が存在する"
+    - "[x] ドキュメントに 32 Hooks の動作確認結果が記載されている"
+    - "[x] ドキュメントに 6 SubAgents の動作確認結果が記載されている"
+    - "[x] ドキュメントに 9 Skills の動作確認結果が記載されている"
+    - "[x] E2E テスト 52件の実行結果が含まれている"
+  test_commands:
+    - "test -f tmp/full-system-verification.md && echo PASS || echo FAIL"
+    - "grep -c 'Hook.*PASS\\|PASS.*Hook' tmp/full-system-verification.md | awk '{if($1>=32) print \"PASS\"; else print \"FAIL\"}'"
+    - "grep -c 'SubAgent\\|Agent' tmp/full-system-verification.md | awk '{if($1>=6) print \"PASS\"; else print \"FAIL\"}'"
+    - "grep -c 'Skill' tmp/full-system-verification.md | awk '{if($1>=9) print \"PASS\"; else print \"FAIL\"}'"
+    - "grep -q '52' tmp/full-system-verification.md && echo PASS || echo FAIL"
+
 ```
 
 ---
