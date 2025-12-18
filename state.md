@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-contract-consolidation.md
-branch: refactor/contract-consolidation
-last_archived: null
+active: null
+branch: null
+last_archived: plan/archive/playbook-contract-consolidation.md
 ```
 
 ---
@@ -28,13 +28,9 @@ last_archived: null
 ## goal
 
 ```yaml
-milestone: Contract-Consolidation
-phase: p1
-done_criteria:
-  - docs/core-contract.md と docs/admin-contract.md が作成されている
-  - scripts/contract.sh が作成され、Hook が統合されている
-  - E2E シナリオ A/B/C が全て PASS する
-  - セッション終了処理が手動なしで完遂できる
+milestone: null  # M079 completed
+phase: null
+done_criteria: []
 ```
 
 ---
@@ -42,7 +38,7 @@ done_criteria:
 ## session
 
 ```yaml
-last_start: 2025-12-18 23:43:18
+last_start: 2025-12-19 01:48:26
 last_clear: 2025-12-13 00:30:00
 ```
 

@@ -626,17 +626,19 @@ success_criteria:
     1. ズレA: CLAUDE.md に Golden Path ルールがない → 追加
     2. ズレB: Bash で playbook-guard をバイパス可能 → pre-bash-check で封鎖
     3. ズレC: admin で全バイパス → playbook-guard の admin バイパス削除
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-19
   depends_on: [M078]
   playbooks:
     - playbook-m079-golden-path-fix.md
+    - playbook-contract-consolidation.md
   done_when:
-    - "[ ] CLAUDE.md に Golden Path セクション（## 11）が追加されている"
-    - "[ ] prompt-guard.sh の playbook=null 警告が pm 必須を明示している"
-    - "[ ] playbook-guard.sh の admin バイパス（29-32行）が削除されている"
-    - "[ ] pre-bash-check.sh が playbook=null で変更系 Bash をブロックする"
-    - "[ ] 検証シナリオ 3 つが全て PASS する"
-    - "[ ] check-integrity.sh が PASS する"
+    - "[x] CLAUDE.md に Golden Path セクション（## 11）が追加されている"
+    - "[x] prompt-guard.sh の playbook=null 警告が pm 必須を明示している"
+    - "[x] playbook-guard.sh の admin バイパス（29-32行）が削除されている"
+    - "[x] pre-bash-check.sh が playbook=null で変更系 Bash をブロックする"
+    - "[x] 検証シナリオ 3 つが全て PASS する（E2E 52件 ALL TESTS PASSED）"
+    - "[x] check-integrity.sh が PASS する"
   test_commands:
     - "grep -q '## 11. Golden Path' CLAUDE.md && echo PASS || echo FAIL"
     - "grep -q 'pm.*必須' .claude/hooks/prompt-guard.sh && echo PASS || echo FAIL"
