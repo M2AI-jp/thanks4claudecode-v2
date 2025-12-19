@@ -956,6 +956,28 @@ success_criteria:
     - "grep -q 'DELETE_LOG' state.md && echo PASS || echo FAIL"
     - "test -f scripts/freeze-file.sh && echo PASS || echo FAIL"
 
+- id: M096
+  name: "pre-bash-check デッドロック修正"
+  description: |
+    playbook=null で git add/commit 等のメンテナンス操作がブロックされ、
+    playbook 完了後の最終コミットができない問題を修正。
+    scripts/contract.sh の ADMIN_MAINTENANCE_PATTERNS に
+    不足しているパターン（git checkout/merge/branch -d 等）を追加。
+  status: achieved
+  achieved_at: 2025-12-20
+  depends_on: [M093]
+  playbooks:
+    - playbook-m096-pre-bash-deadlock-fix.md
+  done_when:
+    - "[x] scripts/contract.sh の ADMIN_MAINTENANCE_PATTERNS に git checkout/merge/branch -d が追加されている"
+    - "[x] playbook=null で git add state.md が実行できる"
+    - "[x] playbook=null で git commit が実行できる"
+    - "[x] playbook=null で git checkout main が実行できる"
+  test_commands:
+    - "grep -q 'git.*checkout.*main' scripts/contract.sh && echo PASS || echo FAIL"
+    - "grep -q 'git.*merge' scripts/contract.sh && echo PASS || echo FAIL"
+    - "grep -q 'git.*branch.*-d' scripts/contract.sh && echo PASS || echo FAIL"
+
 ```
 
 ---

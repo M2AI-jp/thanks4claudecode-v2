@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
+active: plan/playbook-m096-pre-bash-deadlock-fix.md
+branch: fix/pre-bash-deadlock
 last_archived: plan/archive/playbook-m095-branch-merge.md
 ```
 
@@ -28,11 +28,13 @@ last_archived: plan/archive/playbook-m095-branch-merge.md
 ## goal
 
 ```yaml
-milestone: M095
-phase: done
+milestone: M096
+phase: p1
 done_when:
-  - "[x] M093 と M094 のコミットが main に統合されている"
-  - "[x] feat/m093-ssc-phase3 と feat/m094-consent-auto-delete が削除されている"
+  - "[ ] scripts/contract.sh の ADMIN_MAINTENANCE_PATTERNS に git checkout/merge/branch -d が追加されている"
+  - "[ ] playbook=null で git add state.md が実行できる"
+  - "[ ] playbook=null で git commit が実行できる"
+  - "[ ] playbook=null で git checkout main が実行できる"
 ```
 
 ---
@@ -67,7 +69,7 @@ hooks: 34
 agents: 6
 skills: 9
 commands: 8
-last_verified: 2025-12-19
+last_verified: 2025-12-20
 ```
 
 > **Single Source of Truth**: コンポーネント数の正規値。

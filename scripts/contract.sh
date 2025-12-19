@@ -269,6 +269,16 @@ ADMIN_MAINTENANCE_PATTERNS=(
     '^git[[:space:]]+add[[:space:]]+state\.md[[:space:]]+plan/archive/?$'
     # git commit -m "..." (maintenance メッセージ)
     '^git[[:space:]]+commit[[:space:]]+-m[[:space:]]+'
+    # git checkout main（playbook 完了後のメイン復帰）
+    '^git[[:space:]]+checkout[[:space:]]+main$'
+    # git merge <branch>（ブランチマージ）
+    '^git[[:space:]]+merge[[:space:]]+[^[:space:]]+$'
+    # git merge <branch> --no-edit（ブランチマージ、エディタなし）
+    '^git[[:space:]]+merge[[:space:]]+[^[:space:]]+[[:space:]]+--no-edit$'
+    # git branch -d <branch>（マージ済みブランチ削除）
+    '^git[[:space:]]+branch[[:space:]]+-d[[:space:]]+[^[:space:]]+$'
+    # git add -A（全ファイル追加、最終コミット用）
+    '^git[[:space:]]+add[[:space:]]+-A$'
 )
 
 # Admin Maintenance allowlist に一致するか判定
