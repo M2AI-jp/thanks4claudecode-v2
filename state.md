@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m083-state-sync-fix.md
-branch: feat/m083-state-sync-fix
-last_archived: plan/archive/playbook-m082-hook-contract.md
+active: plan/playbook-m084-playbook-schema-v2.md
+branch: feat/m084-playbook-schema-v2
+last_archived: plan/archive/playbook-m083-state-sync-fix.md
 ```
 
 ---
@@ -28,12 +28,13 @@ last_archived: plan/archive/playbook-m082-hook-contract.md
 ## goal
 
 ```yaml
-milestone: M083
-phase: p1 (in_progress)
+milestone: M084
+phase: p1
 done_when:
-  - "[ ] playbook 完了時に project.md の対応 milestone が status: achieved に自動更新される仕組みが存在する"
-  - "[ ] done_when と done_criteria の用語が統一されている（done_when に統一）"
-  - "[ ] consent-guard.sh が consent ファイル存在時に [理解確認] ブロックを表示してブロックする"
+  - "[ ] plan/template/playbook-format.md に Schema v2 マーカーが存在する"
+  - "[ ] .claude/hooks/playbook-validator.sh が存在し実行可能"
+  - "[ ] playbook-validator.sh が不正形式を検出して exit 非0 を返す"
+  - "[ ] 既存の active playbook が Schema v2 に準拠している"
 ```
 
 ---

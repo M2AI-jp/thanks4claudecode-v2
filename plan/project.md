@@ -730,14 +730,82 @@ success_criteria:
     1. project.md 自動更新が動作していない（milestone 完了時に status が更新されない）
     2. done_when/done_criteria 用語の不整合（パース失敗の原因）
     3. consent-guard（理解確認/リスク判断）が機能していない
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-19
   depends_on: [M082]
   playbooks:
     - playbook-m083-state-sync-fix.md
   done_when:
-    - "[ ] playbook 完了時に project.md の対応 milestone が status: achieved に自動更新される仕組みが存在する"
-    - "[ ] done_when と done_criteria の用語が統一されている（done_when に統一）"
-    - "[ ] consent-guard.sh が consent ファイル存在時に [理解確認] ブロックを表示してブロックする"
+    - "[x] playbook 完了時に project.md の対応 milestone が status: achieved に自動更新される仕組みが存在する"
+    - "[x] done_when と done_criteria の用語が統一されている（done_when に統一）"
+    - "[x] consent-guard.sh が consent ファイル存在時に [理解確認] ブロックを表示してブロックする"
+
+# ============================================================
+# M084-M087: Hook システム安定化（2025-12-19 E2E レポート続行）
+# ============================================================
+
+- id: M084
+  name: "Playbook Schema v2 + 正規化"
+  description: |
+    playbook の表記揺れを根絶し、Hook が確実にパースできる形式に正規化する。
+    1. playbook-format.md を Schema v2 として厳密化
+    2. playbook-validator.sh を実装
+    3. 既存 playbook を正規化
+  status: not_started
+  depends_on: [M083]
+  playbooks: []
+  done_when:
+    - "[ ] plan/template/playbook-format.md に Schema v2 マーカーが存在する"
+    - "[ ] .claude/hooks/playbook-validator.sh が存在し実行可能"
+    - "[ ] playbook-validator.sh が不正形式を検出して exit 非0 を返す"
+    - "[ ] 既存の active playbook が Schema v2 に準拠している"
+
+- id: M085
+  name: "subtask-guard の仕様準拠化"
+  description: |
+    subtask-guard.sh を M082 の契約に完全準拠させ、Layer2 復旧を完了。
+    1. パース失敗時は WARN で通す
+    2. validations チェックをオプション化（厳格モードで BLOCK）
+    3. 詳細なデバッグログを stderr に出力
+  status: not_started
+  depends_on: [M084]
+  playbooks: []
+  done_when:
+    - "[ ] subtask-guard.sh がパース失敗時に exit 0 を返す"
+    - "[ ] subtask-guard.sh に厳格モード（STRICT=1）オプションが存在する"
+    - "[ ] 通常モードで validations 不足は WARN のみ"
+    - "[ ] 厳格モードで validations 不足は BLOCK"
+
+- id: M086
+  name: "create-pr-hook の復旧"
+  description: |
+    create-pr-hook.sh を復旧し、CodeRabbit 連携を再開。
+    1. SKIP 理由の明確化
+    2. gh コマンドの存在チェック
+    3. PR 作成成功時のログ強化
+  status: not_started
+  depends_on: [M085]
+  playbooks: []
+  done_when:
+    - "[ ] create-pr-hook.sh が SKIP 時に理由を stderr に出す"
+    - "[ ] gh コマンド不存在時に WARN を出力"
+    - "[ ] PR 作成成功時に PR URL をログに出力"
+
+- id: M087
+  name: "Hook 回帰 E2E の CI 化"
+  description: |
+    Hook の動作を保証する E2E テストを CI で自動実行。
+    1. .claude/tests/e2e-hooks.sh を作成
+    2. GitHub Actions で自動実行
+    3. 回帰テストのレポート生成
+  status: not_started
+  depends_on: [M086]
+  playbooks: []
+  done_when:
+    - "[ ] .claude/tests/e2e-hooks.sh が存在し実行可能"
+    - "[ ] .github/workflows/hook-tests.yml が存在"
+    - "[ ] E2E テストが全 PASS している"
+    - "[ ] テストレポートが生成される"
 
 ```
 

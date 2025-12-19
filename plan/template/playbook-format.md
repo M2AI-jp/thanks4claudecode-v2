@@ -10,13 +10,14 @@
 ## meta
 
 ```yaml
-project: {プロジェクト名}
-branch: {type}/{description}  # feat/xxx, fix/xxx, refactor/xxx, docs/xxx
-created: {作成日}
-issue: {Issue 番号 or null}
-derives_from: {project.done_when の id}  # 例: DW-001
-reviewed: false  # reviewer SubAgent による検証済みフラグ
-roles:  # オプション: 役割の override（state.md のデフォルトを上書き）
+schema_version: v2  # [MUST] Schema v2 準拠
+project: {プロジェクト名}  # [MUST] 空文字不可
+branch: {type}/{description}  # [MUST] feat/xxx, fix/xxx, refactor/xxx, docs/xxx
+created: {YYYY-MM-DD}  # [MUST] ISO 8601 日付形式
+issue: {Issue 番号 or null}  # [MAY] null 許容
+derives_from: {milestone ID or null}  # [SHOULD] 例: M084
+reviewed: false  # [MUST] reviewer SubAgent による検証済みフラグ (default: false)
+roles:  # [MAY] 役割の override（state.md のデフォルトを上書き）
   worker: claudecode  # この playbook では worker = claudecode
 ```
 
@@ -92,6 +93,8 @@ done_when:
 ## phases
 
 > **V12: チェックボックス形式を導入。報酬詐欺防止のため `- [ ]` / `- [x]` で進捗を明示。**
+>
+> **Schema v2 準拠**: 詳細な仕様は docs/playbook-schema-v2.md を参照。
 
 ### p1: {フェーズ名}
 
@@ -123,8 +126,8 @@ done_when:
     - consistency: "{...}"
     - completeness: "{...}"
 
-**status**: pending | in_progress | done
-**max_iterations**: 5
+**status**: pending | in_progress | done  <!-- [MUST] 小文字のみ -->
+**max_iterations**: 5  <!-- [SHOULD] デッドロック防止 -->
 
 ---
 
@@ -163,6 +166,11 @@ done_when:
 
 > **重要**: `- [ ]` → `- [x]` の変更は subtask-guard.sh がチェック。
 > validations の 3 点全てが PASS でなければ `[x]` への変更はブロックされる。
+>
+> **Schema v2 正規表現**:
+> - subtask: `^- \[([ x])\] \*\*p([1-9][0-9]?|_final)\.[1-9][0-9]?\*\*:`
+> - final_task: `^- \[([ x])\] \*\*ft[0-9]{1,2}\*\*:`
+> - `[X]`（大文字）は不正形式として拒否される
 
 ### subtask 構造（V12: チェックボックス形式）
 
@@ -177,16 +185,16 @@ done_when:
   - depends_on: [p1.2]  # オプション
 ```
 
-### 必須フィールド
+### 必須フィールド [MUST]
 
-| フィールド | 説明 |
-|-----------|------|
-| `- [ ]` / `- [x]` | チェックボックス（未完了/完了） |
-| `**p{N}.{M}**` | subtask ID（太字） |
-| criterion | 検証可能な完了条件（`:` の後に記述） |
-| executor | 実行者（claudecode / codex / coderabbit / user） |
-| test_command | PASS/FAIL を返す検証コマンド |
-| validations | 3 点検証（technical / consistency / completeness） |
+| フィールド | 説明 | 必須度 |
+|-----------|------|--------|
+| `- [ ]` / `- [x]` | チェックボックス（未完了/完了）。`[x]` は小文字のみ | MUST |
+| `**p{N}.{M}**` | subtask ID（太字）。N: 1-99, M: 1-99 | MUST |
+| criterion | 検証可能な完了条件（`:` の後に記述） | MUST |
+| executor | 実行者（claudecode / codex / coderabbit / user） | MUST |
+| test_command | PASS/FAIL を返す検証コマンド（バッククォート推奨） | MUST |
+| validations | 3 点検証（technical / consistency / completeness） | MUST |
 
 ### 完了時の追加フィールド
 
