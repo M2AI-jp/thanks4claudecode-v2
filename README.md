@@ -49,7 +49,7 @@ bash scripts/e2e-contract-test.sh
 ```
 CLAUDE.md（262行）
   ↓ 思考制御
-Hook（32個）
+Hook（33個: 登録済 22 + 手動実行 6 + ライブラリ 5）
   ↓ 構造的強制
 SubAgent（6個）+ Skill（9個）+ Command（8個）
   ↓ 検証・専門知識
@@ -83,14 +83,14 @@ is_compound_command()   # 複合コマンド検出
 ├── RUNBOOK.md              # 運用手順
 ├── state.md                # 現在の状態
 ├── plan/
-│   ├── project.md          # プロジェクト計画（82 milestone）
+│   ├── project.md          # プロジェクト計画（40 milestone、M001-M088）
 │   ├── archive/            # 完了した playbook
 │   └── template/           # playbook テンプレート
 ├── scripts/
 │   ├── contract.sh         # 契約判定中核
 │   └── e2e-contract-test.sh # E2E テスト（52件）
 ├── .claude/
-│   ├── hooks/              # Hook（32個）
+│   ├── hooks/              # Hook（33個）
 │   ├── agents/             # SubAgent（6個）
 │   ├── skills/             # Skill（9個）
 │   ├── commands/           # Command（8個）
@@ -143,7 +143,7 @@ bash .claude/hooks/check-integrity.sh
 
 ## 開発履歴
 
-- **82 milestone** を達成（M001〜M082）
+- **40 milestone** を定義（M001〜M088、欠番あり）
 - **52 E2E テスト** で契約システムを保証
 - **CLAUDE.md** を 648行 → 262行に最適化
 

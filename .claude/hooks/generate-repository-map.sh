@@ -164,11 +164,15 @@ get_hook_trigger() {
     fi
 }
 
-# ファイル数をカウント
+# ファイル数をカウント（ディレクトリが存在しない場合は 0 を返す）
 count_files() {
     local dir="$1"
     local pattern="$2"
-    find "$dir" -maxdepth 1 -type f -name "$pattern" 2>/dev/null | wc -l | tr -d ' '
+    if [[ -d "$dir" ]]; then
+        find "$dir" -maxdepth 1 -type f -name "$pattern" 2>/dev/null | wc -l | tr -d ' '
+    else
+        echo "0"
+    fi
 }
 
 # ==============================================================================
@@ -563,7 +567,12 @@ plan:
       description: "進行中の playbook"
 EOF
 
-ACTIVE_COUNT=$(find "$PLAN_DIR/active" -maxdepth 1 -name "playbook-*.md" 2>/dev/null | wc -l | tr -d ' ')
+# plan/active が存在しない場合は 0 を返す
+if [[ -d "$PLAN_DIR/active" ]]; then
+    ACTIVE_COUNT=$(find "$PLAN_DIR/active" -maxdepth 1 -name "playbook-*.md" 2>/dev/null | wc -l | tr -d ' ')
+else
+    ACTIVE_COUNT=0
+fi
 echo "      count: $ACTIVE_COUNT" >> "$TEMP_FILE"
 
 cat >> "$TEMP_FILE" << EOF
@@ -571,7 +580,12 @@ cat >> "$TEMP_FILE" << EOF
       description: "完了した playbook のアーカイブ"
 EOF
 
-ARCHIVE_COUNT=$(find "$PLAN_DIR/archive" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+# plan/archive が存在しない場合は 0 を返す
+if [[ -d "$PLAN_DIR/archive" ]]; then
+    ARCHIVE_COUNT=$(find "$PLAN_DIR/archive" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+else
+    ARCHIVE_COUNT=0
+fi
 echo "      count: $ARCHIVE_COUNT" >> "$TEMP_FILE"
 
 cat >> "$TEMP_FILE" << EOF

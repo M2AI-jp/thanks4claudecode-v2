@@ -149,7 +149,8 @@ if [ -f "plan/project.md" ]; then
 
         if [ -n "$MILESTONE_ID" ]; then
             # project.md でその milestone が achieved かチェック
-            MILESTONE_STATUS=$(awk "/id: $MILESTONE_ID\$/,/^- id:/" plan/project.md 2>/dev/null | grep "status:" | head -1 | sed 's/.*status: *//')
+            # grep + sed でシンプルに status を取得
+            MILESTONE_STATUS=$(grep -A15 "id: $MILESTONE_ID$" plan/project.md 2>/dev/null | grep "status:" | head -1 | sed 's/.*status: *//' | tr -d ' ')
 
             if [ "$MILESTONE_STATUS" = "achieved" ]; then
                 log_err "$PLAYBOOK_NAME → $MILESTONE_ID is achieved but playbook not archived"

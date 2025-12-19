@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m087-local-hook-tests.md
-branch: feat/m087-local-hook-tests
-last_archived: plan/archive/playbook-m086-create-pr-hook-recovery.md
+active: plan/playbook-m089-component-registry-normalization.md
+branch: feat/m089-component-registry
+last_archived: plan/archive/playbook-m088-gap-fix.md
 ```
 
 ---
@@ -28,13 +28,15 @@ last_archived: plan/archive/playbook-m086-create-pr-hook-recovery.md
 ## goal
 
 ```yaml
-milestone: M087
-phase: p1
+milestone: M089
+phase: p_final
 done_when:
-  - "[ ] .claude/tests/hook-tests.sh が存在し実行可能"
-  - "[ ] 全 Hook が bash -n で構文エラーなし"
-  - "[ ] 主要 Hook の基本動作テストが PASS"
-  - "[ ] テスト結果が stdout に出力される"
+  - generate-repository-map.sh が exit 0 で完了する
+  - repository-map.yaml の hooks が 33 と一致
+  - repository-map.yaml の agents が 6 と一致
+  - repository-map.yaml の skills が 9 と一致
+  - repository-map.yaml の commands が 8 と一致
+  - check-integrity.sh が PASS
 ```
 
 ---

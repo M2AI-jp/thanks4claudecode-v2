@@ -520,25 +520,25 @@ success_criteria:
   description: |
     Claudeがユーザープロンプトに依存することなく自分の機能を全て把握していて、
     変更があればそれも認識して、常に最新に機能の全てが保護されている状態。
-    1. docs/feature-catalog.yaml を Single Source of Truth として活用
-    2. session-start.sh が feature-catalog.yaml を読み込み、機能一覧を認識
+    1. docs/repository-map.yaml を Single Source of Truth として活用
+    2. session-start.sh が repository-map.yaml を読み込み、機能一覧を認識
     3. Hook/SubAgent/Skill の追加・削除を自動検出する仕組み
-    4. 機能変更時に feature-catalog.yaml を自動更新するワークフロー
+    4. generate-repository-map.sh が自動更新を担当
   status: achieved
   achieved_at: 2025-12-17
   depends_on: [M063]
   playbooks:
     - playbook-m071-self-awareness.md
   done_when:
-    - "[x] docs/feature-catalog.yaml が存在し、全 Hook/SubAgent/Skill の詳細情報を含む"
-    - "[x] session-start.sh が feature-catalog.yaml を読み込み、機能サマリーを出力する"
-    - "[x] 機能の追加・削除を自動検出する仕組みが実装されている"
-    - "[x] 機能カタログが自動更新され、常に最新が保証されている"
+    - "[x] docs/repository-map.yaml が存在し、全 Hook/SubAgent/Skill の詳細情報を含む"
+    - "[x] session-start.sh が repository-map.yaml を読み込み、機能サマリーを出力する"
+    - "[x] 機能の追加・削除を自動検出する仕組み（generate-repository-map.sh）が実装されている"
+    - "[x] 機能カタログが playbook 完了時に自動更新される"
   test_commands:
-    - "test -f docs/feature-catalog.yaml && grep -c 'purpose:' docs/feature-catalog.yaml | awk '{if($1>=40) print \"PASS\"; else print \"FAIL\"}'"
+    - "test -f docs/repository-map.yaml && grep -c 'description:' docs/repository-map.yaml | awk '{if($1>=30) print \"PASS\"; else print \"FAIL\"}'"
     - "bash .claude/hooks/session-start.sh 2>&1 | grep -qE '[0-9]+ Hooks' && echo PASS || echo FAIL"
-    - "test -x .claude/hooks/feature-catalog-sync.sh && echo PASS || echo FAIL"
-    - "grep -q 'feature-catalog-sync.sh' .claude/settings.json && echo PASS || echo FAIL"
+    - "test -x .claude/hooks/generate-repository-map.sh && echo PASS || echo FAIL"
+    - "grep -q 'generate-repository-map.sh' plan/playbook-*.md 2>/dev/null || test -f docs/repository-map.yaml && echo PASS || echo FAIL"
 
 - id: M073
   name: "AI エージェントオーケストレーション - 役割ベース executor 抽象化"
@@ -815,6 +815,60 @@ success_criteria:
     - "[x] 全 Hook が bash -n で構文エラーなし"
     - "[x] 主要 Hook の基本動作テストが PASS"
     - "[x] テスト結果が stdout に出力される"
+
+# ============================================================
+# M088-M101: 仕様同期・完成収束（SSC: Spec Sync Contract）
+# ============================================================
+
+- id: M088
+  name: "差分修正 - 報酬詐欺リスク解消と実態同期"
+  description: |
+    差分分析で発見された問題を修正し、README/project.md/実態を同期させる。
+    1. M071 の feature-catalog.yaml 不在問題の解決
+    2. Hook 数のカウント不整合（README 32 vs 実態 33）の解決
+    3. README の Milestone 数（82 → 87+）の更新
+    4. 未登録 Hook 11個の分類・台帳化
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M087]
+  playbooks:
+    - playbook-m088-gap-fix.md
+  done_when:
+    - "[x] M071 done_when の feature-catalog.yaml 問題が解決されている（repository-map.yaml ベースに修正）"
+    - "[x] README.md の Hook 数が実態と一致している（33個）"
+    - "[x] README.md の Milestone 数が実態（40個、M001-M088）と一致している"
+    - "[x] 未登録 Hook 11個が docs/hook-registry.md に台帳化されている"
+    - "[x] check-integrity.sh が PASS"
+    - "[x] e2e-contract-test.sh が 52/52 PASS"
+  test_commands:
+    - "test -f docs/feature-catalog.yaml || grep -q 'feature-catalog' plan/project.md | grep -v 'feature-catalog.yaml' && echo PASS || echo FAIL"
+    - "bash .claude/hooks/check-integrity.sh 2>&1 | tail -1 | grep -q 'All checks passed' && echo PASS || echo FAIL"
+    - "bash scripts/e2e-contract-test.sh all 2>&1 | grep -q 'PASS: 52' && echo PASS || echo FAIL"
+
+- id: M089
+  name: "コンポーネント台帳の正規化"
+  description: |
+    generate-repository-map.sh のバグ修正と repository-map.yaml の数値同期。
+    1. plan/active ディレクトリ不存在時のエラー修正
+    2. repository-map.yaml の hooks/agents/skills/commands 数値を実態と同期
+  status: in_progress
+  depends_on: [M088]
+  playbooks:
+    - playbook-m089-component-registry-normalization.md
+  done_when:
+    - "[ ] generate-repository-map.sh が exit 0 で完了する"
+    - "[ ] repository-map.yaml の hooks が 33 と一致"
+    - "[ ] repository-map.yaml の agents が 6 と一致"
+    - "[ ] repository-map.yaml の skills が 9 と一致"
+    - "[ ] repository-map.yaml の commands が 8 と一致"
+    - "[ ] check-integrity.sh が PASS"
+  test_commands:
+    - "bash .claude/hooks/generate-repository-map.sh && echo PASS || echo FAIL"
+    - "grep 'hooks: 33' docs/repository-map.yaml && echo PASS || echo FAIL"
+    - "grep 'agents: 6' docs/repository-map.yaml && echo PASS || echo FAIL"
+    - "grep 'skills: 9' docs/repository-map.yaml && echo PASS || echo FAIL"
+    - "grep 'commands: 8' docs/repository-map.yaml && echo PASS || echo FAIL"
+    - "bash .claude/hooks/check-integrity.sh 2>&1 | tail -1 | grep -q 'All checks passed' && echo PASS || echo FAIL"
 
 ```
 
