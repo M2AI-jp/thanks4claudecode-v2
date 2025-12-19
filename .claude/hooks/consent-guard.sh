@@ -13,15 +13,17 @@
 # 1. ユーザープロンプト受信
 # 2. LLM が [理解確認] ブロックを出力
 # 3. ユーザーが OK/修正/却下 を選択
-# 4. OK の場合のみ consent ファイルを作成
-# 5. consent ファイルがある場合のみ Edit/Write 許可
+# 4. OK の場合のみ consent ファイルを削除
+# 5. consent ファイルがない場合のみ Edit/Write 許可
 #
-# 【注意】
-# - このフックは settings.json に未登録（設計検証段階）
-# - 実際の運用には session-start.sh との統合が必要
+# M082: Hook 契約準拠（必ず理由を出力、パース失敗時は INTERNAL ERROR）
+# 参照: docs/hook-exit-code-contract.md
 # ============================================================
 
-set -euo pipefail
+# -e を外す（エラーでも処理を続けて理由を出力するため）
+set -uo pipefail
+
+HOOK_NAME="consent-guard"
 
 # ============================================================
 # リポジトリルート取得（portable化）
@@ -46,15 +48,22 @@ CONSENT_FILE="${CONSENT_DIR}/consent"
 # jq チェック
 # ============================================================
 if ! command -v jq &> /dev/null; then
-    # jq がない場合はスキップ（安全側に倒す）
+    echo "[SKIP] $HOOK_NAME: jq command not found" >&2
     exit 0
 fi
 
 # ============================================================
 # 入力解析
 # ============================================================
-INPUT=$(cat)
-TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
+INPUT=$(cat) || {
+    echo "[INTERNAL ERROR] $HOOK_NAME: failed to read input" >&2
+    exit 0
+}
+
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null) || {
+    echo "[INTERNAL ERROR] $HOOK_NAME: JSON parse failed" >&2
+    exit 0
+}
 
 # ============================================================
 # 対象ツールチェック
@@ -65,6 +74,7 @@ case "$TOOL_NAME" in
         ;;
     *)
         # 対象外ツールは通過
+        echo "[SKIP] $HOOK_NAME: not Edit/Write tool ($TOOL_NAME)" >&2
         exit 0
         ;;
 esac
@@ -82,11 +92,15 @@ esac
 #   4. Edit/Write が許可される
 # ============================================================
 if [ -f "$CONSENT_FILE" ]; then
+    echo "[BLOCK] $HOOK_NAME: consent file exists, user agreement required" >&2
     cat << 'EOF'
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ⛔ 合意プロセス未完了 - Edit/Write をブロック
+  [理解確認] - 合意プロセス未完了
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  [理解確認] ブロックを出力し、ユーザーの合意を得てください。
+
+  Edit/Write を実行する前に、以下の [理解確認] ブロックを
+  出力し、ユーザーの合意を得てください。
 
   フォーマット:
     [理解確認]
@@ -101,11 +115,10 @@ if [ -f "$CONSENT_FILE" ]; then
         影響: {影響度}
         対策: {防止策}
 
-  ⚠️ risks は必須です。3-5個のリスクを分析してください。
-
   ユーザーが「OK」と応答したら:
     rm .claude/.session-init/consent
   を実行して作業を開始できます。
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
     exit 2
@@ -114,4 +127,5 @@ fi
 # ============================================================
 # 合意済み（consent ファイルが存在しない）- 通過
 # ============================================================
+echo "[PASS] $HOOK_NAME: consent file not found, proceeding" >&2
 exit 0

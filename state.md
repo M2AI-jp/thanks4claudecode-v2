@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
-last_archived: plan/archive/playbook-m082-archive-check.md
+active: plan/playbook-m087-local-hook-tests.md
+branch: feat/m087-local-hook-tests
+last_archived: plan/archive/playbook-m086-create-pr-hook-recovery.md
 ```
 
 ---
@@ -28,9 +28,13 @@ last_archived: plan/archive/playbook-m082-archive-check.md
 ## goal
 
 ```yaml
-milestone: null
-phase: null
-done_criteria: []
+milestone: M087
+phase: p1
+done_when:
+  - "[ ] .claude/tests/hook-tests.sh が存在し実行可能"
+  - "[ ] 全 Hook が bash -n で構文エラーなし"
+  - "[ ] 主要 Hook の基本動作テストが PASS"
+  - "[ ] テスト結果が stdout に出力される"
 ```
 
 ---

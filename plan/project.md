@@ -696,6 +696,126 @@ success_criteria:
     - "grep -c 'Skill' tmp/full-system-verification.md | awk '{if($1>=9) print \"PASS\"; else print \"FAIL\"}'"
     - "grep -q '52' tmp/full-system-verification.md && echo PASS || echo FAIL"
 
+# ============================================================
+# M082-M087: 復旧マイルストーン（2025-12-19 E2E レポート基づく）
+# ============================================================
+
+- id: M082
+  name: "Hook の契約固定と止血"
+  description: |
+    今の最悪は「subtask-guard がチェック更新をブロック」「create-pr が黙って何もしない」で運用が詰むこと。
+    まず "Hook が壊れても作業が詰まない（少なくとも理由が出る）" にする。
+
+    対象 Hook:
+      - subtask-guard.sh
+      - create-pr-hook.sh
+      - archive-playbook.sh
+      - （横断）Hook の出力/exit code の共通契約
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M081]
+  playbooks:
+    - playbook-m082-hook-contract.md
+  done_when:
+    - "[x] docs/hook-exit-code-contract.md が存在し、WARN/BLOCK/INTERNAL ERROR の定義が明記されている"
+    - "[x] subtask-guard.sh がパース失敗時に exit 0 + stderr メッセージを出す"
+    - "[x] create-pr-hook.sh が PR 未作成時に SKIP 理由を stderr に出す"
+    - "[x] archive-playbook.sh が SKIP 時に理由を stderr に出す"
+    - "[x] 全対象 Hook で 'No stderr output' が再現しない（必ず何か出力）"
+
+- id: M083
+  name: "状態同期とガード機能の修正"
+  description: |
+    M082 完了後に発見された 3 つの問題を修正:
+    1. project.md 自動更新が動作していない（milestone 完了時に status が更新されない）
+    2. done_when/done_criteria 用語の不整合（パース失敗の原因）
+    3. consent-guard（理解確認/リスク判断）が機能していない
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M082]
+  playbooks:
+    - playbook-m083-state-sync-fix.md
+  done_when:
+    - "[x] playbook 完了時に project.md の対応 milestone が status: achieved に自動更新される仕組みが存在する"
+    - "[x] done_when と done_criteria の用語が統一されている（done_when に統一）"
+    - "[x] consent-guard.sh が consent ファイル存在時に [理解確認] ブロックを表示してブロックする"
+
+# ============================================================
+# M084-M087: Hook システム安定化（2025-12-19 E2E レポート続行）
+# ============================================================
+
+- id: M084
+  name: "Playbook Schema v2 + 正規化"
+  description: |
+    playbook の表記揺れを根絶し、Hook が確実にパースできる形式に正規化する。
+    1. playbook-format.md を Schema v2 として厳密化
+    2. playbook-validator.sh を実装
+    3. 既存 playbook を正規化
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M083]
+  playbooks:
+    - playbook-m084-playbook-schema-v2.md
+  done_when:
+    - "[x] plan/template/playbook-format.md に Schema v2 マーカーが存在する"
+    - "[x] .claude/hooks/playbook-validator.sh が存在し実行可能"
+    - "[x] playbook-validator.sh が不正形式を検出して exit 非0 を返す"
+    - "[x] 既存の active playbook が Schema v2 に準拠している"
+
+- id: M085
+  name: "subtask-guard の仕様準拠化"
+  description: |
+    subtask-guard.sh を M082 の契約に完全準拠させ、Layer2 復旧を完了。
+    1. パース失敗時は WARN で通す
+    2. validations チェックをオプション化（厳格モードで BLOCK）
+    3. 詳細なデバッグログを stderr に出力
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M084]
+  playbooks:
+    - playbook-m085-subtask-guard-compliance.md
+  done_when:
+    - "[x] subtask-guard.sh がパース失敗時に exit 0 を返す"
+    - "[x] subtask-guard.sh に厳格モード（STRICT=1）オプションが存在する"
+    - "[x] 通常モードで validations 不足は WARN のみ"
+    - "[x] 厳格モードで validations 不足は BLOCK"
+
+- id: M086
+  name: "create-pr-hook の復旧"
+  description: |
+    create-pr-hook.sh を復旧し、CodeRabbit 連携を再開。
+    1. SKIP 理由の明確化
+    2. gh コマンドの存在チェック
+    3. PR 作成成功時のログ強化
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M085]
+  playbooks:
+    - playbook-m086-create-pr-hook-recovery.md
+  done_when:
+    - "[x] create-pr-hook.sh が SKIP 時に理由を stderr に出す"
+    - "[x] gh コマンド不存在時に WARN を出力"
+    - "[x] PR 作成成功時に PR URL をログに出力"
+
+- id: M087
+  name: "ローカル Hook テストスイートの整備"
+  description: |
+    Hook の動作を保証するローカルテストスイートを整備。
+    ローカル完結の設計原則を維持し、CI 依存を回避。
+    1. .claude/tests/hook-tests.sh を作成
+    2. 全 Hook の構文チェック（bash -n）
+    3. 擬似入力での基本動作テスト
+  status: achieved
+  achieved_at: 2025-12-19
+  depends_on: [M086]
+  playbooks:
+    - playbook-m087-local-hook-tests.md
+  done_when:
+    - "[x] .claude/tests/hook-tests.sh が存在し実行可能"
+    - "[x] 全 Hook が bash -n で構文エラーなし"
+    - "[x] 主要 Hook の基本動作テストが PASS"
+    - "[x] テスト結果が stdout に出力される"
+
 ```
 
 ---

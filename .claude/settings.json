@@ -162,10 +162,6 @@
             "type": "command",
             "command": "bash .claude/hooks/session-start.sh",
             "timeout": 5000
-          },
-          {
-            "type": "command",
-            "timeout": 5000
           }
         ]
       }
