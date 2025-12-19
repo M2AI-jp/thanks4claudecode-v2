@@ -26,6 +26,14 @@ set -uo pipefail
 
 HOOK_NAME="subtask-guard"
 
+# ==============================================================================
+# M085: 厳格モード（STRICT=1 で BLOCK、デフォルトは WARN）
+# ==============================================================================
+# STRICT=1: validations 不足時に BLOCK（exit 2）
+# STRICT 未設定 or 0: validations 不足時に WARN のみ（exit 0）
+# ==============================================================================
+STRICT_MODE="${STRICT:-0}"
+
 # 入力 JSON を読み取り（失敗時は INTERNAL ERROR）
 INPUT=$(cat) || {
     echo "[INTERNAL ERROR] $HOOK_NAME: failed to read input" >&2
@@ -116,27 +124,39 @@ fi
 # ==============================================================================
 # V12 形式: - [x] の後に validations ブロックがあるか
 # V11 形式: status: done の後に validations があるか
+#
+# M085: モード切替
+#   - 通常モード（STRICT=0）: validations 不足は WARN のみ（exit 0）
+#   - 厳格モード（STRICT=1）: validations 不足は BLOCK（exit 2）
 # ==============================================================================
 if [[ "$NEW_STRING" != *"validations:"* ]]; then
-    # validations がない場合はブロック
-    echo "[BLOCK] $HOOK_NAME: subtask 完了には validations が必須です" >&2
-    echo "" >&2
-    echo "V12 形式（チェックボックス）で以下の 3 検証を追加してください:" >&2
-    echo "" >&2
-    echo "- [x] **p1.1**: criterion が満たされている" >&2
-    echo "  - executor: claudecode" >&2
-    echo "  - test_command: \`...\`" >&2
-    echo "  - validations:" >&2
-    echo "    - technical: \"PASS - 技術的に正しい\"" >&2
-    echo "    - consistency: \"PASS - 整合性がある\"" >&2
-    echo "    - completeness: \"PASS - 完全に実装\"" >&2
-    echo "  - validated: $(date -u +%Y-%m-%dT%H:%M:%S)" >&2
-    echo "" >&2
-    echo "参照: plan/template/playbook-format.md" >&2
-    exit 2
+    # validations がない場合
+    if [[ "$STRICT_MODE" == "1" ]]; then
+        # 厳格モード: BLOCK
+        echo "[BLOCK] $HOOK_NAME: subtask 完了には validations が必須です (STRICT=1)" >&2
+        echo "" >&2
+        echo "V12 形式（チェックボックス）で以下の 3 検証を追加してください:" >&2
+        echo "" >&2
+        echo "- [x] **p1.1**: criterion が満たされている" >&2
+        echo "  - executor: claudecode" >&2
+        echo "  - test_command: \`...\`" >&2
+        echo "  - validations:" >&2
+        echo "    - technical: \"PASS - 技術的に正しい\"" >&2
+        echo "    - consistency: \"PASS - 整合性がある\"" >&2
+        echo "    - completeness: \"PASS - 完全に実装\"" >&2
+        echo "  - validated: $(date -u +%Y-%m-%dT%H:%M:%S)" >&2
+        echo "" >&2
+        echo "参照: plan/template/playbook-format.md" >&2
+        exit 2
+    else
+        # 通常モード: WARN のみで通す
+        echo "[WARN] $HOOK_NAME: validations が不足しています。3 検証 (technical/consistency/completeness) の追加を推奨します" >&2
+        echo "{\"decision\": \"allow\", \"systemMessage\": \"[subtask-guard] validations 不足: 3 検証の追加を推奨します。\"}"
+        exit 0
+    fi
 fi
 
-# validations がある場合は警告のみで許可
-echo "[WARN] $HOOK_NAME: subtask を完了にする前に 3 検証を確認してください (technical/consistency/completeness)" >&2
-echo "{\"decision\": \"allow\", \"systemMessage\": \"[subtask-guard] subtask 完了確認: 3 検証 (technical/consistency/completeness) の確認を推奨します。\"}"
+# validations がある場合は PASS で許可
+echo "[PASS] $HOOK_NAME: validations 確認済み" >&2
+echo "{\"decision\": \"allow\", \"systemMessage\": \"[subtask-guard] subtask 完了: validations 確認済み\"}"
 exit 0

@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m084-playbook-schema-v2.md
-branch: feat/m084-playbook-schema-v2
-last_archived: plan/archive/playbook-m083-state-sync-fix.md
+active: plan/playbook-m085-subtask-guard-compliance.md
+branch: feat/m085-subtask-guard-compliance
+last_archived: plan/archive/playbook-m084-playbook-schema-v2.md
 ```
 
 ---
@@ -28,13 +28,13 @@ last_archived: plan/archive/playbook-m083-state-sync-fix.md
 ## goal
 
 ```yaml
-milestone: M084
+milestone: M085
 phase: p1
 done_when:
-  - "[ ] plan/template/playbook-format.md に Schema v2 マーカーが存在する"
-  - "[ ] .claude/hooks/playbook-validator.sh が存在し実行可能"
-  - "[ ] playbook-validator.sh が不正形式を検出して exit 非0 を返す"
-  - "[ ] 既存の active playbook が Schema v2 に準拠している"
+  - "[ ] subtask-guard.sh がパース失敗時に exit 0 を返す"
+  - "[ ] subtask-guard.sh に厳格モード（STRICT=1）オプションが存在する"
+  - "[ ] 通常モードで validations 不足は WARN のみ"
+  - "[ ] 厳格モードで validations 不足は BLOCK"
 ```
 
 ---
