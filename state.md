@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: feat/m093-ssc-phase3
+active: plan/playbook-m094-consent-auto-delete.md
+branch: feat/m094-consent-auto-delete
 last_archived: plan/archive/playbook-m093-ssc-phase3.md
 ```
 
@@ -28,14 +28,12 @@ last_archived: plan/archive/playbook-m093-ssc-phase3.md
 ## goal
 
 ```yaml
-milestone: M093
-phase: done
+milestone: M094
+phase: p1
 done_when:
-  - "[x] state.md に FREEZE_QUEUE セクションが存在する"
-  - "[x] state.md に DELETE_LOG セクションが存在する"
-  - "[x] scripts/freeze-file.sh が存在し実行可能である"
-  - "[x] scripts/delete-frozen.sh が存在し実行可能である"
-  - "[x] Freeze-then-Delete プロセスが文書化されている"
+  - "[ ] prompt-guard.sh に合意検出ロジックが追加されている"
+  - "[ ] 「OK」「了解」「はい」パターンで consent ファイルが自動削除される"
+  - "[ ] SKILL.md が更新されている"
 ```
 
 ---

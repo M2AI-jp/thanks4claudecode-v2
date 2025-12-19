@@ -206,6 +206,28 @@ if [ -n "$PLAYBOOK" ] && [ "$PLAYBOOK" != "null" ] && [ -f "$PLAYBOOK" ]; then
 fi
 
 # ==============================================================================
+# 合意検出 - ユーザーが「OK」「了解」等と応答した場合に consent を自動削除
+# ==============================================================================
+CONSENT_FILE=".claude/.session-init/consent"
+PENDING_FILE=".claude/.session-init/pending"
+
+# consent ファイルが存在する場合のみチェック
+if [ -f "$CONSENT_FILE" ]; then
+    # 短いプロンプト（20文字以内）かつ合意パターンにマッチ
+    PROMPT_LENGTH=${#PROMPT}
+    if [ "$PROMPT_LENGTH" -le 20 ]; then
+        # 厳密な合意パターン: 行全体が OK/了解/はい/進めて/yes のいずれか（前後の空白は許容）
+        if echo "$PROMPT" | grep -qiE '^[[:space:]]*(OK|ok|Ok|了解|はい|進めて|yes|Yes|YES|進めます|お願い|おねがい|おｋ|オッケー|オーケー)[[:space:]]*$'; then
+            # consent と pending を削除
+            rm -f "$CONSENT_FILE" "$PENDING_FILE" 2>/dev/null
+            WARNINGS="${WARNINGS}\\n\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            WARNINGS="${WARNINGS}\\n  ✅ 合意確認完了 - 作業を開始できます"
+            WARNINGS="${WARNINGS}\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        fi
+    fi
+fi
+
+# ==============================================================================
 # State Injection - 常に systemMessage を出力
 # ==============================================================================
 
