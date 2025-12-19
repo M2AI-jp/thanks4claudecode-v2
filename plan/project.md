@@ -902,13 +902,16 @@ success_criteria:
     1. state.md に COMPONENT_REGISTRY セクション追加
     2. repository-map.yaml 生成時に COMPONENT_REGISTRY を自動更新
     3. 数値変更検出と警告メカニズム
-  status: pending
+  status: achieved
+  achieved_at: 2025-12-19
   depends_on: [M090]
+  playbooks:
+    - playbook-m091-ssc-phase1.md
   done_when:
-    - "[ ] state.md に COMPONENT_REGISTRY セクションが存在"
-    - "[ ] COMPONENT_REGISTRY に hooks/agents/skills/commands の数値が記録"
-    - "[ ] generate-repository-map.sh が COMPONENT_REGISTRY を更新"
-    - "[ ] 数値変更時に警告が出力される"
+    - "[x] state.md に COMPONENT_REGISTRY セクションが存在"
+    - "[x] COMPONENT_REGISTRY に hooks/agents/skills/commands の数値が記録"
+    - "[x] generate-repository-map.sh が COMPONENT_REGISTRY を更新"
+    - "[x] 数値変更時に警告が出力される"
   test_commands:
     - "grep -q 'COMPONENT_REGISTRY' state.md && echo PASS || echo FAIL"
     - "grep -E 'hooks: 33|agents: 6|skills: 9|commands: 8' state.md && echo PASS || echo FAIL"

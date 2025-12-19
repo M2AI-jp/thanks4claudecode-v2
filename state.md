@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m091-ssc-phase1.md
-branch: feat/m091-ssc-phase1
-last_archived: plan/archive/playbook-m090-component-tests.md
+active: plan/playbook-m092-ssc-phase2.md
+branch: feat/m092-ssc-phase2
+last_archived: plan/archive/playbook-m091-ssc-phase1.md
 ```
 
 ---
@@ -28,13 +28,12 @@ last_archived: plan/archive/playbook-m090-component-tests.md
 ## goal
 
 ```yaml
-milestone: M091
+milestone: M092
 phase: p1
 done_when:
-  - state.md に COMPONENT_REGISTRY セクションが存在する
-  - COMPONENT_REGISTRY に hooks/agents/skills/commands の数値が記録されている
-  - generate-repository-map.sh が COMPONENT_REGISTRY を更新する
-  - 数値変更時に警告が出力される
+  - state.md に SPEC_SNAPSHOT セクションが存在する
+  - playbook 完了時に SPEC_SNAPSHOT が自動更新される
+  - README/project.md と実態の乖離検出時に警告が出力される
 ```
 
 ---
