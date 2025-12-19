@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m094-consent-auto-delete.md
+active: plan/playbook-m095-branch-merge.md
 branch: feat/m094-consent-auto-delete
-last_archived: plan/archive/playbook-m093-ssc-phase3.md
+last_archived: plan/archive/playbook-m094-consent-auto-delete.md
 ```
 
 ---
@@ -28,12 +28,11 @@ last_archived: plan/archive/playbook-m093-ssc-phase3.md
 ## goal
 
 ```yaml
-milestone: M094
+milestone: M095
 phase: p1
 done_when:
-  - "[ ] prompt-guard.sh に合意検出ロジックが追加されている"
-  - "[ ] 「OK」「了解」「はい」パターンで consent ファイルが自動削除される"
-  - "[ ] SKILL.md が更新されている"
+  - "[ ] M093 と M094 のコミットが main に統合されている"
+  - "[ ] feat/m093-ssc-phase3 と feat/m094-consent-auto-delete が削除されている"
 ```
 
 ---
