@@ -88,6 +88,13 @@ if [ -x "$MAP_SCRIPT" ]; then
     MAP_RESULT=$(bash "$MAP_SCRIPT" 2>&1 || true)
 fi
 
+# SPEC_SNAPSHOT チェックと更新 (M092: SSC Phase 2)
+SPEC_SCRIPT="$SCRIPT_DIR/check-spec-sync.sh"
+SPEC_RESULT=""
+if [ -x "$SPEC_SCRIPT" ]; then
+    SPEC_RESULT=$(bash "$SPEC_SCRIPT" --update 2>&1 || true)
+fi
+
 # project.md から進捗を取得
 TOTAL_MILESTONES=$(grep -c "^- id: M" plan/project.md 2>/dev/null || echo "0")
 ACHIEVED_MILESTONES=$(grep -c "status: achieved" plan/project.md 2>/dev/null || echo "0")
@@ -106,6 +113,9 @@ cat << EOF
 
   [2] リポジトリマップ 自動更新
       出力: docs/repository-map.yaml
+
+  [3] SPEC_SNAPSHOT チェック・更新
+      $SPEC_RESULT
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ⚠️ /clear を実行してください

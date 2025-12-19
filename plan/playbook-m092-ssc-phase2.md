@@ -38,7 +38,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p1.1**: state.md に SPEC_SNAPSHOT セクションが存在する
+- [x] **p1.1**: state.md に SPEC_SNAPSHOT セクションが存在する
   - executor: claudecode
   - test_command: `grep -q 'SPEC_SNAPSHOT' state.md && echo PASS || echo FAIL`
   - validations:
@@ -46,7 +46,7 @@ done_when:
     - consistency: "COMPONENT_REGISTRY セクションと同じ粒度で設計されている"
     - completeness: "readme/project の全必要フィールドが含まれている"
 
-- [ ] **p1.2**: SPEC_SNAPSHOT に readme.hooks が記録されている
+- [x] **p1.2**: SPEC_SNAPSHOT に readme.hooks が記録されている
   - executor: claudecode
   - test_command: `grep -A 10 'SPEC_SNAPSHOT' state.md | grep -q 'hooks:' && echo PASS || echo FAIL`
   - validations:
@@ -54,7 +54,7 @@ done_when:
     - consistency: "README.md の Hook 数と一致している"
     - completeness: "last_checked タイムスタンプが含まれている"
 
-- [ ] **p1.3**: SPEC_SNAPSHOT に project.milestone_count が記録されている
+- [x] **p1.3**: SPEC_SNAPSHOT に project.milestone_count が記録されている
   - executor: claudecode
   - test_command: `grep -A 15 'SPEC_SNAPSHOT' state.md | grep -q 'milestone_count:' && echo PASS || echo FAIL`
   - validations:
@@ -62,7 +62,7 @@ done_when:
     - consistency: "project.md の Milestone 数と一致している"
     - completeness: "achieved_count も記録されている"
 
-**status**: pending
+**status**: done
 **max_iterations**: 5
 
 ---
@@ -75,7 +75,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p2.1**: .claude/hooks/check-spec-sync.sh が存在し実行可能である
+- [x] **p2.1**: .claude/hooks/check-spec-sync.sh が存在し実行可能である
   - executor: claudecode
   - test_command: `test -x .claude/hooks/check-spec-sync.sh && echo PASS || echo FAIL`
   - validations:
@@ -83,7 +83,7 @@ done_when:
     - consistency: "他の Hook と同じ契約パターン（SKIP/WARN/PASS/BLOCK）を使用"
     - completeness: "必要な関数が全て実装されている"
 
-- [ ] **p2.2**: check-spec-sync.sh が README.md から Hook 数を抽出できる
+- [x] **p2.2**: check-spec-sync.sh が README.md から Hook 数を抽出できる
   - executor: claudecode
   - test_command: `bash .claude/hooks/check-spec-sync.sh --extract-readme 2>&1 | grep -q 'hooks:' && echo PASS || echo FAIL`
   - validations:
@@ -91,7 +91,7 @@ done_when:
     - consistency: "README.md の記載形式と整合している"
     - completeness: "hooks, milestone_count を全て抽出"
 
-- [ ] **p2.3**: check-spec-sync.sh が project.md から Milestone 数を抽出できる
+- [x] **p2.3**: check-spec-sync.sh が project.md から Milestone 数を抽出できる
   - executor: claudecode
   - test_command: `bash .claude/hooks/check-spec-sync.sh --extract-project 2>&1 | grep -q 'total:' && echo PASS || echo FAIL`
   - validations:
@@ -99,7 +99,7 @@ done_when:
     - consistency: "project.md の記載形式と整合している"
     - completeness: "total, achieved, pending を全て抽出"
 
-- [ ] **p2.4**: check-spec-sync.sh が乖離検出時に WARNING を出力する
+- [x] **p2.4**: check-spec-sync.sh が乖離検出時に WARNING を出力する
   - executor: claudecode
   - test_command: `echo 'FORCE_MISMATCH=1' | bash .claude/hooks/check-spec-sync.sh 2>&1 | grep -q 'WARNING' && echo PASS || echo FAIL`
   - validations:
@@ -107,7 +107,7 @@ done_when:
     - consistency: "他の Hook の警告形式と一致"
     - completeness: "乖離の詳細（期待値 vs 実際値）が出力される"
 
-**status**: pending
+**status**: done
 **max_iterations**: 5
 
 ---
@@ -120,7 +120,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p3.1**: cleanup-hook.sh から check-spec-sync.sh が呼び出される
+- [x] **p3.1**: cleanup-hook.sh から check-spec-sync.sh が呼び出される
   - executor: claudecode
   - test_command: `grep -q 'check-spec-sync.sh' .claude/hooks/cleanup-hook.sh && echo PASS || echo FAIL`
   - validations:
@@ -128,7 +128,7 @@ done_when:
     - consistency: "既存の generate-repository-map.sh 呼び出しと同じパターン"
     - completeness: "呼び出し結果のエラーハンドリングがある"
 
-- [ ] **p3.2**: check-spec-sync.sh が SPEC_SNAPSHOT を自動更新する
+- [x] **p3.2**: check-spec-sync.sh が SPEC_SNAPSHOT を自動更新する
   - executor: claudecode
   - test_command: `bash .claude/hooks/check-spec-sync.sh --update 2>&1 | grep -q 'SPEC_SNAPSHOT updated' && echo PASS || echo FAIL`
   - validations:
@@ -136,7 +136,7 @@ done_when:
     - consistency: "COMPONENT_REGISTRY 更新と同じパターン"
     - completeness: "last_checked タイムスタンプも更新される"
 
-- [ ] **p3.3**: playbook 完了時に SPEC_SNAPSHOT が実際に更新される
+- [x] **p3.3**: playbook 完了時に SPEC_SNAPSHOT が実際に更新される
   - executor: claudecode
   - test_command: `grep -A 10 'SPEC_SNAPSHOT' state.md | grep -q 'last_checked:' && echo PASS || echo FAIL`
   - validations:
@@ -144,7 +144,7 @@ done_when:
     - consistency: "COMPONENT_REGISTRY の last_verified と同じ形式"
     - completeness: "全てのフィールドが更新されている"
 
-**status**: pending
+**status**: done
 **max_iterations**: 5
 
 ---
@@ -157,7 +157,7 @@ done_when:
 
 #### subtasks
 
-- [ ] **p_final.1**: state.md に SPEC_SNAPSHOT セクションが存在する
+- [x] **p_final.1**: state.md に SPEC_SNAPSHOT セクションが存在する
   - executor: claudecode
   - test_command: `grep -q '## SPEC_SNAPSHOT' state.md && echo PASS || echo FAIL`
   - validations:
@@ -165,7 +165,7 @@ done_when:
     - consistency: "COMPONENT_REGISTRY と同じ構造"
     - completeness: "必要なフィールドが全て含まれている"
 
-- [ ] **p_final.2**: playbook 完了時に SPEC_SNAPSHOT が自動更新される
+- [x] **p_final.2**: playbook 完了時に SPEC_SNAPSHOT が自動更新される
   - executor: claudecode
   - test_command: `grep -q 'check-spec-sync.sh' .claude/hooks/cleanup-hook.sh && bash .claude/hooks/check-spec-sync.sh --update && echo PASS || echo FAIL`
   - validations:
@@ -173,7 +173,7 @@ done_when:
     - consistency: "cleanup-hook.sh からの呼び出しが正しい"
     - completeness: "全てのフィールドが更新される"
 
-- [ ] **p_final.3**: README/project.md と実態の乖離検出時に警告が出力される
+- [x] **p_final.3**: README/project.md と実態の乖離検出時に警告が出力される
   - executor: claudecode
   - test_command: `bash .claude/hooks/check-spec-sync.sh 2>&1 | grep -qE 'WARNING|PASS' && echo PASS || echo FAIL`
   - validations:
@@ -181,24 +181,24 @@ done_when:
     - consistency: "他の Hook と同じ出力形式"
     - completeness: "乖離の詳細が出力される"
 
-**status**: pending
+**status**: done
 **max_iterations**: 3
 
 ---
 
 ## final_tasks
 
-- [ ] **ft1**: repository-map.yaml を更新する
+- [x] **ft1**: repository-map.yaml を更新する
   - command: `bash .claude/hooks/generate-repository-map.sh`
-  - status: pending
+  - status: done
 
-- [ ] **ft2**: tmp/ 内の一時ファイルを削除する
+- [x] **ft2**: tmp/ 内の一時ファイルを削除する
   - command: `find tmp/ -type f ! -name 'README.md' -delete 2>/dev/null || true`
-  - status: pending
+  - status: done
 
-- [ ] **ft3**: 変更を全てコミットする
+- [x] **ft3**: 変更を全てコミットする
   - command: `git add -A && git status`
-  - status: pending
+  - status: done
 
 ---
 

@@ -76,6 +76,24 @@ last_verified: 2025-12-19
 
 ---
 
+## SPEC_SNAPSHOT
+
+```yaml
+readme:
+  hooks: 33
+  milestone_count: 45
+project:
+  total: 45
+  achieved: 43
+  pending: 2
+last_checked: 2025-12-19
+```
+
+> **仕様同期スナップショット**: README/project.md の数値を記録。
+> check-spec-sync.sh が実行時にこの値と実態を比較し、乖離があれば警告を出力する。
+
+---
+
 ## 参照
 
 | ファイル | 役割 |
