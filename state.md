@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m098-m100-final-freeze.md
-branch: feat/final-freeze
-last_archived: plan/archive/playbook-m097-anti-lie-system.md
+active: null
+branch: main
+last_archived: plan/archive/playbook-m098-m100-final-freeze.md
 ```
 
 ---
@@ -28,13 +28,9 @@ last_archived: plan/archive/playbook-m097-anti-lie-system.md
 ## goal
 
 ```yaml
-milestone: M098-M100
-phase: done
-done_when:
-  - "[x] governance/core-manifest.yaml が存在し policy.no_new_components=true"
-  - "[x] 未登録 hooks が削除されている（34→22）"
-  - "[x] scripts/behavior-test.sh が PASS"
-  - "[x] README から数字自慢が消えている"
+milestone: null
+phase: idle
+done_when: []
 ```
 
 ---
@@ -42,7 +38,7 @@ done_when:
 ## session
 
 ```yaml
-last_start: 2025-12-20 00:21:30
+last_start: 2025-12-20 02:27:00
 last_clear: 2025-12-13 00:30:00
 ```
 
