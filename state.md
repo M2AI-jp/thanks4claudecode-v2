@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m082-hook-contract.md
-branch: feat/m082-hook-contract
-last_archived: plan/archive/playbook-m082-archive-check.md
+active: plan/playbook-m083-state-sync-fix.md
+branch: feat/m083-state-sync-fix
+last_archived: plan/archive/playbook-m082-hook-contract.md
 ```
 
 ---
@@ -28,14 +28,12 @@ last_archived: plan/archive/playbook-m082-archive-check.md
 ## goal
 
 ```yaml
-milestone: M082
-phase: p_final (done)
-done_criteria:
-  - "[x] docs/hook-exit-code-contract.md が存在し、WARN/BLOCK/INTERNAL ERROR の定義が明記されている"
-  - "[x] subtask-guard.sh がパース失敗時に exit 0 + stderr メッセージを出す"
-  - "[x] create-pr-hook.sh が PR 未作成時に SKIP 理由を stderr に出す"
-  - "[x] archive-playbook.sh が SKIP 時に理由を stderr に出す"
-  - "[x] 全対象 Hook で 'No stderr output' が再現しない"
+milestone: M083
+phase: p1 (in_progress)
+done_when:
+  - "[ ] playbook 完了時に project.md の対応 milestone が status: achieved に自動更新される仕組みが存在する"
+  - "[ ] done_when と done_criteria の用語が統一されている（done_when に統一）"
+  - "[ ] consent-guard.sh が consent ファイル存在時に [理解確認] ブロックを表示してブロックする"
 ```
 
 ---
