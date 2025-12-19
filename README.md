@@ -83,7 +83,7 @@ is_compound_command()   # 複合コマンド検出
 ├── RUNBOOK.md              # 運用手順
 ├── state.md                # 現在の状態
 ├── plan/
-│   ├── project.md          # プロジェクト計画（40 milestone、M001-M088）
+│   ├── project.md          # プロジェクト計画（45 milestone、M001-M093）
 │   ├── archive/            # 完了した playbook
 │   └── template/           # playbook テンプレート
 ├── scripts/

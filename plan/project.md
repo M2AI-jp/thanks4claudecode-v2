@@ -871,6 +871,82 @@ success_criteria:
     - "grep 'commands: 8' docs/repository-map.yaml && echo PASS || echo FAIL"
     - "bash .claude/hooks/check-integrity.sh 2>&1 | tail -1 | grep -q 'All checks passed' && echo PASS || echo FAIL"
 
+- id: M090
+  name: "コンポーネント動作保証システム"
+  description: |
+    vision.success_criteria「全 Hook/SubAgent/Skill が動作確認済み」を達成。
+    Hook は test-hooks.sh で検証済み。残りのコンポーネントをテストする。
+    1. SubAgent (6個) の動作テストスクリプト作成
+    2. Skill (9個) の動作テストスクリプト作成
+    3. Command (8個) の動作テストスクリプト作成
+  status: pending
+  depends_on: [M089]
+  done_when:
+    - "[ ] scripts/test-subagents.sh が存在し、6 SubAgent 全てをテスト"
+    - "[ ] scripts/test-skills.sh が存在し、9 Skill 全てをテスト"
+    - "[ ] scripts/test-commands.sh が存在し、8 Command 全てをテスト"
+    - "[ ] 全テストが PASS"
+  test_commands:
+    - "test -f scripts/test-subagents.sh && echo PASS || echo FAIL"
+    - "test -f scripts/test-skills.sh && echo PASS || echo FAIL"
+    - "test -f scripts/test-commands.sh && echo PASS || echo FAIL"
+    - "bash scripts/test-subagents.sh 2>&1 | grep -q 'ALL.*PASS' && echo PASS || echo FAIL"
+
+- id: M091
+  name: "仕様同期基盤 (SSC Phase 1)"
+  description: |
+    Spec Sync Contract の基盤。コンポーネント数の自動追跡と警告システム。
+    1. state.md に COMPONENT_REGISTRY セクション追加
+    2. repository-map.yaml 生成時に COMPONENT_REGISTRY を自動更新
+    3. 数値変更検出と警告メカニズム
+  status: pending
+  depends_on: [M090]
+  done_when:
+    - "[ ] state.md に COMPONENT_REGISTRY セクションが存在"
+    - "[ ] COMPONENT_REGISTRY に hooks/agents/skills/commands の数値が記録"
+    - "[ ] generate-repository-map.sh が COMPONENT_REGISTRY を更新"
+    - "[ ] 数値変更時に警告が出力される"
+  test_commands:
+    - "grep -q 'COMPONENT_REGISTRY' state.md && echo PASS || echo FAIL"
+    - "grep -E 'hooks: 33|agents: 6|skills: 9|commands: 8' state.md && echo PASS || echo FAIL"
+
+- id: M092
+  name: "自己検証自動化 (SSC Phase 2)"
+  description: |
+    playbook 完了時の自動整合性チェック強化。
+    1. SPEC_SNAPSHOT の導入（README/project.md の数値スナップショット）
+    2. repository-map.yaml と実態の自動比較
+    3. 乖離検出時の警告システム
+  status: pending
+  depends_on: [M091]
+  done_when:
+    - "[ ] state.md に SPEC_SNAPSHOT セクションが存在"
+    - "[ ] playbook 完了時に SPEC_SNAPSHOT が自動更新される"
+    - "[ ] README/project.md と実態の乖離検出時に警告が出力される"
+  test_commands:
+    - "grep -q 'SPEC_SNAPSHOT' state.md && echo PASS || echo FAIL"
+    - "bash .claude/hooks/check-spec-sync.sh && echo PASS || echo FAIL"
+
+- id: M093
+  name: "安全な進化システム (SSC Phase 3)"
+  description: |
+    Freeze-then-Delete プロセスの実装。ファイル削除の安全性を保証。
+    1. FREEZE_QUEUE: 削除予定ファイルの猶予期間管理
+    2. DELETE_LOG: 削除履歴の追跡
+    3. freeze → confirm → delete の3段階プロセス
+  status: pending
+  depends_on: [M092]
+  done_when:
+    - "[ ] state.md に FREEZE_QUEUE セクションが存在"
+    - "[ ] state.md に DELETE_LOG セクションが存在"
+    - "[ ] scripts/freeze-file.sh が存在し動作"
+    - "[ ] scripts/delete-frozen.sh が存在し動作"
+    - "[ ] Freeze-then-Delete プロセスが文書化"
+  test_commands:
+    - "grep -q 'FREEZE_QUEUE' state.md && echo PASS || echo FAIL"
+    - "grep -q 'DELETE_LOG' state.md && echo PASS || echo FAIL"
+    - "test -f scripts/freeze-file.sh && echo PASS || echo FAIL"
+
 ```
 
 ---
