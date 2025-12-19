@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m093-ssc-phase3.md
+active: plan/archive/playbook-m093-ssc-phase3.md
 branch: feat/m093-ssc-phase3
-last_archived: plan/archive/playbook-m092-ssc-phase2.md
+last_archived: plan/archive/playbook-m093-ssc-phase3.md
 ```
 
 ---
@@ -29,13 +29,13 @@ last_archived: plan/archive/playbook-m092-ssc-phase2.md
 
 ```yaml
 milestone: M093
-phase: p1
+phase: done
 done_when:
-  - state.md に FREEZE_QUEUE セクションが存在する
-  - state.md に DELETE_LOG セクションが存在する
-  - scripts/freeze-file.sh が存在し実行可能である
-  - scripts/delete-frozen.sh が存在し実行可能である
-  - Freeze-then-Delete プロセスが文書化されている
+  - "[x] state.md に FREEZE_QUEUE セクションが存在する"
+  - "[x] state.md に DELETE_LOG セクションが存在する"
+  - "[x] scripts/freeze-file.sh が存在し実行可能である"
+  - "[x] scripts/delete-frozen.sh が存在し実行可能である"
+  - "[x] Freeze-then-Delete プロセスが文書化されている"
 ```
 
 ---
@@ -82,12 +82,12 @@ last_verified: 2025-12-19
 
 ```yaml
 readme:
-  hooks: 33
-  milestone_count: 45
+  hooks: 34
+  milestone_count: 46
 project:
   total: 45
-  achieved: 44
-  pending: 1
+  achieved: 45
+  pending: 0
 last_checked: 2025-12-19
 ```
 

@@ -943,14 +943,14 @@ success_criteria:
     1. FREEZE_QUEUE: 削除予定ファイルの猶予期間管理
     2. DELETE_LOG: 削除履歴の追跡
     3. freeze → confirm → delete の3段階プロセス
-  status: pending
+  status: achieved
   depends_on: [M092]
   done_when:
-    - "[ ] state.md に FREEZE_QUEUE セクションが存在"
-    - "[ ] state.md に DELETE_LOG セクションが存在"
-    - "[ ] scripts/freeze-file.sh が存在し動作"
-    - "[ ] scripts/delete-frozen.sh が存在し動作"
-    - "[ ] Freeze-then-Delete プロセスが文書化"
+    - "[x] state.md に FREEZE_QUEUE セクションが存在"
+    - "[x] state.md に DELETE_LOG セクションが存在"
+    - "[x] scripts/freeze-file.sh が存在し動作"
+    - "[x] scripts/delete-frozen.sh が存在し動作"
+    - "[x] Freeze-then-Delete プロセスが文書化"
   test_commands:
     - "grep -q 'FREEZE_QUEUE' state.md && echo PASS || echo FAIL"
     - "grep -q 'DELETE_LOG' state.md && echo PASS || echo FAIL"
