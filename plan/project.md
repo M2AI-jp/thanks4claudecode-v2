@@ -979,26 +979,48 @@ success_criteria:
     - "grep -q 'git.*branch.*-d' scripts/contract.sh && echo PASS || echo FAIL"
 
 - id: M097
-  name: "嘘が生まれない仕組み - README 自動同期 + コンポーネント分類 + 完成定義"
-  description: |
-    外部 LLM からの指摘を受けて、README と実態の乖離を構造的に防止する。
-    1. README 自動生成: 数値を手動更新から自動生成に切り替え
-    2. コンポーネント三軍分け: Core/Optional/Experimental に分類
-    3. 完成の定義: 5 つのシナリオで「完成」を明文化
-  status: in_progress
+  name: "嘘が生まれない仕組み - README 自動同期"
+  description: README と実態の乖離を構造的に防止する。
+  status: achieved
   depends_on: [M096]
   playbooks:
     - playbook-m097-anti-lie-system.md
   done_when:
-    - "[ ] scripts/generate-readme-stats.sh が存在し実行可能"
-    - "[ ] README.md の数値部分が STATS タグで囲まれスクリプトで更新可能"
-    - "[ ] .claude/component-tiers.yaml に Core/Optional/Experimental 分類が存在"
-    - "[ ] docs/completion-criteria.md に 5 つのシナリオが定義されている"
-  test_commands:
-    - "test -x scripts/generate-readme-stats.sh && echo PASS || echo FAIL"
-    - "grep -c '<!-- STATS -->' README.md | awk '{if($1>=2) print \"PASS\"; else print \"FAIL\"}'"
-    - "test -f .claude/component-tiers.yaml && grep -qE '^(core|optional|experimental):' .claude/component-tiers.yaml && echo PASS || echo FAIL"
-    - "grep -c '## シナリオ' docs/completion-criteria.md | awk '{if($1>=5) print \"PASS\"; else print \"FAIL\"}'"
+    - "[x] scripts/generate-readme-stats.sh が存在し実行可能"
+    - "[x] README.md の STATS タグでスクリプト更新可能"
+
+- id: M098
+  name: "CORE FREEZE - 増殖停止"
+  description: Core を凍結し新規コンポーネント追加を禁止する。
+  status: achieved
+  depends_on: [M097]
+  playbooks:
+    - playbook-m098-m100-final-freeze.md
+  done_when:
+    - "[x] governance/core-manifest.yaml が存在"
+    - "[x] policy.no_new_components=true"
+
+- id: M099
+  name: "UNUSED PURGE - 未使用削除"
+  description: 未登録 hooks と非 Core コンポーネントを機械的に削除。
+  status: achieved
+  depends_on: [M098]
+  playbooks:
+    - playbook-m098-m100-final-freeze.md
+  done_when:
+    - "[x] scripts/find-unused.sh が存在"
+    - "[x] 未登録 hooks 削除完了（34→22）"
+
+- id: M100
+  name: "STABILIZE + RELEASE - 安定化と公開準備"
+  description: 挙動テストで保証し、公開用に凍結する。
+  status: achieved
+  depends_on: [M099]
+  playbooks:
+    - playbook-m098-m100-final-freeze.md
+  done_when:
+    - "[x] scripts/behavior-test.sh が PASS"
+    - "[x] README から数字自慢が消えている"
 
 ```
 

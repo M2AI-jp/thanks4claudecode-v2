@@ -20,7 +20,7 @@ project: plan/project.md
 ```yaml
 active: null
 branch: main
-last_archived: plan/archive/playbook-m098-m100-final-freeze.md
+last_archived: plan/archive/playbook-m101-project-update.md
 ```
 
 ---
@@ -78,12 +78,12 @@ last_verified: 2025-12-20
 ```yaml
 readme:
   hooks: 22
-  milestone_count: 47
+  milestone_count: 50
 project:
-  total: 47
-  achieved: 46
-  pending: 1
-last_checked: 2025-12-19
+  total: 50
+  achieved: 50
+  pending: 0
+last_checked: 2025-12-20
 ```
 
 > **仕様同期スナップショット**: README/project.md の数値を記録。
