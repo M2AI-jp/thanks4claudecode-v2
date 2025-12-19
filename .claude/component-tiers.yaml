@@ -1,0 +1,150 @@
+# component-tiers.yaml
+#
+# コンポーネントの重要度分類
+# - core: 黄金動線に必須。削除不可
+# - optional: 便利だが必須ではない。状況に応じて使用
+# - experimental: 試験的または廃止候補。削除検討対象
+#
+# 更新: scripts/generate-readme-stats.sh で集計
+# 最終更新: 2025-12-20
+
+core:
+  hooks:
+    - name: session-start.sh
+      reason: セッション開始処理。state.md 更新、ログ初期化
+    - name: session-end.sh
+      reason: セッション終了処理。状態保存
+    - name: init-guard.sh
+      reason: 初期化ガード。必須ファイル Read 強制
+    - name: playbook-guard.sh
+      reason: playbook=null で Edit/Write ブロック
+    - name: consent-guard.sh
+      reason: 合意プロセス。ユーザー承認なしの変更防止
+    - name: prompt-guard.sh
+      reason: プロンプト処理。合意自動検出
+    - name: pre-bash-check.sh
+      reason: Bash コマンドチェック。危険コマンド防止
+    - name: critic-guard.sh
+      reason: done_criteria 検証ガード
+    - name: scope-guard.sh
+      reason: スコープ外変更防止
+    - name: check-protected-edit.sh
+      reason: HARD_BLOCK ファイル保護
+    - name: failure-logger.sh
+      reason: 失敗パターン記録。再発防止
+
+  subagents:
+    - name: pm.md
+      reason: プロジェクトマネージャー。playbook 作成必須
+    - name: critic.md
+      reason: done_criteria 検証。報酬詐欺防止必須
+
+  skills:
+    - name: state
+      reason: state.md 管理の専門知識
+    - name: consent-process
+      reason: 合意プロセスのガイドライン
+    - name: context-management
+      reason: コンテキスト最適化（/compact）
+    - name: plan-management
+      reason: playbook・phase 管理
+
+  commands:
+    - name: task-start.md
+      reason: タスク開始の標準フロー
+    - name: focus.md
+      reason: フォーカス切り替え
+    - name: crit.md
+      reason: CRITIQUE 実行
+
+optional:
+  hooks:
+    - name: archive-playbook.sh
+      reason: playbook 完了時のアーカイブ
+    - name: generate-repository-map.sh
+      reason: リポジトリマップ自動生成
+    - name: check-spec-sync.sh
+      reason: README/project.md 同期チェック
+    - name: check-integrity.sh
+      reason: ファイル整合性チェック
+    - name: check-coherence.sh
+      reason: 設定一貫性チェック
+    - name: check-main-branch.sh
+      reason: main ブランチ保護
+    - name: playbook-validator.sh
+      reason: playbook YAML 検証
+    - name: depends-check.sh
+      reason: phase 依存関係チェック
+    - name: executor-guard.sh
+      reason: 実行者ロールチェック
+    - name: subtask-guard.sh
+      reason: サブタスク順序チェック
+    - name: test-done-criteria.sh
+      reason: done_criteria テスト実行
+    - name: lint-check.sh
+      reason: コードリントチェック
+    - name: create-pr-hook.sh
+      reason: PR 作成フック
+    - name: create-pr.sh
+      reason: PR 作成補助
+    - name: merge-pr.sh
+      reason: PR マージ補助
+    - name: pre-compact.sh
+      reason: /compact 前処理
+    - name: stop-summary.sh
+      reason: 停止時サマリー出力
+    - name: cleanup-hook.sh
+      reason: 一時ファイルクリーンアップ
+    - name: role-resolver.sh
+      reason: toolstack によるロール解決
+    - name: log-subagent.sh
+      reason: SubAgent 呼び出しログ
+
+  subagents:
+    - name: reviewer.md
+      reason: コードレビュー。toolstack C で使用
+    - name: setup-guide.md
+      reason: 初期セットアップガイド
+
+  skills:
+    - name: test-runner
+      reason: テスト実行の専門知識
+    - name: lint-checker
+      reason: リントチェックの専門知識
+    - name: post-loop
+      reason: ループ終了後処理
+
+  commands:
+    - name: test.md
+      reason: テスト実行コマンド
+    - name: lint.md
+      reason: リント実行コマンド
+    - name: playbook-init.md
+      reason: playbook 初期化ウィザード
+    - name: rollback.md
+      reason: Git ロールバック
+    - name: state-rollback.md
+      reason: state.md バックアップ/復元
+
+experimental:
+  hooks:
+    - name: audit-unused.sh
+      reason: 未使用ファイル監査。機能重複のため廃止検討
+    - name: system-health-check.sh
+      reason: システムヘルスチェック。実際には未使用
+    - name: test-hooks.sh
+      reason: Hook 開発用テスト。本番不要
+
+  subagents:
+    - name: codex-delegate.md
+      reason: Codex MCP 委任。toolstack B/C 専用だが未活用
+    - name: health-checker.md
+      reason: 定期監視。実際には未使用
+
+  skills:
+    - name: deploy-checker
+      reason: デプロイ準備チェック。このリポジトリでは不要
+    - name: frontend-design
+      reason: フロントエンド設計。このリポジトリでは不要
+
+  commands: []

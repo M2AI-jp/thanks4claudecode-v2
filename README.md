@@ -73,6 +73,31 @@ is_compound_command()   # 複合コマンド検出
 - **Playbook Gate**: playbook=null で Edit/Write/Bash 変更系をブロック
 - **HARD_BLOCK**: CLAUDE.md 等の保護ファイルは編集不可
 
+### コンポーネント統計
+
+<!-- STATS_START -->
+| 項目 | 数 | 備考 |
+|------|-----|------|
+| Hook | 34 | 登録済: 29 |
+| SubAgent | 6 | |
+| Skill | 9 | |
+| Command | 8 | |
+| E2E テスト | 10 | |
+| Milestone | 47 | 達成: 46 |
+<!-- STATS_END -->
+
+> **自動生成**: `bash scripts/generate-readme-stats.sh --update` で最新化
+
+### コンポーネント分類
+
+| 分類 | 説明 |
+|------|------|
+| **Core** | 黄金動線に必須。削除不可 |
+| **Optional** | 便利だが必須ではない |
+| **Experimental** | 試験的または廃止候補 |
+
+> 詳細: `.claude/component-tiers.yaml`
+
 ---
 
 ## ファイル構造

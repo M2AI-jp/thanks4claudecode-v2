@@ -8,9 +8,9 @@
 # このファイルは自動生成されます。手動編集は上書きされます。
 
 meta:
-  generated: "2025-12-20 00:07:06"
+  generated: "2025-12-20 00:28:06"
   generator: ".claude/hooks/generate-repository-map.sh"
-  total_files: 170
+  total_files: 175
 
 hooks:
   directory: .claude/hooks/
@@ -187,7 +187,7 @@ commands:
 
 docs:
   directory: docs/
-  count: 21
+  count: 22
   files:
     - name: "ARCHITECTURE.md"
       description: "リポジトリの構造と各コンポーネントの関係を文書化"
@@ -199,6 +199,8 @@ docs:
       description: "目的"
     - name: "artifact-management-rules.md"
       description: "目的"
+    - name: "completion-criteria.md"
+      description: "「完成」の定義 - 5つの動作シナリオ"
     - name: "core-contract.md"
       description: "この契約は admin モードでも回避不可。Hooks により構造的に強制される。"
     - name: "criterion-validation-rules.md"
@@ -238,7 +240,7 @@ plan:
       count: 0
     archive:
       description: "完了した playbook のアーカイブ"
-      count: 20
+      count: 21
     template:
       description: "playbook テンプレート"
       count: 6
@@ -265,11 +267,11 @@ summary:
   skills: 9
   frameworks: 0
   commands: 8
-  docs: 21
+  docs: 22
   plan_active: 0
-  plan_archive: 20
+  plan_archive: 21
   plan_template: 6
-  total: 170
+  total: 175
 
 # ==============================================================================
 # System Specification (M025)
@@ -363,6 +365,6 @@ system_specification:
 # 変更履歴
 # ==============================================================================
 changelog:
-  - date: "2025-12-20 00:07:06"
+  - date: "2025-12-20 00:28:06"
     action: "auto-generated"
     description: "playbook 完了時に自動生成"

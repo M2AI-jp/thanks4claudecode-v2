@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
+active: plan/playbook-m097-anti-lie-system.md
+branch: feat/m097-anti-lie-system
 last_archived: plan/archive/playbook-m096-pre-bash-deadlock-fix.md
 ```
 
@@ -28,13 +28,13 @@ last_archived: plan/archive/playbook-m096-pre-bash-deadlock-fix.md
 ## goal
 
 ```yaml
-milestone: M096
+milestone: M097
 phase: done
 done_when:
-  - "[x] scripts/contract.sh の ADMIN_MAINTENANCE_PATTERNS に git checkout/merge/branch -d が追加されている"
-  - "[x] playbook=null で git add state.md が実行できる"
-  - "[x] playbook=null で git commit が実行できる"
-  - "[x] playbook=null で git checkout main が実行できる"
+  - "[x] scripts/generate-readme-stats.sh が存在し実行可能"
+  - "[x] README.md の数値部分が STATS タグで囲まれスクリプトで更新可能"
+  - "[x] .claude/component-tiers.yaml に Core/Optional/Experimental 分類が存在"
+  - "[x] docs/completion-criteria.md に 5 つのシナリオが定義されている"
 ```
 
 ---
@@ -42,7 +42,7 @@ done_when:
 ## session
 
 ```yaml
-last_start: 2025-12-19 22:00:34
+last_start: 2025-12-20 00:21:30
 last_clear: 2025-12-13 00:30:00
 ```
 

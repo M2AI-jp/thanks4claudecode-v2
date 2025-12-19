@@ -978,6 +978,28 @@ success_criteria:
     - "grep -q 'git.*merge' scripts/contract.sh && echo PASS || echo FAIL"
     - "grep -q 'git.*branch.*-d' scripts/contract.sh && echo PASS || echo FAIL"
 
+- id: M097
+  name: "嘘が生まれない仕組み - README 自動同期 + コンポーネント分類 + 完成定義"
+  description: |
+    外部 LLM からの指摘を受けて、README と実態の乖離を構造的に防止する。
+    1. README 自動生成: 数値を手動更新から自動生成に切り替え
+    2. コンポーネント三軍分け: Core/Optional/Experimental に分類
+    3. 完成の定義: 5 つのシナリオで「完成」を明文化
+  status: in_progress
+  depends_on: [M096]
+  playbooks:
+    - playbook-m097-anti-lie-system.md
+  done_when:
+    - "[ ] scripts/generate-readme-stats.sh が存在し実行可能"
+    - "[ ] README.md の数値部分が STATS タグで囲まれスクリプトで更新可能"
+    - "[ ] .claude/component-tiers.yaml に Core/Optional/Experimental 分類が存在"
+    - "[ ] docs/completion-criteria.md に 5 つのシナリオが定義されている"
+  test_commands:
+    - "test -x scripts/generate-readme-stats.sh && echo PASS || echo FAIL"
+    - "grep -c '<!-- STATS -->' README.md | awk '{if($1>=2) print \"PASS\"; else print \"FAIL\"}'"
+    - "test -f .claude/component-tiers.yaml && grep -qE '^(core|optional|experimental):' .claude/component-tiers.yaml && echo PASS || echo FAIL"
+    - "grep -c '## シナリオ' docs/completion-criteria.md | awk '{if($1>=5) print \"PASS\"; else print \"FAIL\"}'"
+
 ```
 
 ---
