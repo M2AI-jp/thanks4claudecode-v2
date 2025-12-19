@@ -9,10 +9,16 @@
 # 以下の追加チェックを行います：
 #   - playbook が完了しているか確認
 #   - 未コミット変更がないか確認
+#   - main ブランチでないか確認
 #   - create-pr.sh を呼び出し
+#
+# M082: Hook 契約準拠（必ず理由を出力、パース失敗時は INTERNAL ERROR）
 # ============================================================
 
-set -euo pipefail
+# -e を外す（エラーでも処理を続けて理由を出力するため）
+set -uo pipefail
+
+HOOK_NAME="create-pr-hook"
 
 # ============================================================
 # 設定
@@ -34,15 +40,21 @@ NC='\033[0m'
 
 # create-pr.sh の存在確認
 if [ ! -x "$CREATE_PR_SCRIPT" ]; then
-    echo -e "${RED}[ERROR]${NC} create-pr.sh が見つからないか、実行権限がありません"
-    echo "  $CREATE_PR_SCRIPT"
-    exit 1
+    echo "[SKIP] $HOOK_NAME: create-pr.sh not found or not executable ($CREATE_PR_SCRIPT)" >&2
+    exit 0
 fi
 
 # state.md の存在確認
 if [ ! -f "$STATE_FILE" ]; then
-    echo -e "${RED}[ERROR]${NC} state.md が見つかりません"
-    exit 1
+    echo "[SKIP] $HOOK_NAME: state.md not found" >&2
+    exit 0
+fi
+
+# main/master ブランチチェック
+CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "")
+if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+    echo "[SKIP] $HOOK_NAME: on main/master branch, PR not needed" >&2
+    exit 0
 fi
 
 # ============================================================
@@ -53,13 +65,13 @@ fi
 PLAYBOOK_PATH=$(grep -A5 "## playbook" "$STATE_FILE" 2>/dev/null | grep "active:" | sed 's/.*: *//' | sed 's/ *#.*//' || echo "null")
 
 if [ "$PLAYBOOK_PATH" = "null" ] || [ -z "$PLAYBOOK_PATH" ]; then
-    echo -e "${YELLOW}[SKIP]${NC} アクティブな playbook がありません"
+    echo "[SKIP] $HOOK_NAME: no active playbook" >&2
     exit 0
 fi
 
 if [ ! -f "$REPO_ROOT/$PLAYBOOK_PATH" ]; then
-    echo -e "${RED}[ERROR]${NC} playbook が見つかりません: $PLAYBOOK_PATH"
-    exit 1
+    echo "[SKIP] $HOOK_NAME: playbook not found ($PLAYBOOK_PATH)" >&2
+    exit 0
 fi
 
 PLAYBOOK_FILE="$REPO_ROOT/$PLAYBOOK_PATH"
@@ -69,7 +81,7 @@ PLAYBOOK_FILE="$REPO_ROOT/$PLAYBOOK_PATH"
 INCOMPLETE_PHASES=$(grep -cE "status: (pending|in_progress)" "$PLAYBOOK_FILE" 2>/dev/null || echo "0")
 
 if [ "$INCOMPLETE_PHASES" -gt 0 ]; then
-    echo -e "${YELLOW}[SKIP]${NC} playbook に未完了の Phase があります ($INCOMPLETE_PHASES 件)"
+    echo "[SKIP] $HOOK_NAME: playbook has incomplete phases ($INCOMPLETE_PHASES remaining)" >&2
     exit 0
 fi
 
@@ -80,29 +92,17 @@ fi
 UNCOMMITTED=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$UNCOMMITTED" -gt 0 ]; then
-    echo ""
-    echo "$SEP"
-    echo -e "  ${YELLOW}⚠️ 未コミット変更があります${NC}"
-    echo "$SEP"
-    echo ""
-    echo "  PR 作成前にコミットしてください:"
-    echo "    git add -A && git commit -m \"feat: playbook 完了\""
-    echo ""
-    exit 1
+    echo "[SKIP] $HOOK_NAME: uncommitted changes exist ($UNCOMMITTED files)" >&2
+    echo "  Run: git add -A && git commit -m \"feat: playbook completion\"" >&2
+    exit 0
 fi
 
 # ============================================================
 # PR 作成
 # ============================================================
 
-echo ""
-echo "$SEP"
-echo "  🚀 PR 自動作成を開始します"
-echo "$SEP"
-echo ""
-echo "  Playbook: $PLAYBOOK_PATH"
-echo "  全 Phase: done"
-echo ""
+echo "[PASS] $HOOK_NAME: all checks passed, creating PR" >&2
+echo "  Playbook: $PLAYBOOK_PATH" >&2
 
 # create-pr.sh を実行
 exec "$CREATE_PR_SCRIPT"

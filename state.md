@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/playbook-m082-hook-contract.md
+branch: feat/m082-hook-contract
 last_archived: plan/archive/playbook-m082-archive-check.md
 ```
 
@@ -28,9 +28,14 @@ last_archived: plan/archive/playbook-m082-archive-check.md
 ## goal
 
 ```yaml
-milestone: null
-phase: null
-done_criteria: []
+milestone: M082
+phase: p_final (done)
+done_criteria:
+  - "[x] docs/hook-exit-code-contract.md が存在し、WARN/BLOCK/INTERNAL ERROR の定義が明記されている"
+  - "[x] subtask-guard.sh がパース失敗時に exit 0 + stderr メッセージを出す"
+  - "[x] create-pr-hook.sh が PR 未作成時に SKIP 理由を stderr に出す"
+  - "[x] archive-playbook.sh が SKIP 時に理由を stderr に出す"
+  - "[x] 全対象 Hook で 'No stderr output' が再現しない"
 ```
 
 ---

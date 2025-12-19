@@ -16,36 +16,52 @@
 #   3. Claude が POST_LOOP に入る
 #   4. POST_LOOP 行動 0.5 で mv 実行
 #
+# M082: Hook 契約準拠（必ず理由を出力、パース失敗時は INTERNAL ERROR）
 # 参照: docs/archive-operation-rules.md
 
-set -e
+# -e を使わない（エラーでも処理を続けて理由を出力するため）
+set -uo pipefail
+
+HOOK_NAME="archive-playbook"
 
 # state.md が存在しない場合はスキップ
 if [ ! -f "state.md" ]; then
+    echo "[SKIP] $HOOK_NAME: state.md not found" >&2
     exit 0
 fi
 
 # stdin から JSON を読み込む
-INPUT=$(cat)
+INPUT=$(cat) || {
+    echo "[INTERNAL ERROR] $HOOK_NAME: failed to read input" >&2
+    exit 0
+}
 
 # jq がない場合はスキップ
 if ! command -v jq &> /dev/null; then
+    echo "[SKIP] $HOOK_NAME: jq command not found" >&2
     exit 0
 fi
 
 # 編集対象ファイルを取得
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null) || {
+    echo "[INTERNAL ERROR] $HOOK_NAME: JSON parse failed" >&2
+    exit 0
+}
+
 if [[ -z "$FILE_PATH" ]]; then
+    echo "[SKIP] $HOOK_NAME: no file_path in input" >&2
     exit 0
 fi
 
 # playbook ファイル以外は無視
 if [[ "$FILE_PATH" != *playbook*.md ]]; then
+    echo "[SKIP] $HOOK_NAME: not a playbook file ($FILE_PATH)" >&2
     exit 0
 fi
 
 # playbook ファイルが存在しない場合はスキップ
 if [ ! -f "$FILE_PATH" ]; then
+    echo "[SKIP] $HOOK_NAME: playbook file not found ($FILE_PATH)" >&2
     exit 0
 fi
 
@@ -59,11 +75,13 @@ DONE_PHASES=${DONE_PHASES:-0}
 
 # Phase がない場合はスキップ
 if [ "$TOTAL_PHASES" -eq 0 ]; then
+    echo "[SKIP] $HOOK_NAME: no phases found in playbook" >&2
     exit 0
 fi
 
 # 全 Phase が done でない場合はスキップ
 if [ "$DONE_PHASES" -ne "$TOTAL_PHASES" ]; then
+    echo "[SKIP] $HOOK_NAME: phases not all done ($DONE_PHASES/$TOTAL_PHASES)" >&2
     exit 0
 fi
 
@@ -81,17 +99,7 @@ TOTAL_CHECKBOX=$((CHECKED_COUNT + UNCHECKED_COUNT))
 
 if [ "$TOTAL_CHECKBOX" -gt 0 ]; then
     if [ "$UNCHECKED_COUNT" -gt 0 ]; then
-        echo ""
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  ⚠️ 未完了の subtask があります（V12 形式）"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  完了: $CHECKED_COUNT / 未完了: $UNCHECKED_COUNT"
-        echo ""
-        echo "  全ての subtask を完了させてください:"
-        echo "  - [ ] → - [x] に変更"
-        echo "  - validations を追加"
-        echo "  - validated タイムスタンプを追加"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "[SKIP] $HOOK_NAME: unchecked subtasks remain ($UNCHECKED_COUNT unchecked, $CHECKED_COUNT checked)" >&2
         exit 0  # 未完了があれば提案しない
     fi
 fi
@@ -111,13 +119,7 @@ if grep -q "^## final_tasks" "$FILE_PATH" 2>/dev/null; then
     fi
 
     if [ "$TOTAL_FINAL_TASKS" -gt 0 ] && [ "$DONE_FINAL_TASKS" -lt "$TOTAL_FINAL_TASKS" ]; then
-        echo ""
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  ⚠️ final_tasks が未完了です"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  完了: $DONE_FINAL_TASKS / $TOTAL_FINAL_TASKS"
-        echo "  → final_tasks を全て完了してからアーカイブしてください"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "[SKIP] $HOOK_NAME: final_tasks incomplete ($DONE_FINAL_TASKS/$TOTAL_FINAL_TASKS done)" >&2
         exit 0
     fi
 fi
@@ -128,6 +130,7 @@ ACTIVE_PLAYBOOK=$(grep -A 5 "^## playbook" state.md 2>/dev/null | grep "^active:
 if [ -n "$ACTIVE_PLAYBOOK" ] && [ "$ACTIVE_PLAYBOOK" != "null" ]; then
     if echo "$ACTIVE_PLAYBOOK" | grep -q "$(basename "$FILE_PATH")"; then
         # 現在進行中なのでスキップ（完了後に再度発火する）
+        echo "[SKIP] $HOOK_NAME: playbook is currently active (state.md playbook.active)" >&2
         exit 0
     fi
 fi
@@ -144,30 +147,14 @@ DONE_WHEN_COUNT=$(echo "$DONE_WHEN_SECTION" | grep -c "^  - " 2>/dev/null || ech
 if [ "$DONE_WHEN_COUNT" -gt 0 ]; then
     # p_final Phase の存在チェック
     if ! grep -q "p_final" "$FILE_PATH" 2>/dev/null; then
-        echo ""
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  ⚠️ p_final（完了検証フェーズ）が存在しません"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  done_when: $DONE_WHEN_COUNT 項目"
-        echo ""
-        echo "  playbook に p_final フェーズを追加してください。"
-        echo "  参照: plan/template/playbook-format.md"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "[WARN] $HOOK_NAME: p_final phase not found (done_when: $DONE_WHEN_COUNT items)" >&2
         # 警告のみ（ブロックしない）- 既存 playbook との互換性のため
     fi
 
     # p_final Phase の status チェック
     P_FINAL_STATUS=$(grep -A 30 "p_final" "$FILE_PATH" 2>/dev/null | grep "^status:" | head -1 | sed 's/status: *//')
     if [ -n "$P_FINAL_STATUS" ] && [ "$P_FINAL_STATUS" != "done" ]; then
-        echo ""
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  ❌ p_final（完了検証）が未完了です"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "  done_when の検証: status = $P_FINAL_STATUS"
-        echo ""
-        echo "  p_final を完了させてからアーカイブしてください。"
-        echo "  → done_when の各項目が実際に満たされているか検証"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "[BLOCK] $HOOK_NAME: p_final not done (status=$P_FINAL_STATUS)" >&2
         exit 2  # done_when 未検証でブロック
     fi
 
@@ -192,15 +179,7 @@ if [ "$DONE_WHEN_COUNT" -gt 0 ]; then
         done <<< "$P_FINAL_TEST_COMMANDS"
 
         if [ "$FAIL_COUNT" -gt 0 ]; then
-            echo ""
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "  ❌ done_when の検証に失敗しました"
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "  PASS: $PASS_COUNT / FAIL: $FAIL_COUNT"
-            echo ""
-            echo "  アーカイブをブロックします。"
-            echo "  → 失敗した done_when 項目を修正してください。"
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "[BLOCK] $HOOK_NAME: done_when verification failed (PASS=$PASS_COUNT, FAIL=$FAIL_COUNT)" >&2
             exit 2  # done_when FAIL でブロック
         fi
     fi
@@ -218,24 +197,15 @@ ARCHIVE_DIR="plan/archive"
 ARCHIVE_PATH="$ARCHIVE_DIR/$PLAYBOOK_NAME"
 
 # 全 Phase が done の場合、アーカイブを提案
+echo "[PASS] $HOOK_NAME: playbook ready for archive ($RELATIVE_PATH)" >&2
 cat << EOF
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📦 Playbook 完了検出
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
   Playbook: $RELATIVE_PATH
-  Status: 全 $TOTAL_PHASES Phase が done
+  Status: all $TOTAL_PHASES phases done
 
-  アーカイブを推奨します:
-    mkdir -p $ARCHIVE_DIR
-    mv $RELATIVE_PATH $ARCHIVE_PATH
+  Archive command:
+    mkdir -p $ARCHIVE_DIR && mv $RELATIVE_PATH $ARCHIVE_PATH
 
-  アーカイブ後:
-    1. state.md の playbook.active を null に更新
-    2. 新しい playbook を作成（必要に応じて）
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
 
 exit 0

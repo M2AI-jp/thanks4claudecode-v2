@@ -696,6 +696,151 @@ success_criteria:
     - "grep -c 'Skill' tmp/full-system-verification.md | awk '{if($1>=9) print \"PASS\"; else print \"FAIL\"}'"
     - "grep -q '52' tmp/full-system-verification.md && echo PASS || echo FAIL"
 
+# ============================================================
+# M082-M087: 復旧マイルストーン（2025-12-19 E2E レポート基づく）
+# ============================================================
+
+- id: M082
+  name: "Hook の契約固定と止血"
+  description: |
+    今の最悪は「subtask-guard がチェック更新をブロック」「create-pr が黙って何もしない」で運用が詰むこと。
+    まず "Hook が壊れても作業が詰まない（少なくとも理由が出る）" にする。
+
+    対象 Hook:
+      - subtask-guard.sh
+      - create-pr-hook.sh
+      - archive-playbook.sh
+      - （横断）Hook の出力/exit code の共通契約
+
+    実施内容:
+      1. Hook 共通契約を明文化
+         - WARN: exit 0、メッセージは stderr
+         - BLOCK: exit 非0（例:2）、メッセージは stderr
+         - INTERNAL ERROR: 原則 exit 0 + WARN扱いで必ず理由を stderr
+      2. subtask-guard.sh を「パース失敗時は WARN で通す」に変更
+      3. create-pr-hook.sh は PR 未作成でも必ず「SKIP 理由」or「FAIL 理由」を出す
+      4. archive-playbook.sh も同様に「SKIP 理由/FAIL 理由」を出す
+  status: not_started
+  depends_on: [M081]
+  playbooks: []
+  done_when:
+    - "[ ] docs/hook-exit-code-contract.md が存在し、WARN/BLOCK/INTERNAL ERROR の定義が明記されている"
+    - "[ ] subtask-guard.sh がパース失敗時に exit 0 + stderr メッセージを出す"
+    - "[ ] create-pr-hook.sh が PR 未作成時に SKIP 理由を stderr に出す"
+    - "[ ] archive-playbook.sh が SKIP 時に理由を stderr に出す"
+    - "[ ] 全対象 Hook で 'No stderr output' が再現しない（必ず何か出力）"
+  test_commands:
+    - "test -f docs/hook-exit-code-contract.md && grep -q 'WARN' docs/hook-exit-code-contract.md && grep -q 'BLOCK' docs/hook-exit-code-contract.md && echo PASS || echo FAIL"
+    - "echo '{}' | bash .claude/hooks/subtask-guard.sh 2>&1; echo $?"
+    - "bash .claude/hooks/create-pr-hook.sh 2>&1 | grep -qE 'SKIP|ERROR|WARN' && echo PASS || echo FAIL"
+    - "echo '{}' | bash .claude/hooks/archive-playbook.sh 2>&1 | wc -c | awk '{if($1>0) print \"PASS\"; else print \"FAIL\"}'"
+  decomposition:
+    playbook_summary: Hook の共通契約を明文化し、パース失敗や SKIP 時に必ず理由を出力するよう修正
+    phase_hints:
+      - name: Hook 共通契約の設計
+        what: |
+          docs/hook-exit-code-contract.md を作成。
+          WARN/BLOCK/INTERNAL ERROR の定義、exit code、出力先を明記。
+      - name: subtask-guard.sh 修正
+        what: |
+          パース失敗時に exit 2 でブロックせず、exit 0 + WARN で通す。
+          JSON パース失敗、playbook 不存在等のエラーハンドリング強化。
+      - name: create-pr-hook.sh 修正
+        what: |
+          SKIP 時に「なぜ SKIP したか」を stderr に出力。
+          playbook 未完了、未コミット変更、ブランチ状態等の理由を明示。
+      - name: archive-playbook.sh 修正
+        what: |
+          SKIP 時に理由を出力。
+          playbook 不存在、Phase 未完了、final_tasks 未完了等の理由を明示。
+      - name: 統合テスト
+        what: |
+          全対象 Hook が契約に準拠しているか検証。
+          bash -n + 実際の実行で WARN/BLOCK/SKIP 出力を確認。
+    success_indicators:
+      - docs/hook-exit-code-contract.md が存在し、共通契約が明文化されている
+      - 全対象 Hook で stderr に理由が出力される
+      - パース失敗時に作業が詰まらない（WARN で通過）
+
+- id: M083
+  name: "Playbook Schema v2 + 正規化"
+  description: |
+    playbook の表記揺れを根絶し、Hook が確実にパースできる形式に正規化する。
+    1. playbook-format.md を Schema v2 として厳密化
+    2. playbook-validator.sh を実装
+    3. 既存 playbook を正規化
+  status: not_started
+  depends_on: [M082]
+  playbooks: []
+  done_when:
+    - "[ ] plan/template/playbook-format.md に Schema v2 マーカーが存在する"
+    - "[ ] .claude/hooks/playbook-validator.sh が存在し実行可能"
+    - "[ ] playbook-validator.sh が不正形式を検出して exit 非0 を返す"
+    - "[ ] 既存の active playbook が Schema v2 に準拠している"
+
+- id: M084
+  name: "subtask-guard の仕様準拠化"
+  description: |
+    subtask-guard.sh を M082 の契約に完全準拠させ、Layer2 復旧を完了。
+    1. パース失敗時は WARN で通す
+    2. validations チェックをオプション化（厳格モードで BLOCK）
+    3. 詳細なデバッグログを stderr に出力
+  status: not_started
+  depends_on: [M083]
+  playbooks: []
+  done_when:
+    - "[ ] subtask-guard.sh がパース失敗時に exit 0 を返す"
+    - "[ ] subtask-guard.sh に厳格モード（STRICT=1）オプションが存在する"
+    - "[ ] 通常モードで validations 不足は WARN のみ"
+    - "[ ] 厳格モードで validations 不足は BLOCK"
+
+- id: M085
+  name: "create-pr-hook の復旧"
+  description: |
+    create-pr-hook.sh を復旧し、CodeRabbit 連携を再開。
+    1. SKIP 理由の明確化
+    2. gh コマンドの存在チェック
+    3. PR 作成成功時のログ強化
+  status: not_started
+  depends_on: [M084]
+  playbooks: []
+  done_when:
+    - "[ ] create-pr-hook.sh が SKIP 時に理由を stderr に出す"
+    - "[ ] gh コマンド不存在時に WARN を出力"
+    - "[ ] PR 作成成功時に PR URL をログに出力"
+    - "[ ] CodeRabbit が PR にコメントできる状態"
+
+- id: M086
+  name: "archive-playbook + final_tasks の確実化"
+  description: |
+    archive-playbook.sh を安定化し、final_tasks の確実な実行を保証。
+    1. SKIP 理由の明確化
+    2. final_tasks 未完了時の警告強化
+    3. アーカイブ前の最終チェックリスト出力
+  status: not_started
+  depends_on: [M085]
+  playbooks: []
+  done_when:
+    - "[ ] archive-playbook.sh が SKIP 時に理由を stderr に出す"
+    - "[ ] final_tasks 未完了時に未完了タスク一覧を出力"
+    - "[ ] アーカイブ成功時に移動先パスを出力"
+
+- id: M087
+  name: "Hook 回帰 E2E の CI 化"
+  description: |
+    Hook の動作を保証する E2E テストを CI で自動実行。
+    1. .claude/tests/e2e-hooks.sh を作成
+    2. GitHub Actions で自動実行
+    3. 回帰テストのレポート生成
+  status: not_started
+  depends_on: [M086]
+  playbooks: []
+  done_when:
+    - "[ ] .claude/tests/e2e-hooks.sh が存在し実行可能"
+    - "[ ] .github/workflows/hook-tests.yml が存在"
+    - "[ ] E2E テストが全 PASS している"
+    - "[ ] テストレポートが生成される"
+
 ```
 
 ---
