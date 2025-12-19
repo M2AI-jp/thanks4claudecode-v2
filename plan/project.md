@@ -879,13 +879,16 @@ success_criteria:
     1. SubAgent (6個) の動作テストスクリプト作成
     2. Skill (9個) の動作テストスクリプト作成
     3. Command (8個) の動作テストスクリプト作成
-  status: pending
+  status: achieved
+  achieved_at: 2025-12-19
   depends_on: [M089]
+  playbooks:
+    - playbook-m090-component-tests.md
   done_when:
-    - "[ ] scripts/test-subagents.sh が存在し、6 SubAgent 全てをテスト"
-    - "[ ] scripts/test-skills.sh が存在し、9 Skill 全てをテスト"
-    - "[ ] scripts/test-commands.sh が存在し、8 Command 全てをテスト"
-    - "[ ] 全テストが PASS"
+    - "[x] scripts/test-subagents.sh が存在し、6 SubAgent 全てをテスト"
+    - "[x] scripts/test-skills.sh が存在し、9 Skill 全てをテスト"
+    - "[x] scripts/test-commands.sh が存在し、8 Command 全てをテスト"
+    - "[x] 全テストが PASS"
   test_commands:
     - "test -f scripts/test-subagents.sh && echo PASS || echo FAIL"
     - "test -f scripts/test-skills.sh && echo PASS || echo FAIL"

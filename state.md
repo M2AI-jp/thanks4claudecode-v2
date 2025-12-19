@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m090-component-tests.md
-branch: feat/m090-component-tests
-last_archived: plan/archive/playbook-m089-component-registry-normalization.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m090-component-tests.md
 ```
 
 ---
@@ -28,13 +28,9 @@ last_archived: plan/archive/playbook-m089-component-registry-normalization.md
 ## goal
 
 ```yaml
-milestone: M090
-phase: p1
-done_when:
-  - scripts/test-subagents.sh が存在し、6 SubAgent 全てをテスト
-  - scripts/test-skills.sh が存在し、9 Skill 全てをテスト
-  - scripts/test-commands.sh が存在し、8 Command 全てをテスト
-  - 全テストが PASS
+milestone: null
+phase: null
+done_when: []
 ```
 
 ---
