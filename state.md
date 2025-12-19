@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m097-anti-lie-system.md
-branch: feat/m097-anti-lie-system
-last_archived: plan/archive/playbook-m096-pre-bash-deadlock-fix.md
+active: plan/playbook-m098-m100-final-freeze.md
+branch: feat/final-freeze
+last_archived: plan/archive/playbook-m097-anti-lie-system.md
 ```
 
 ---
@@ -28,13 +28,13 @@ last_archived: plan/archive/playbook-m096-pre-bash-deadlock-fix.md
 ## goal
 
 ```yaml
-milestone: M097
-phase: done
+milestone: M098-M100
+phase: M098
 done_when:
-  - "[x] scripts/generate-readme-stats.sh が存在し実行可能"
-  - "[x] README.md の数値部分が STATS タグで囲まれスクリプトで更新可能"
-  - "[x] .claude/component-tiers.yaml に Core/Optional/Experimental 分類が存在"
-  - "[x] docs/completion-criteria.md に 5 つのシナリオが定義されている"
+  - "[ ] governance/core-manifest.yaml が存在し policy.no_new_components=true"
+  - "[ ] 未登録 hooks が削除されている（34→22）"
+  - "[ ] scripts/behavior-test.sh が PASS"
+  - "[ ] README から数字自慢が消えている"
 ```
 
 ---

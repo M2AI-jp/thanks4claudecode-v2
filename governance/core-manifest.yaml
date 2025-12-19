@@ -1,0 +1,119 @@
+# core-manifest.yaml
+#
+# このリポジトリの「凍結された正本」
+# ここに無いものは削除候補
+# ここにあるものは変更に厳格な理由が必要
+
+version: 1
+frozen_at: "2025-12-20"
+
+policy:
+  no_new_components: true
+  allow_changes:
+    - bugfix
+    - deletion
+    - test_improvement
+  forbid_changes:
+    - new_hook
+    - new_subagent
+    - new_skill
+    - new_architecture_doc
+
+# Core = これが無いと「契約制御」または「黄金動線」が成立しない
+core:
+  hooks:
+    - name: session-start.sh
+      reason: セッション初期化、state.md 更新
+    - name: init-guard.sh
+      reason: 必須ファイル Read 強制
+    - name: playbook-guard.sh
+      reason: Playbook Gate（Edit/Write ブロック）
+    - name: pre-bash-check.sh
+      reason: Playbook Gate（Bash 変更系ブロック）
+    - name: check-protected-edit.sh
+      reason: HARD_BLOCK（保護ファイル編集防止）
+    - name: consent-guard.sh
+      reason: ユーザー承認なしの変更防止
+    - name: prompt-guard.sh
+      reason: 合意検出、consent 自動削除
+    - name: critic-guard.sh
+      reason: done_criteria 検証漏れ防止
+
+  subagents:
+    - name: pm.md
+      reason: playbook 作成（黄金動線の起点）
+    - name: critic.md
+      reason: done_criteria 検証（報酬詐欺防止）
+
+  skills:
+    - name: state
+      reason: state.md 管理の専門知識
+    - name: plan-management
+      reason: playbook 運用の一貫性
+
+  scripts:
+    - name: contract.sh
+      reason: 契約判定の中核ロジック
+
+  docs:
+    - name: README.md
+      reason: 公開時の入口
+    - name: CLAUDE.md
+      reason: 凍結された憲法
+
+# Non-Core = 削除候補（M099 で処理）
+non_core:
+  hooks:
+    # 未登録（12個）→ 削除
+    - audit-unused.sh
+    - check-integrity.sh
+    - check-spec-sync.sh
+    - create-pr.sh
+    - failure-logger.sh
+    - generate-repository-map.sh
+    - merge-pr.sh
+    - playbook-validator.sh
+    - role-resolver.sh
+    - system-health-check.sh
+    - test-done-criteria.sh
+    - test-hooks.sh
+    # 登録済みだが Core ではない（便利機能）→ 保留
+    - archive-playbook.sh
+    - check-coherence.sh
+    - check-main-branch.sh
+    - cleanup-hook.sh
+    - create-pr-hook.sh
+    - depends-check.sh
+    - executor-guard.sh
+    - lint-check.sh
+    - log-subagent.sh
+    - pre-compact.sh
+    - scope-guard.sh
+    - session-end.sh
+    - stop-summary.sh
+    - subtask-guard.sh
+
+  subagents:
+    - codex-delegate.md    # Codex MCP 用、未使用
+    - health-checker.md    # 定期監視、未使用
+    - reviewer.md          # toolstack C 用
+    - setup-guide.md       # 初期セットアップ用
+
+  skills:
+    - consent-process      # SKILL.md として存在するが実質ドキュメント
+    - context-management   # /compact 用
+    - deploy-checker       # このリポジトリでは不要
+    - frontend-design      # このリポジトリでは不要
+    - lint-checker         # 便利機能
+    - post-loop            # ループ後処理
+    - test-runner          # テスト実行
+
+  commands:
+    - crit.md
+    - focus.md
+    - lint.md
+    - playbook-init.md
+    - rollback.md
+    - state-rollback.md
+    - task-start.md
+    - test.md

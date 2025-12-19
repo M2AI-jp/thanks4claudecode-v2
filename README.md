@@ -96,7 +96,7 @@ is_compound_command()   # 複合コマンド検出
 | **Optional** | 便利だが必須ではない |
 | **Experimental** | 試験的または廃止候補 |
 
-> 詳細: `.claude/component-tiers.yaml`
+> 詳細: `governance/core-manifest.yaml`
 
 ---
 

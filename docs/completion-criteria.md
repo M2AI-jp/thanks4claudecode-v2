@@ -208,7 +208,7 @@ bash scripts/e2e-contract-test.sh | grep "critic"
 ```
 1. README の数値は自動生成
 2. 手動更新は嘘の温床なので禁止
-3. component-tiers.yaml で実態を分類
+3. governance/core-manifest.yaml で Core/Non-Core を定義
 4. 未登録 Hook、未使用 SubAgent を可視化
 5. 定期的な整合性チェック
 ```
@@ -233,22 +233,18 @@ bash scripts/check-spec-sync.sh
 ### テスト方法
 
 ```bash
-# 検証: README の STATS が最新
-bash scripts/generate-readme-stats.sh --update
-git diff README.md  # 差分がなければ最新
+# 検証: 挙動テスト
+bash scripts/behavior-test.sh
 
-# 検証: component-tiers.yaml と実態の整合性
-# Core に分類された Hook が実際に登録されているか
-for hook in $(grep -A1 "core:" .claude/component-tiers.yaml | grep "name:" | awk '{print $3}'); do
-    grep -q "$hook" .claude/settings.json || echo "WARN: $hook not registered"
-done
+# 検証: 未使用ファイル検出
+bash scripts/find-unused.sh
 ```
 
 ### 関連コンポーネント
 
-- scripts/generate-readme-stats.sh: 統計自動生成
-- .claude/component-tiers.yaml: コンポーネント分類
-- scripts/check-spec-sync.sh: 仕様同期チェック
+- governance/core-manifest.yaml: Core/Non-Core の正本
+- scripts/behavior-test.sh: 挙動テスト
+- scripts/find-unused.sh: 未使用ファイル検出
 
 ---
 
@@ -256,11 +252,35 @@ done
 
 | シナリオ | 検証コマンド | 主要コンポーネント |
 |----------|--------------|-------------------|
-| 黄金動線 | `grep pm .claude/logs/subagent.log` | pm, critic, playbook-guard |
-| デッドロック防止 | `scripts/contract.sh check_bash` | contract.sh, pre-bash-check |
-| HARD_BLOCK 保護 | `scripts/contract.sh is_hard_block` | check-protected-edit, protected-files.txt |
-| 報酬詐欺防止 | `bash scripts/e2e-contract-test.sh` | critic, critic-guard |
-| README/実装一致 | `bash scripts/generate-readme-stats.sh` | generate-readme-stats, component-tiers |
+| Playbook Gate | `bash scripts/behavior-test.sh` | playbook-guard, pre-bash-check |
+| HARD_BLOCK 保護 | `bash scripts/behavior-test.sh` | check-protected-edit |
+| デッドロック回避 | `bash scripts/behavior-test.sh` | pre-bash-check (例外処理) |
+| 黄金動線 | pm/critic SubAgent が動作 | pm, critic |
+
+---
+
+## テスト方針（M098 で凍結）
+
+```yaml
+policy:
+  grep_prohibition: true
+  reason: |
+    grep/test -f による「存在確認」は PASS 条件にしない。
+    「ファイルがある」≠「動く」だから。
+
+allowed_tests:
+  - 挙動テスト（実行して exit code で判定）
+  - scripts/behavior-test.sh による統合テスト
+
+forbidden_tests:
+  - grep -q "keyword" file && echo PASS
+  - test -f path/to/file && echo PASS
+  - ファイル数のカウント
+
+enforcement:
+  - PR レビューで grep ベースの done_when は reject
+  - 正本は governance/core-manifest.yaml
+```
 
 ---
 
@@ -268,4 +288,5 @@ done
 
 | 日付 | 変更 |
 |------|------|
+| 2025-12-20 | grep 禁止ポリシーを追加（M098） |
 | 2025-12-20 | 初版作成（M097） |
