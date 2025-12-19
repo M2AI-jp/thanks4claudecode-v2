@@ -40,7 +40,7 @@ done_when:
 ## session
 
 ```yaml
-last_start: 2025-12-19 15:06:14
+last_start: 2025-12-19 22:00:34
 last_clear: 2025-12-13 00:30:00
 ```
 
@@ -63,7 +63,7 @@ roles:
 ## COMPONENT_REGISTRY
 
 ```yaml
-hooks: 33
+hooks: 34
 agents: 6
 skills: 9
 commands: 8
@@ -79,17 +79,42 @@ last_verified: 2025-12-19
 
 ```yaml
 readme:
-  hooks: 33
-  milestone_count: 45
+  hooks: 34
+  milestone_count: 46
 project:
   total: 45
-  achieved: 44
-  pending: 1
+  achieved: 45
+  pending: 0
 last_checked: 2025-12-19
 ```
 
 > **仕様同期スナップショット**: README/project.md の数値を記録。
 > check-spec-sync.sh が実行時にこの値と実態を比較し、乖離があれば警告を出力する。
+
+---
+
+## FREEZE_QUEUE
+
+```yaml
+queue: []
+freeze_period_days: 7
+```
+
+> **削除予定ファイルの凍結キュー**: 削除前に一定期間保持するファイルのリスト。
+> freeze-file.sh でファイルを追加、delete-frozen.sh で凍結期間経過後に削除。
+> 形式: `- { path: "path/to/file", freeze_date: "YYYY-MM-DD", reason: "理由" }`
+
+---
+
+## DELETE_LOG
+
+```yaml
+log: []
+```
+
+> **削除履歴ログ**: 削除されたファイルの記録。
+> delete-frozen.sh が削除実行時に自動で記録。
+> 形式: `- { path: "path/to/file", deleted_date: "YYYY-MM-DD", reason: "理由" }`
 
 ---
 

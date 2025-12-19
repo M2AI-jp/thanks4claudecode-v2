@@ -8,13 +8,13 @@
 # このファイルは自動生成されます。手動編集は上書きされます。
 
 meta:
-  generated: "2025-12-19 21:00:42"
+  generated: "2025-12-19 21:43:44"
   generator: ".claude/hooks/generate-repository-map.sh"
-  total_files: 161
+  total_files: 167
 
 hooks:
   directory: .claude/hooks/
-  count: 33
+  count: 34
   files:
     - name: "archive-playbook.sh"
       trigger: "PostToolUse:Edit"
@@ -34,6 +34,9 @@ hooks:
     - name: "check-protected-edit.sh"
       trigger: "PreToolUse:Edit"
       description: "check-protected-edit.sh - 保護対象ファイルの編集をブロック"
+    - name: "check-spec-sync.sh"
+      trigger: "utility"
+      description: "check-spec-sync.sh - 仕様同期チェック (SSC Phase 2)"
     - name: "cleanup-hook.sh"
       trigger: "PostToolUse:Edit"
       description: "cleanup-hook.sh - playbook 完了時のテンポラリファイル自動クリーンアップ"
@@ -184,7 +187,7 @@ commands:
 
 docs:
   directory: docs/
-  count: 20
+  count: 21
   files:
     - name: "ARCHITECTURE.md"
       description: "リポジトリの構造と各コンポーネントの関係を文書化"
@@ -208,6 +211,8 @@ docs:
       description: "公式リファレンスに基づく発火タイミング・トリガー・連携の完全ガイド"
     - name: "folder-management.md"
       description: "全フォルダの役割、テンポラリ/永続区分、削除タイミングを定義"
+    - name: "freeze-then-delete.md"
+      description: "安全なファイル削除のための 3 段階プロセス"
     - name: "git-operations.md"
       description: "設計方針"
     - name: "hook-exit-code-contract.md"
@@ -233,7 +238,7 @@ plan:
       count: 0
     archive:
       description: "完了した playbook のアーカイブ"
-      count: 16
+      count: 17
     template:
       description: "playbook テンプレート"
       count: 6
@@ -247,22 +252,24 @@ root:
       description: "このファイルは純粋なコーディングルール。"
     - name: "README.md"
       description: "Claude Code の自律性と品質を向上させるフレームワーク"
+    - name: "state.md"
+      description: "現在地を示す Single Source of Truth"
     - name: ".gitignore"
       description: ""
     - name: ".mcp.json"
       description: ""
 
 summary:
-  hooks: 33
+  hooks: 34
   agents: 6
   skills: 9
   frameworks: 0
   commands: 8
-  docs: 20
+  docs: 21
   plan_active: 0
-  plan_archive: 16
+  plan_archive: 17
   plan_template: 6
-  total: 161
+  total: 167
 
 # ==============================================================================
 # System Specification (M025)
@@ -356,6 +363,6 @@ system_specification:
 # 変更履歴
 # ==============================================================================
 changelog:
-  - date: "2025-12-19 21:00:42"
+  - date: "2025-12-19 21:43:44"
     action: "auto-generated"
     description: "playbook 完了時に自動生成"
