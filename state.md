@@ -10,6 +10,7 @@
 
 ```yaml
 current: plan-template  # 現在作業中のプロジェクト名
+session: task           # task | discussion
 project: plan/project.md
 ```
 
@@ -18,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
+active: plan/playbook-m119-consent-guard-fix.md
 branch: feat/layer-architecture
-last_archived: plan/archive/playbook-m111-scenario-test-100.md
+last_archived: plan/archive/playbook-m118-document-core-context.md
 ```
 
 ---
@@ -28,14 +29,61 @@ last_archived: plan/archive/playbook-m111-scenario-test-100.md
 ## goal
 
 ```yaml
-milestone: M111
-phase: done
+milestone: M119
+phase: p1
 done_when:
-  - "[x] scenario-test.sh 未変更（git diff で確認）"
-  - "[x] subtask-guard.sh が STRICT=1 で警告を出す"
-  - "[x] scenario-test.sh 実行で 13/13 PASS（完遂率 100%）"
-  - "[x] 100% 警告が表示される（報酬詐欺監視機能）"
+  - consent-guard.sh が plan/playbook-*.md への Edit/Write を許可する
+  - playbook-guard.sh と同じ例外パターンが使用されている
 next: null
+```
+
+---
+
+## context
+
+```yaml
+mode: normal             # normal | interrupt
+interrupt_reason: null
+return_to: null
+```
+
+> **コンテキストモード**: 新しい要求が来た時の処理方法を制御。
+> normal: 通常の作業続行
+> interrupt: 現在の作業を中断して新要求を処理
+
+---
+
+## verification
+
+```yaml
+self_complete: false     # LLM の自己申告（critic PASS で true）
+user_verified: false     # ユーザーの確認（明示的 OK で true）
+```
+
+> **報酬詐欺防止**: self_complete と user_verified の両方が true になるまで done にしない。
+
+---
+
+## states
+
+```yaml
+flow: pending → designing → implementing → reviewing → done
+forbidden:
+  - pending → done (without critic)
+  - implementing → done (without reviewer)
+  - * → done (without state_update)
+```
+
+> **状態遷移ルール**: 許可される遷移と禁止される遷移を定義。
+
+---
+
+## rules
+
+```yaml
+原則: focus.current のレイヤーのみ編集可能
+例外: state.md の focus/context/verification は常に編集可能
+保護: CLAUDE.md は HARD_BLOCK（管理者以外変更不可）
 ```
 
 ---
@@ -43,8 +91,9 @@ next: null
 ## session
 
 ```yaml
-last_start: 2025-12-21 00:13:17
+last_start: 2025-12-21 01:48:36
 last_clear: 2025-12-13 00:30:00
+uncommitted_warning: false
 ```
 
 ---
