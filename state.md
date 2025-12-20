@@ -18,7 +18,7 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
+active: plan/playbook-m111-scenario-test-100.md
 branch: feat/layer-architecture
 last_archived: plan/archive/playbook-m110-fix-and-defend.md
 ```
@@ -28,14 +28,14 @@ last_archived: plan/archive/playbook-m110-fix-and-defend.md
 ## goal
 
 ```yaml
-milestone: M110
-phase: done
+milestone: M111
+phase: p1
 done_when:
-  - "[x] rm -rf / が exit 2 でブロックされる"
-  - "[x] playbook-guard.sh が STATE_FILE 環境変数を参照"
-  - "[x] 完遂率が 69% から改善（差分記録必須）→ 92%"
-  - "[x] 3層防衛（外部証拠/自己評価禁止/完遂率監視）が機能"
-next: M111
+  - "[ ] scenario-test.sh 未変更（git diff で確認）"
+  - "[ ] subtask-guard.sh が STRICT=1 で警告を出す"
+  - "[ ] scenario-test.sh 実行で 13/13 PASS（完遂率 100%）"
+  - "[ ] 100% 警告が表示される（報酬詐欺監視機能）"
+next: null
 ```
 
 ---

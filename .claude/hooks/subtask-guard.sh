@@ -71,10 +71,16 @@ if [[ "$FILE_PATH" != *"playbook-"* ]]; then
     exit 0
 fi
 
-# playbook ファイルが存在しない場合は SKIP
+# playbook ファイルが存在しない場合
 if [[ ! -f "$FILE_PATH" ]]; then
-    echo "[SKIP] $HOOK_NAME: playbook file not found (file=$FILE_PATH)" >&2
-    exit 0
+    if [[ "$STRICT_MODE" == "1" ]]; then
+        # STRICT=1: 存在しないファイルへの編集は警告
+        echo "[WARN] $HOOK_NAME: playbook file not found in STRICT mode (file=$FILE_PATH)" >&2
+        exit 0
+    else
+        echo "[SKIP] $HOOK_NAME: playbook file not found (file=$FILE_PATH)" >&2
+        exit 0
+    fi
 fi
 
 # old_string / new_string を取得
