@@ -54,7 +54,7 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: false     # LLM の自己申告（critic PASS で true）
+self_complete: true      # LLM の自己申告（critic PASS で true）
 user_verified: false     # ユーザーの確認（明示的 OK で true）
 ```
 
