@@ -1176,6 +1176,70 @@ success_criteria:
     - "grep -A 25 '### 標準 final_tasks' plan/template/playbook-format.md | grep -E 'ft1.*マージ|ft1.*merge' && echo PASS || echo FAIL"
     - "grep -q '動線\|順序' plan/template/playbook-format.md && echo PASS || echo FAIL"
 
+# ============================================================
+# M113-M116: 動線検証マイルストーン（Layer Architecture 検証）
+# ============================================================
+
+- id: M113
+  name: "計画動線の検証"
+  description: |
+    計画動線が正しく機能するか検証する。
+    動線: 要求 → [理解確認] → pm → playbook → state.md
+  status: pending
+  depends_on: [M112]
+  done_when:
+    - "[ ] 理解確認プロセスが発火する"
+    - "[ ] pm 経由で playbook が作成される"
+    - "[ ] state.md が正しく更新される"
+    - "[ ] playbook=null での Edit がブロックされる"
+  test_commands:
+    - "bash scripts/flow-test.sh planning 2>&1 | grep -q 'PASS' && echo PASS || echo FAIL"
+
+- id: M114
+  name: "検証動線の検証"
+  description: |
+    検証動線が正しく機能するか検証する。
+    動線: /crit → critic → PASS/FAIL
+  status: pending
+  depends_on: [M112]
+  done_when:
+    - "[ ] /crit で critic agent が呼び出される"
+    - "[ ] done_criteria が検証される"
+    - "[ ] PASS/FAIL 判定が正しく行われる"
+    - "[ ] critic なしでの phase 完了がブロックされる"
+  test_commands:
+    - "bash scripts/flow-test.sh verification 2>&1 | grep -q 'PASS' && echo PASS || echo FAIL"
+
+- id: M115
+  name: "実行動線の検証"
+  description: |
+    実行動線が正しく機能するか検証する。
+    動線: playbook → Edit → Guard発火
+  status: pending
+  depends_on: [M112]
+  done_when:
+    - "[ ] Edit 時に適切な Guard が発火する"
+    - "[ ] CLAUDE.md 等の保護ファイルがブロックされる"
+    - "[ ] subtask-guard が validations を強制する"
+    - "[ ] 危険コマンドがブロックされる"
+  test_commands:
+    - "bash scripts/flow-test.sh execution 2>&1 | grep -q 'PASS' && echo PASS || echo FAIL"
+
+- id: M116
+  name: "完了動線の検証"
+  description: |
+    完了動線が正しく機能するか検証する。
+    動線: phase完了 → マージ → アーカイブ → state更新
+  status: pending
+  depends_on: [M112]
+  done_when:
+    - "[ ] final_tasks の順序が正しい（マージ→アーカイブ）"
+    - "[ ] マージが playbook active 中に実行可能"
+    - "[ ] アーカイブ後に playbook=null になる"
+    - "[ ] 次タスクへの移行が正常"
+  test_commands:
+    - "bash scripts/flow-test.sh completion 2>&1 | grep -q 'PASS' && echo PASS || echo FAIL"
+
 ```
 
 ---

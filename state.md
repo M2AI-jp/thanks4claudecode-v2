@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
+active: plan/playbook-m113-m116-milestone-addition.md
+branch: feat/layer-architecture
 last_archived: plan/archive/playbook-m112-completion-flow-order.md
 ```
 
@@ -28,12 +28,12 @@ last_archived: plan/archive/playbook-m112-completion-flow-order.md
 ## goal
 
 ```yaml
-milestone: M112
-phase: done
+milestone: M113-M116
+phase: p1
 done_when:
-  - "[x] final_tasks の標準順序が「マージ → ブランチ削除 → アーカイブ → state更新」になっている"
-  - "[x] playbook-format.md の標準 final_tasks が更新されている"
-  - "[x] 次の playbook から正しい順序で完了できる設計になっている"
+  - "[ ] M113-M116 が project.md に追加されている"
+  - "[ ] 各マイルストーンが depends_on: [M112] を持っている"
+  - "[ ] done_when が検証可能な形式で記述されている"
 next: null
 ```
 
