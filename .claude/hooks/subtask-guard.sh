@@ -27,12 +27,15 @@ set -uo pipefail
 HOOK_NAME="subtask-guard"
 
 # ==============================================================================
-# M085: 厳格モード（STRICT=1 で BLOCK、デフォルトは WARN）
+# M085: 厳格モード（M106: デフォルトを STRICT=1 に変更）
 # ==============================================================================
-# STRICT=1: validations 不足時に BLOCK（exit 2）
-# STRICT 未設定 or 0: validations 不足時に WARN のみ（exit 0）
+# STRICT=1: validations 不足時に BLOCK（exit 2）- デフォルト
+# STRICT=0: validations 不足時に WARN のみ（exit 0）
 # ==============================================================================
-STRICT_MODE="${STRICT:-0}"
+# M106: 報酬詐欺防止のため、デフォルトを BLOCK に変更
+# 旧: STRICT_MODE="${STRICT:-0}" (デフォルト WARN)
+# 新: STRICT_MODE="${STRICT:-1}" (デフォルト BLOCK)
+STRICT_MODE="${STRICT:-1}"
 
 # 入力 JSON を読み取り（失敗時は INTERNAL ERROR）
 INPUT=$(cat) || {
