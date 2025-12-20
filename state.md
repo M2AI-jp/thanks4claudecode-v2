@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m109-scenario-test.md
+active: plan/playbook-m110-fix-and-defend.md
 branch: feat/layer-architecture
-last_archived: plan/archive/playbook-m108-core-finalization.md
+last_archived: plan/archive/playbook-m109-scenario-test.md
 ```
 
 ---
@@ -28,15 +28,14 @@ last_archived: plan/archive/playbook-m108-core-finalization.md
 ## goal
 
 ```yaml
-milestone: M109
-phase: p_final
+milestone: M110
+phase: p1
 done_when:
-  - "[x] 計画動線シナリオ 3つ以上策定・実行（3シナリオ、1/3 PASS）"
-  - "[x] 実行動線シナリオ 3つ以上策定・実行（4シナリオ、2/4 PASS）"
-  - "[x] 検証動線シナリオ 3つ以上策定・実行（3シナリオ、3/3 PASS）"
-  - "[x] 完了動線シナリオ 3つ以上策定・実行（3シナリオ、3/3 PASS）"
-  - "[x] 完遂率算出・改善点洗い出し（69%、3改善点特定）"
-next: M110
+  - "[ ] rm -rf / が exit 2 でブロックされる"
+  - "[ ] playbook-guard.sh が STATE_FILE 環境変数を参照"
+  - "[ ] 完遂率が 69% から改善（差分記録必須）"
+  - "[ ] 3層防衛（外部証拠/自己評価禁止/完遂率監視）が機能"
+next: M111
 ```
 
 ---
@@ -44,7 +43,7 @@ next: M110
 ## session
 
 ```yaml
-last_start: 2025-12-20 21:36:13
+last_start: 2025-12-21 00:13:17
 last_clear: 2025-12-13 00:30:00
 ```
 

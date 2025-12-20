@@ -51,6 +51,24 @@ MUTATION_PATTERNS="tee[[:space:]]|sed[[:space:]]+-i|git[[:space:]]+(${GIT_MUTATI
 # 複合コマンド検出パターン（admin maintenance でも禁止）
 COMPOUND_PATTERNS='&&|;|\|\||[|]'
 
+# HARD_BLOCK コマンド（playbook 有無に関係なく常にブロック）
+# これらは破壊的すぎるため、いかなる状況でも許可しない
+HARD_BLOCK_COMMANDS=(
+    'rm -rf /'
+    'rm -rf ~'
+    'rm -rf /*'
+    'rm -rf $HOME'
+    'rm -rf \$HOME'
+    'rm -rf ${HOME}'
+    'rm -rf \${HOME}'
+    ':(){:|:&};:'      # Fork bomb
+    'dd if=/dev/zero of=/dev/sda'
+    'mkfs'
+    '> /dev/sda'
+    'chmod -R 777 /'
+    'chown -R'
+)
+
 # ==============================================================================
 # ヘルパー関数
 # ==============================================================================
@@ -298,6 +316,29 @@ is_admin_maintenance_allowed() {
 # Returns: 0=ALLOW, 1=WARN, 2=BLOCK
 contract_check_bash() {
     local command="$1"
+
+    # 0. HARD_BLOCK コマンドチェック（最優先、playbook 有無に関係なくブロック）
+    for blocked_cmd in "${HARD_BLOCK_COMMANDS[@]}"; do
+        if [[ "$command" == *"$blocked_cmd"* ]]; then
+            cat >&2 <<EOF
+========================================
+  [HARD_BLOCK] 破壊的コマンド検出
+========================================
+
+  コマンド: $command
+  検出パターン: $blocked_cmd
+
+  このコマンドは破壊的すぎるため、
+  playbook 有無に関係なく常にブロックされます。
+
+  本当に実行が必要な場合は、
+  ターミナルから直接実行してください。
+
+========================================
+EOF
+            return 2
+        fi
+    done
 
     # Fail-closed: state.md が存在しない場合
     if [[ ! -f "$STATE_FILE" ]]; then
