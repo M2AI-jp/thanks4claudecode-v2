@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m110-fix-and-defend.md
+active: null
 branch: feat/layer-architecture
-last_archived: plan/archive/playbook-m109-scenario-test.md
+last_archived: plan/archive/playbook-m110-fix-and-defend.md
 ```
 
 ---
@@ -29,12 +29,12 @@ last_archived: plan/archive/playbook-m109-scenario-test.md
 
 ```yaml
 milestone: M110
-phase: p1
+phase: done
 done_when:
-  - "[ ] rm -rf / が exit 2 でブロックされる"
-  - "[ ] playbook-guard.sh が STATE_FILE 環境変数を参照"
-  - "[ ] 完遂率が 69% から改善（差分記録必須）"
-  - "[ ] 3層防衛（外部証拠/自己評価禁止/完遂率監視）が機能"
+  - "[x] rm -rf / が exit 2 でブロックされる"
+  - "[x] playbook-guard.sh が STATE_FILE 環境変数を参照"
+  - "[x] 完遂率が 69% から改善（差分記録必須）→ 92%"
+  - "[x] 3層防衛（外部証拠/自己評価禁止/完遂率監視）が機能"
 next: M111
 ```
 
