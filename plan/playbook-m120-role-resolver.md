@@ -143,10 +143,15 @@ done_when:
 
 ## final_tasks
 
-- [ ] **ft1**: 変更を全てコミットする
+- [x] **ft1**: 変更を全てコミットする
   - command: `git add -A && git commit -m "feat(M120): create role-resolver.sh"`
+  - status: done
+  - executed: 2025-12-21T03:05:00
+
+- [ ] **ft2**: main ブランチにマージする
+  - command: `git checkout main && git merge feat/m120-role-resolver --no-edit`
   - status: pending
 
-- [ ] **ft2**: state.md の playbook.active を null に更新する
+- [ ] **ft3**: state.md の playbook.active を null に更新する
   - command: `# playbook.active を null に更新`
   - status: pending
