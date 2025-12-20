@@ -1094,6 +1094,79 @@ success_criteria:
   test_commands:
     - "test -f check.md && grep -q '旧仕様' check.md && echo PASS || echo FAIL"
     - "bash scripts/golden-path-test.sh 2>&1 | tail -5 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL"
+  note: |
+    ⚠️ M105 のテストは「コンポーネント単位の構文・存在確認」であり、
+    「動線単位のテスト」ではなかった。報酬詐欺として M107 で再実施。
+
+- id: M106
+  name: "動作不良コンポーネント修正"
+  description: |
+    M105 で特定された動作不良 3 件を修正する。
+
+    修正対象:
+      1. consent-guard.sh - デッドロック問題（HIGH）
+         - 「削除」「rm」等のトリガー単語で無限ループ
+         - 対策: admin モードで無効化 or トリガー単語見直し
+
+      2. critic-guard.sh - phase 完了チェック欠落（HIGH）
+         - playbook の phase.status 変更を検出しない
+         - subtask チェックボックス編集のみ監視
+         - 対策: phase 完了時の critic 呼び出し強制
+
+      3. subtask-guard.sh - デフォルト WARN モード（MEDIUM）
+         - STRICT=0 がデフォルト
+         - 3 観点検証なしで subtask 完了可能
+         - 対策: デフォルト STRICT=1 に変更
+  status: not_achieved
+  depends_on: [M105]
+  done_when:
+    - "[ ] consent-guard.sh のデッドロック問題が解消されている"
+    - "[ ] critic-guard.sh が phase.status 変更を検出する"
+    - "[ ] subtask-guard.sh がデフォルト STRICT=1 になっている"
+    - "[ ] 各修正に対する回帰テストが追加されている"
+  test_commands:
+    - "grep -q 'STRICT=1' .claude/hooks/subtask-guard.sh && echo PASS || echo FAIL"
+    - "grep -q 'phase' .claude/hooks/critic-guard.sh && echo PASS || echo FAIL"
+
+- id: M107
+  name: "動線単位テスト - Golden Path 検証再実施"
+  description: |
+    M105 は「コンポーネント構文チェック」のみで「動線単位テスト」を実施していなかった。
+    本マイルストーンで正しいテスト手法を設計・実行する。
+
+    動線単位テストとは:
+      ❌ bash -n でエラーがない（構文チェック）
+      ❌ ファイルが存在する（存在確認）
+      ✅ 動線を端から端まで実行して期待結果を得る（E2E テスト）
+
+    テスト対象動線:
+      1. 計画動線: ユーザー要求 → pm 呼び出し → playbook 作成 → state.md 更新
+      2. 実行動線: playbook active → Edit/Write → Guard 発火 → 適切なブロック/警告
+      3. 検証動線: /crit → critic 呼び出し → done_criteria 検証 → 証拠付き判定
+      4. 完了動線: phase 完了 → アーカイブ → project.md 更新 → 次タスク導出
+
+    テスト手法:
+      - Hook 入力をシミュレートして出力を検証
+      - 実際の Claude Code セッションログから動作確認
+      - 状態遷移の前後比較（state.md diff）
+
+    報酬詐欺防止:
+      - FAIL が出ることを前提とした設計
+      - 「全 PASS」は疑わしい結果として扱う
+      - 動線ごとの具体的な期待値を事前定義
+  status: not_achieved
+  depends_on: [M106]
+  done_when:
+    - "[ ] 動線単位テストスクリプト（scripts/flow-test.sh）が存在する"
+    - "[ ] 計画動線のテストケースが定義され実行されている"
+    - "[ ] 実行動線のテストケースが定義され実行されている"
+    - "[ ] 検証動線のテストケースが定義され実行されている"
+    - "[ ] 完了動線のテストケースが定義され実行されている"
+    - "[ ] テスト結果に FAIL が含まれ、その原因が分析されている"
+    - "[ ] FAIL 項目の修正方針が決定されている"
+  test_commands:
+    - "test -f scripts/flow-test.sh && echo PASS || echo FAIL"
+    - "bash scripts/flow-test.sh 2>&1 | grep -q 'FAIL' && echo 'FAIL found (expected)' || echo 'All PASS (suspicious)'"
 
 ```
 

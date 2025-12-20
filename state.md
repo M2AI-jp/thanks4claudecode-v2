@@ -18,7 +18,7 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
+active: plan/playbook-m106-m107-milestone-addition.md
 branch: feat/layer-architecture
 last_archived: plan/archive/playbook-m105-golden-path-verification.md
 ```
@@ -28,14 +28,12 @@ last_archived: plan/archive/playbook-m105-golden-path-verification.md
 ## goal
 
 ```yaml
-milestone: M105 (achieved)
-phase: completed
+milestone: M106/M107 計画更新
+phase: p1
 done_when:
-  - "[x] 全40コンポーネント検証完了（40/40 PASS）"
-  - "[x] 動作不良3件を特定、M106 へ引継ぎ"
-achieved_at: 2025-12-20
-next: M106
-next_task: "動作不良コンポーネントの修正（subtask-guard, consent-guard, critic-guard）"
+  - "[x] project.md に M106 が追加されている"
+  - "[x] project.md に M107 が追加されている"
+  - "[x] M105 に報酬詐欺の note が追加されている"
 ```
 
 ---
