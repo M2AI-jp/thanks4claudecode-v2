@@ -18,8 +18,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: main
+active: plan/playbook-m102-component-catalog.md
+branch: feat/m102-component-catalog
 last_archived: plan/archive/playbook-m101-project-update.md
 ```
 
@@ -28,9 +28,13 @@ last_archived: plan/archive/playbook-m101-project-update.md
 ## goal
 
 ```yaml
-milestone: null
-phase: idle
-done_when: []
+milestone: M102
+phase: p1
+done_when:
+  - check.md に Hooks 22個の要点とソースが含まれている
+  - check.md に SubAgents 3個の要点とソースが含まれている
+  - check.md に Skills 7個の要点とソースが含まれている
+  - check.md に Commands 8個の要点とソースが含まれている
 ```
 
 ---
@@ -38,7 +42,7 @@ done_when: []
 ## session
 
 ```yaml
-last_start: 2025-12-20 02:27:00
+last_start: 2025-12-20 15:28:33
 last_clear: 2025-12-13 00:30:00
 ```
 
