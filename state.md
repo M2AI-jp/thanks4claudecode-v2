@@ -21,7 +21,7 @@ project: plan/project.md
 ```yaml
 active: null
 branch: null
-last_archived: plan/archive/playbook-m118-document-core-context.md
+last_archived: plan/archive/playbook-m119-consent-guard-fix.md
 ```
 
 ---
@@ -32,7 +32,7 @@ last_archived: plan/archive/playbook-m118-document-core-context.md
 milestone: null
 phase: null
 done_when: []
-next: M119
+next: null
 ```
 
 ---
@@ -89,7 +89,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 01:39:12
+last_start: 2025-12-21 01:48:36
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: false
 ```

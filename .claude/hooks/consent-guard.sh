@@ -74,6 +74,19 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null) || {
 }
 
 # ============================================================
+# ブートストラップ例外: playbook ファイル自体の作成/編集は許可
+# /playbook-init や pm が新規 playbook を作成できるようにする
+# M119: playbook-guard.sh の 57-60行目と同じパターン
+# ============================================================
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null) || FILE_PATH=""
+
+if [[ "$FILE_PATH" == *"plan/playbook-"*.md ]] || \
+   [[ "$FILE_PATH" == *"plan/active/playbook-"*.md ]]; then
+    echo "[PASS] $HOOK_NAME: playbook file creation allowed ($FILE_PATH)" >&2
+    exit 0
+fi
+
+# ============================================================
 # 対象ツールチェック
 # ============================================================
 case "$TOOL_NAME" in
