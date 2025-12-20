@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m112-completion-flow-order.md
-branch: fix/completion-flow-order
-last_archived: plan/archive/playbook-m111-scenario-test-100.md
+active: null
+branch: main
+last_archived: plan/archive/playbook-m112-completion-flow-order.md
 ```
 
 ---
@@ -29,11 +29,11 @@ last_archived: plan/archive/playbook-m111-scenario-test-100.md
 
 ```yaml
 milestone: M112
-phase: p1
+phase: done
 done_when:
-  - "[ ] final_tasks の標準順序が「マージ → ブランチ削除 → アーカイブ → state更新」になっている"
-  - "[ ] playbook-format.md の標準 final_tasks が更新されている"
-  - "[ ] 次の playbook から正しい順序で完了できる設計になっている"
+  - "[x] final_tasks の標準順序が「マージ → ブランチ削除 → アーカイブ → state更新」になっている"
+  - "[x] playbook-format.md の標準 final_tasks が更新されている"
+  - "[x] 次の playbook から正しい順序で完了できる設計になっている"
 next: null
 ```
 
