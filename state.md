@@ -18,9 +18,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m105-golden-path-verification.md
+active: null
 branch: feat/layer-architecture
-last_archived: plan/archive/playbook-m104-layer-architecture.md
+last_archived: plan/archive/playbook-m105-golden-path-verification.md
 ```
 
 ---
@@ -28,25 +28,14 @@ last_archived: plan/archive/playbook-m104-layer-architecture.md
 ## goal
 
 ```yaml
-milestone: M105 (in_progress)
-phase: p_final
+milestone: M105 (achieved)
+phase: completed
 done_when:
-  # p1: ドキュメント整合 (done)
-  - "[x] check.md に旧仕様セクションが存在する"
-  - "[x] project.md の M105 テスト対象が check.md と整合している"
-
-  # p2: テスト基盤整備 (done)
-  - "[x] docs/verification-criteria.md が存在し PASS/FAIL 判定基準が定義されている"
-  - "[x] docs/golden-path-verification-report.md が存在する"
-  - "[x] scripts/golden-path-test.sh が存在し実行可能である（40/40 PASS）"
-
-  # p3-p8: 動作テスト (done)
-  - "[x] 全40コンポーネントの検証結果が golden-path-verification-report.md に記録されている"
-
-  # p_final: 総括 (done)
-  - "[x] 動作不良コンポーネントの一覧が作成されている（3件: subtask-guard, consent-guard, critic-guard）"
-  - "[x] 修正方針が決定され文書化されている（M106 への引継ぎ）"
+  - "[x] 全40コンポーネント検証完了（40/40 PASS）"
+  - "[x] 動作不良3件を特定、M106 へ引継ぎ"
+achieved_at: 2025-12-20
 next: M106
+next_task: "動作不良コンポーネントの修正（subtask-guard, consent-guard, critic-guard）"
 ```
 
 ---

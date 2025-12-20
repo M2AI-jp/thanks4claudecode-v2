@@ -1077,20 +1077,23 @@ success_criteria:
       5. 共通基盤（6個）: session-start, session-end, pre-compact, stop-summary, log-subagent, consent-process
       6. 横断的整合性（3個）: check-coherence, depends-check, lint-check
 
-    既知の動作不良:
+    既知の動作不良（M106 で修正予定）:
       - consent-guard: 特定単語トリガー、デッドロック発生
       - subtask-guard: STRICT=0 でデフォルト WARN
       - critic-guard: playbook の phase 完了をチェックしない
-  status: not_achieved
+  status: achieved
+  achieved_at: 2025-12-20
   depends_on: [M104]
+  playbooks:
+    - playbook-m105-golden-path-verification.md
   done_when:
-    - "[ ] check.md に旧仕様が記録されている"
-    - "[ ] project.md の M105 が check.md と整合している"
-    - "[ ] 全40コンポーネントの動作確認が完了している"
-    - "[ ] 動作不良コンポーネントが特定され修正方針が決まっている"
+    - "[x] check.md に旧仕様が記録されている"
+    - "[x] project.md の M105 が check.md と整合している"
+    - "[x] 全40コンポーネントの動作確認が完了している（40/40 PASS）"
+    - "[x] 動作不良コンポーネントが特定され修正方針が決まっている（3件→M106）"
   test_commands:
     - "test -f check.md && grep -q '旧仕様' check.md && echo PASS || echo FAIL"
-    - "bash scripts/behavior-test.sh 2>/dev/null || echo 'behavior-test.sh not yet implemented'"
+    - "bash scripts/golden-path-test.sh 2>&1 | tail -5 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL"
 
 ```
 
