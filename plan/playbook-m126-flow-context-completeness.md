@@ -80,7 +80,7 @@ done_when:
 
 - [ ] **p1.1**: cleanup-hook.sh から削除済みスクリプト参照が除去されている
   - executor: claudecode
-  - test_command: `! grep -qE 'generate-repository-map\.sh|check-spec-sync\.sh' .claude/hooks/cleanup-hook.sh && echo PASS || echo FAIL`
+  - test_command: `test -f .claude/hooks/cleanup-hook.sh && { grep -qE 'generate-repository-map\.sh|check-spec-sync\.sh' .claude/hooks/cleanup-hook.sh && echo FAIL || echo PASS; }`
   - validations:
     - technical: "Hook が bash -n で構文エラーなし"
     - consistency: "参照先ファイルが全て存在する"
@@ -154,15 +154,15 @@ done_when:
 
 - [ ] **p3.2**: flow-integrity-test.sh が PASS を返す
   - executor: claudecode
-  - test_command: `bash scripts/flow-integrity-test.sh 2>&1 | tail -1 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL`
+  - test_command: `bash scripts/flow-integrity-test.sh; [ $? -eq 0 ] && echo PASS || echo FAIL`
   - validations:
     - technical: "テストが正常実行"
     - consistency: "全項目が PASS"
     - completeness: "修正漏れがない"
 
-- [ ] **p3.3**: essential-documents.md の実行動線セクションが更新されている
+- [ ] **p3.3**: essential-documents.md の実行動線セクションが更新されている（/compact, /post-loop 両方記載）
   - executor: claudecode
-  - test_command: `grep -q '/compact' docs/essential-documents.md && echo PASS || echo FAIL`
+  - test_command: `grep -q '/compact' docs/essential-documents.md && grep -q '/post-loop' docs/essential-documents.md && echo PASS || echo FAIL`
   - validations:
     - technical: "ファイルが正しい形式"
     - consistency: "新 Command が反映"
@@ -183,7 +183,7 @@ done_when:
 
 - [ ] **p_final.1**: cleanup-hook.sh から削除済みスクリプトへの参照が除去されている
   - executor: claudecode
-  - test_command: `! grep -qE 'generate-repository-map\.sh|check-spec-sync\.sh' .claude/hooks/cleanup-hook.sh && echo PASS || echo FAIL`
+  - test_command: `test -f .claude/hooks/cleanup-hook.sh && { grep -qE 'generate-repository-map\.sh|check-spec-sync\.sh' .claude/hooks/cleanup-hook.sh && echo FAIL || echo PASS; }`
   - validations:
     - technical: "grep コマンドが正常動作"
     - consistency: "Hook ファイルの内容が修正済み"
@@ -207,7 +207,7 @@ done_when:
 
 - [ ] **p_final.4**: scripts/flow-integrity-test.sh が PASS する
   - executor: claudecode
-  - test_command: `bash scripts/flow-integrity-test.sh 2>&1 | tail -1 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL`
+  - test_command: `bash scripts/flow-integrity-test.sh; [ $? -eq 0 ] && echo PASS || echo FAIL`
   - validations:
     - technical: "テスト実行が正常"
     - consistency: "全テストケースが PASS"
