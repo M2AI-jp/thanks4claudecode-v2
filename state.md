@@ -19,8 +19,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null  # M155 完了
-branch: main
+active: plan/playbook-m156-pipeline-completeness-audit.md
+branch: feat/m156-pipeline-completeness-audit
 last_archived: plan/archive/playbook-m155-final-freeze.md
 ```
 
@@ -29,15 +29,14 @@ last_archived: plan/archive/playbook-m155-final-freeze.md
 ## goal
 
 ```yaml
-milestone: M155
-phase: p1
+milestone: M156
+phase: p6
 done_when:
-  - "全テスト（flow-runtime-test）が PASS"
-  - "Core Layer 全ファイルが protected-files.txt に登録されている"
-  - "core-manifest.yaml に frozen: true が設定されている"
-  - "CLAUDE.md が version 2.0.0 にバンプされている"
-  - "git tag v1.0.0 が作成されている"
-next: Complete
+  - "4動線すべてがE2Eで PASS（flow-runtime-test.sh が 25/25 PASS）"
+  - "不要なファイル/フォルダがゼロ（deletion_candidates が全て処理済み）"
+  - "全ファイルが「なぜ存在するか」を1文で説明できる（core-manifest.yaml で網羅）"
+  - "project.md が実態と完全同期（M142-M155 の achieved_at 設定、M156 追加）"
+next: p1
 ```
 
 ---
@@ -94,9 +93,9 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-22 00:15:14
+last_start: 2025-12-22 00:56:21
 last_clear: 2025-12-13 00:30:00
-uncommitted_warning: false
+uncommitted_warning: true
 deep_audit_completed: 2025-12-21
 ```
 

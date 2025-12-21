@@ -394,27 +394,17 @@ testing:
       consumed_by: session-start.sh
 
 # ════════════════════════════════════════════════════════════════
-# 削除候補
+# 削除候補（M156で処理完了）
 # ════════════════════════════════════════════════════════════════
 deletion_candidates:
-  hooks:
-    - audit-unused.sh
-    - check-integrity.sh
-    - check-spec-sync.sh
-    - create-pr.sh
-    - failure-logger.sh
-    - generate-repository-map.sh
-    - merge-pr.sh
-    - playbook-validator.sh
-    - role-resolver.sh
-    - system-health-check.sh
-    - test-done-criteria.sh
-    - test-hooks.sh
-
-  subagents:
-    - codex-delegate.md
-    - health-checker.md
-    - setup-guide.md
+  # 全て削除済み (2025-12-22 M156)
+  # 削除されたファイル:
+  #   hooks: audit-unused.sh, check-integrity.sh, check-spec-sync.sh, create-pr.sh,
+  #          failure-logger.sh, generate-repository-map.sh, merge-pr.sh,
+  #          playbook-validator.sh, role-resolver.sh, system-health-check.sh,
+  #          test-done-criteria.sh, test-hooks.sh
+  #   subagents: codex-delegate.md, health-checker.md, setup-guide.md
+  status: cleared
 
 # ════════════════════════════════════════════════════════════════
 # SUMMARY
