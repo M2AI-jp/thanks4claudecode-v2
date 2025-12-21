@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m122-full-review.md
-branch: feat/m122-session-flow-doc-integration
-last_archived: plan/archive/playbook-m121-role-definition.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m122-full-review.md
 ```
 
 ---
@@ -54,8 +54,8 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: true      # Codex PASS で true（2025-12-21）
-user_verified: true      # ユーザー確認済み（2025-12-21）
+self_complete: false     # LLM の自己申告（critic PASS で true）
+user_verified: false     # ユーザーの確認（明示的 OK で true）
 ```
 
 > **報酬詐欺防止**: self_complete と user_verified の両方が true になるまで done にしない。
