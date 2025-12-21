@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m159-gh-pr-patterns.md
-branch: feat/m158-completion-flow-push-fix
-last_archived: plan/archive/playbook-m158-completion-flow-push-fix.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m159-gh-pr-patterns.md
 ```
 
 ---
