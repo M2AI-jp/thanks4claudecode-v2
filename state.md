@@ -19,8 +19,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/playbook-m158-completion-flow-push-fix.md
+branch: feat/m158-completion-flow-push-fix
 last_archived: plan/archive/playbook-m157-post-m156-completion.md
 ```
 

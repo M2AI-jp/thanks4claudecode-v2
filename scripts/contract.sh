@@ -289,6 +289,8 @@ ADMIN_MAINTENANCE_PATTERNS=(
     '^git[[:space:]]+commit[[:space:]]+-m[[:space:]]+'
     # git checkout main（playbook 完了後のメイン復帰）
     '^git[[:space:]]+checkout[[:space:]]+main$'
+    # git checkout <branch>（フィーチャーブランチへの切り替え）
+    '^git[[:space:]]+checkout[[:space:]]+[^[:space:]]+$'
     # git merge <branch>（ブランチマージ）
     '^git[[:space:]]+merge[[:space:]]+[^[:space:]]+$'
     # git merge <branch> --no-edit（ブランチマージ、エディタなし）
@@ -297,6 +299,14 @@ ADMIN_MAINTENANCE_PATTERNS=(
     '^git[[:space:]]+branch[[:space:]]+-d[[:space:]]+[^[:space:]]+$'
     # git add -A（全ファイル追加、最終コミット用）
     '^git[[:space:]]+add[[:space:]]+-A$'
+    # git push（完了動線でのリモート同期）
+    '^git[[:space:]]+push$'
+    # git push origin <branch>
+    '^git[[:space:]]+push[[:space:]]+origin[[:space:]]+[^[:space:]]+$'
+    # git push -u origin <branch>（トラッキング設定付き）
+    '^git[[:space:]]+push[[:space:]]+-u[[:space:]]+origin[[:space:]]+[^[:space:]]+$'
+    # git push origin（デフォルトブランチ）
+    '^git[[:space:]]+push[[:space:]]+origin$'
 )
 
 # Admin Maintenance allowlist に一致するか判定
