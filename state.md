@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m157-post-m156-completion.md
-branch: main
-last_archived: plan/archive/playbook-m156-pipeline-completeness-audit.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m157-post-m156-completion.md
 ```
 
 ---
@@ -57,7 +57,7 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: false      # LLM の自己申告（critic PASS で true）
+self_complete: true       # LLM の自己申告（critic PASS で true）
 user_verified: false     # ユーザーの確認（明示的 OK で true）
 ```
 
