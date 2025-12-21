@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m149a-critic-guard-fix.md
-branch: feat/m149-self-aware-operation
-last_archived: plan/archive/playbook-m148-merge-pending-docs.md
+active: plan/playbook-m150-deep-audit-planning-flow.md
+branch: feat/m150-deep-audit-planning
+last_archived: plan/archive/playbook-m149a-critic-guard-fix.md
 ```
 
 ---
@@ -29,15 +29,15 @@ last_archived: plan/archive/playbook-m148-merge-pending-docs.md
 ## goal
 
 ```yaml
-milestone: M149
+milestone: M150
 phase: p1
 done_when:
-  - "critic-guard.sh が self_complete にフェーズ情報を検証する"
-  - "session-start.sh で self_complete がリセットされる"
-  - "prompt-guard.sh が playbook=null + タスク検出時に exit 2 でブロックする"
-  - "RUNBOOK.md に Self-Aware Operation セクションが追加されている"
-  - "全テスト（flow-runtime-test）が PASS する"
-next: M149-A → M149-B → M149-C
+  - "計画動線7ファイル全てが Read + 理解されている"
+  - "各ファイルに対して Codex レビューが完了している"
+  - "各ファイルの処遇（Keep/Simplify/Delete）が決定している"
+  - "動作確認テストが実施されている"
+  - "精査結果が docs/deep-audit-planning-flow.md に記録されている"
+next: M150 → M151 → M152 → M153 → M154 → M155
 ```
 
 ---
@@ -94,7 +94,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 22:58:19
+last_start: 2025-12-21 23:28:30
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: true
 ```
