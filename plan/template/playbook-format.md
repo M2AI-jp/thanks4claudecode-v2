@@ -19,6 +19,10 @@ derives_from: {milestone ID or null}  # [SHOULD] 例: M084
 reviewed: false  # [MUST] reviewer SubAgent による検証済みフラグ (default: false)
 roles:  # [MAY] 役割の override（state.md のデフォルトを上書き）
   worker: claudecode  # この playbook では worker = claudecode
+
+user_prompt_original: |  # [SHOULD] ユーザーの元の指示を記録（M122 追加）
+  {ユーザーのプロンプト原文をここに記載}
+  {複数行の場合は YAML の | 記法を使用}
 ```
 
 > **branch フィールド**: playbook とブランチは 1:1 で紐づく。

@@ -21,14 +21,24 @@
 
 When starting a new session:
 
-1. **Read state.md** - Understand current focus and active task
-2. **Check branch** - `git branch --show-current`
-3. **Check status** - `git status -sb`
-4. **Read active playbook** - If `playbook.active` is set in state.md
+1. **Read state.md** - Understand current focus and active playbook
+2. **Read project.md** - Check available milestones and dependencies
+3. **Check branch** - `git branch --show-current`
+4. **Check status** - `git status -sb`
+5. **Read active playbook** - If `playbook.active` is set in state.md
+
+```yaml
+# Session Start Flow (明示的な順序)
+state.md → project.md → playbook → 作業開始
+
+# 新規タスクの場合
+state.md(playbook=null) → project.md(done_when確認) → pm呼び出し → playbook作成 → 作業開始
+```
 
 ```bash
 # Quick start commands
 cat state.md
+cat plan/project.md | head -100
 git status -sb
 ```
 

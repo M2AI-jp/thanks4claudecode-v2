@@ -3,6 +3,8 @@
 > **M105 Golden Path Verification のためのテスト基準定義**
 >
 > 報酬詐欺防止: 全コンポーネントに客観的な PASS/FAIL 判定基準を定義
+>
+> **注**: 本ドキュメントには Completion Criteria（5つの動作シナリオ）が統合されています（M122）
 
 ---
 
@@ -318,4 +320,84 @@ priority_3_quarantine:
 
 ---
 
+## 6. Completion Criteria - 5つの動作シナリオ（M122 統合）
+
+> **旧: docs/completion-criteria.md の内容を統合**
+>
+> 数字での成果報告（Hook X個、Milestone Y件）は自己欺瞞を生む。
+> 「動くシナリオ」で完成を定義する。
+
+### 6.1 シナリオ 1: 黄金動線
+
+**目的**: タスク依頼から完了までの基本フローが動作すること
+
+```
+1. ユーザーが「〇〇を作って」とタスク依頼
+2. pm SubAgent が自動起動
+3. playbook が作成される
+4. state.md が更新される
+5. 作業が playbook に従って進行
+6. critic SubAgent が done_criteria を検証
+7. 検証 PASS で phase 完了
+8. 全 phase 完了で playbook アーカイブ
+9. 次タスクが自動提案される
+```
+
+### 6.2 シナリオ 2: メンテ作業デッドロック防止
+
+**目的**: playbook=null でもメンテナンス作業が可能なこと
+
+| コマンド | 期待 |
+|---------|------|
+| `git add -A` | PASS |
+| `git commit` | PASS |
+| `git merge` | PASS |
+| `cat > test.txt` | BLOCK |
+
+### 6.3 シナリオ 3: HARD_BLOCK 保護
+
+**目的**: 重要ファイルが誤って編集・削除されないこと
+
+- CLAUDE.md, protected-files.txt への Edit/Write → exit 2 でブロック
+- admin モードでも回避不可
+
+### 6.4 シナリオ 4: 報酬詐欺防止
+
+**目的**: LLM が自己承認で完了を偽装できないこと
+
+| 抜け道 | 対策 |
+|--------|------|
+| done_criteria を曖昧に書く | pm が具体的な test_command を強制 |
+| critic を呼ばずに完了宣言 | critic-guard.sh でブロック |
+| test_command を通るよう調整 | reviewer が事後チェック |
+
+### 6.5 シナリオ 5: README/実装/テスト一致
+
+**目的**: ドキュメントと実態が乖離しないこと
+
+- README の数値は自動生成
+- governance/core-manifest.yaml で Core/Non-Core を定義
+- 未登録 Hook、未使用 SubAgent を可視化
+
+### 6.6 テスト方針（M098 凍結）
+
+```yaml
+grep_prohibition: true
+reason: |
+  grep/test -f による「存在確認」は PASS 条件にしない。
+  「ファイルがある」≠「動く」だから。
+
+allowed_tests:
+  - 挙動テスト（実行して exit code で判定）
+  - scripts/behavior-test.sh による統合テスト
+
+forbidden_tests:
+  - grep -q "keyword" file && echo PASS
+  - test -f path/to/file && echo PASS
+  - ファイル数のカウント
+```
+
+---
+
 *Created: 2025-12-20 (M105 p2.1)*
+*Updated: 2025-12-21 (M122 - completion-criteria.md 統合)*

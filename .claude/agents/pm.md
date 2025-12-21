@@ -71,13 +71,38 @@ meta:
   - 手動操作 → user
 ```
 
+## project.md 参照必須ルール（M122 追加）
+
+> **全てのタスク開始時に project.md を参照し、derives_from を設定する。**
+
+```yaml
+参照タイミング:
+  1. pm が呼び出された直後（最初のアクション）
+  2. playbook skeleton 作成前
+
+参照内容:
+  - not_achieved の done_when 一覧
+  - depends_on の解決状態
+  - priority と estimated_effort
+  - decomposition（phase_hints, success_indicators）
+
+設定内容:
+  - derives_from: project.md / {section} / {done_when.id}
+  - 例: derives_from: project.md / engineering_ecosystem / dw_2_linter
+
+フロー順序（明示）:
+  state.md → project.md → playbook 作成 → state.md 更新
+```
+
+---
+
 ## 必須経由点（Mandatory Entry Point）
 
 ```yaml
 タスク開始フロー:
   1. ユーザーが新規タスクを要求
   2. Claude が pm を呼び出す（必須）
-  3. pm が project.md を参照
+  3. pm が project.md を参照（必須）← M122 で明確化
   4. pm が derives_from を設定して playbook を作成（ドラフト）
   5. pm が reviewer を呼び出す（必須）★
   6. reviewer が PASS → pm が state.md 更新 & ブランチ作成

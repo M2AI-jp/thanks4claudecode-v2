@@ -1155,6 +1155,41 @@ success_criteria:
     - "test -f scripts/flow-test.sh && echo PASS || echo FAIL"
     - "bash scripts/flow-test.sh 2>&1 | grep -q 'All PASS' && echo 'All PASS (warning triggered)' || echo FAIL"
 
+- id: M122
+  name: "Claude 自己認識システム - 動線単位での全仕様把握"
+  description: |
+    **ユーザープロンプト原文（2025-12-21）:**
+    > Claude自身が自分のすべての仕様（Hook, SubAgents, Skills, 関連ドキュメント、関連ファイル）を、
+    > 黄金動線、つまり単一のコンポーネントではなく、連携している機能が複合して果たしている
+    > 役割単位で整理して常に認知されている必要がある。
+    > 動線単位で最新の全機能を網羅したものを正として、それが維持される仕組みを作る。
+    > 不要なものは必要な記載だけを統合して、数を減らす。
+    > 全ファイルを精査する - 1ファイル1subtask が必要。
+
+    **目的:**
+    1. Claude が全仕様を「動線単位」で把握できる仕組みを構築
+    2. 単一コンポーネントではなく「連携機能が果たす役割」で整理
+    3. docs/ 内の全ファイルを精査し、動線単位で必要性を判断
+    4. 必要な記載のみ統合し、不要なものは削除
+
+    **背景:**
+    - これまで何度も全仕様把握の仕組み作りに挑戦して失敗
+    - 残存ファイルが散逸し、根拠不明の数値目標が設定されていた
+    - playbook 作成時にユーザープロンプト原文が記録されていなかった
+  status: in_progress
+  depends_on: [M107]
+  playbooks:
+    - playbook-m122-session-flow-doc-integration.md
+  done_when:
+    - "[ ] docs/ 内の全ファイルが動線単位で精査されている（1ファイル1subtask で検証）"
+    - "[ ] 動線単位で必要なファイルのみ残存し、不要な記載は統合済み"
+    - "[ ] docs/essential-documents.md が動線単位で全機能を網羅している"
+    - "[ ] essential-documents.md が自動更新される仕組みが構築されている"
+    - "[ ] playbook に user_prompt_original フィールドが標準化されている"
+  test_commands:
+    - "test -f docs/essential-documents.md && grep -q '動線' docs/essential-documents.md && echo PASS || echo FAIL"
+    - "grep -q 'user_prompt_original' plan/template/playbook-format.md && echo PASS || echo FAIL"
+
 ```
 
 ---

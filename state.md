@@ -19,8 +19,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/playbook-m122-full-review.md
+branch: feat/m122-session-flow-doc-integration
 last_archived: plan/archive/playbook-m121-role-definition.md
 ```
 
@@ -54,8 +54,8 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: false     # LLM の自己申告（critic PASS で true）
-user_verified: false     # ユーザーの確認（明示的 OK で true）
+self_complete: true      # Codex PASS で true（2025-12-21）
+user_verified: true      # ユーザー確認済み（2025-12-21）
 ```
 
 > **報酬詐欺防止**: self_complete と user_verified の両方が true になるまで done にしない。
@@ -89,7 +89,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 01:48:36
+last_start: 2025-12-21 04:49:32
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: false
 ```
@@ -146,7 +146,26 @@ last_checked: 2025-12-20
 ## FREEZE_QUEUE
 
 ```yaml
-queue: []
+queue:
+  # DISCARD判定（M122精査）
+  - { path: "docs/current-definitions.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - 一時的な整理用、役割終了" }
+  - { path: "docs/deprecated-references.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - 一時的な整理用、役割終了" }
+  - { path: "docs/document-catalog.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - essential-documents.md で代替" }
+  - { path: "docs/flow-test-report.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - M107完了報告、役割終了" }
+  - { path: "docs/golden-path-verification-report.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - M105完了報告、役割終了" }
+  - { path: "docs/m106-critic-guard-patch.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - M106パッチ、適用済み" }
+  - { path: "docs/scenario-test-report.md", freeze_date: "2025-12-21", reason: "M122 DISCARD - M110完了報告、役割終了" }
+  # MERGE済判定（M122精査）
+  - { path: "docs/admin-contract.md", freeze_date: "2025-12-21", reason: "M122 MERGE済 → core-contract.md" }
+  - { path: "docs/archive-operation-rules.md", freeze_date: "2025-12-21", reason: "M122 MERGE済 → folder-management.md" }
+  - { path: "docs/artifact-management-rules.md", freeze_date: "2025-12-21", reason: "M122 MERGE済 → folder-management.md" }
+  - { path: "docs/completion-criteria.md", freeze_date: "2025-12-21", reason: "M122 MERGE済 → verification-criteria.md" }
+  - { path: "docs/orchestration-contract.md", freeze_date: "2025-12-21", reason: "M122 MERGE済 → ai-orchestration.md" }
+  - { path: "docs/toolstack-patterns.md", freeze_date: "2025-12-21", reason: "M122 MERGE済 → ai-orchestration.md" }
+  # MERGE判定（未統合、統合後にキュー入り）
+  - { path: "docs/ARCHITECTURE.md", freeze_date: "2025-12-21", reason: "M122 MERGE → layer-architecture-design.md" }
+  - { path: "docs/flow-document-map.md", freeze_date: "2025-12-21", reason: "M122 MERGE → essential-documents.md" }
+  - { path: "docs/hook-registry.md", freeze_date: "2025-12-21", reason: "M122 MERGE → repository-map.yaml" }
 freeze_period_days: 7
 ```
 
@@ -160,6 +179,7 @@ freeze_period_days: 7
 
 ```yaml
 log: []
+# 注: 2025-12-21 に誤って削除された15ファイルは git checkout で復元済み
 ```
 
 > **削除履歴ログ**: 削除されたファイルの記録。

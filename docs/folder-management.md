@@ -69,9 +69,7 @@
 | `repository-map.yaml` | 永続 | 全ファイルマッピング（★自動生成） |
 | `extension-system.md` | 永続 | Claude Code 公式リファレンス |
 | `criterion-validation-rules.md` | 永続 | done_criteria 検証ルール |
-| `folder-management.md` | 永続 | フォルダ管理ルール（このファイル） |
-| `archive-operation-rules.md` | 永続 | アーカイブ操作ルール |
-| `artifact-management-rules.md` | 永続 | 成果物管理ルール |
+| `folder-management.md` | 永続 | フォルダ管理 + アーカイブ + 成果物ルール（このファイル、M122 で統合） |
 | `git-operations.md` | 永続 | git 操作ガイド |
 
 #### 全ファイル自動マッピング
@@ -282,11 +280,191 @@ du -sh .archive/
 
 ---
 
+## アーカイブ操作ルール（M122 統合）
+
+> **旧: docs/archive-operation-rules.md の内容を統合**
+
+### アーカイブ判定基準
+
+#### アーカイブ条件（全て満たす必要あり）
+
+| 条件 | 確認方法 |
+|------|---------|
+| 全 Phase の status が done | playbook 内の `status:` を確認 |
+| state.md playbook.active に含まれていない | state.md を確認 |
+| 現在進行中でない | Claude の作業状態を確認 |
+
+#### アーカイブ禁止条件
+
+以下の場合はアーカイブしない:
+
+- Phase の一部が pending または in_progress
+- state.md の playbook.active に登録されている
+- setup/playbook-setup.md（テンプレートとして常に保持）
+
+### 自動検出フロー
+
+```
+1. playbook を Edit → archive-playbook.sh 発火
+2. 全 Phase done を検出
+3. state.md playbook.active をチェック
+   └─ 含まれている → スキップ
+   └─ 含まれていない → 「アーカイブ推奨」を出力
+4. Claude が POST_LOOP に入る
+5. POST_LOOP でアーカイブ実行
+```
+
+### アーカイブ実行手順
+
+#### 自動実行（POST_LOOP）
+
+Claude が POST_LOOP で以下を実行:
+
+```bash
+# 1. アーカイブディレクトリ作成（なければ）
+mkdir -p plan/archive
+
+# 2. playbook を移動
+mv plan/playbook-{name}.md plan/archive/
+
+# 3. state.md 更新
+# playbook.active を null に
+```
+
+#### 手動実行
+
+archive-playbook.sh の提案を見逃した場合:
+
+```bash
+# 1. 完了した playbook を確認
+ls plan/playbook-*.md
+
+# 2. 全 Phase が done か確認
+grep "status:" plan/playbook-{name}.md
+
+# 3. 手動でアーカイブ
+mkdir -p plan/archive
+mv plan/playbook-{name}.md plan/archive/
+
+# 4. state.md を更新
+# playbook.active: null
+
+# 5. git 記録
+git add -A && git commit -m "chore: archive playbook-{name}"
+```
+
+### ロールバック手順
+
+#### アーカイブの取り消し
+
+```bash
+# 1. アーカイブから復元
+mv plan/archive/playbook-{name}.md plan/
+
+# 2. state.md を更新
+# playbook.active: plan/playbook-{name}.md
+
+# 3. git 記録
+git add -A && git commit -m "chore: restore playbook-{name} from archive"
+```
+
+---
+
+## 成果物管理ルール（M122 統合）
+
+> **旧: docs/artifact-management-rules.md の内容を統合**
+
+### ファイル生成時の判定基準
+
+#### 「このファイルは future に参照されるか？」
+
+```yaml
+ファイル作成前に自問:
+  1. このファイルは state.md/CLAUDE.md/project.md から参照されるか？
+  2. このファイルは他のファイルに統合されるか？
+  3. このファイルは playbook 完了後も保持する価値があるか？
+
+判定結果:
+  - 参照される → 最終成果物として作成
+  - 統合される → 中間成果物として作成（クリーンアップ必須）
+  - どちらでもない → 作成しない
+```
+
+#### ファイル種別と処理
+
+| 種別 | 説明 | 処理 |
+|------|------|------|
+| 最終成果物 | タスク完了後も保持 | 保持 |
+| 中間成果物 | 統合後に不要 | 統合後削除 |
+| テンプレート | 再利用される | 保持 |
+| 一時ファイル | 作業中のみ使用 | 即時削除 |
+
+### 削除 vs アーカイブの判定フロー
+
+```
+ファイル処理の判定:
+                    ┌─────────────────┐
+                    │ ファイル不要    │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │ 将来の参照可能性 │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │ あり          │ なし         │
+              ▼              ▼              │
+    ┌─────────────────┐  ┌─────────────────┐
+    │ アーカイブ       │  │ 削除           │
+    │ → .archive/     │  │ → rm           │
+    └─────────────────┘  └─────────────────┘
+```
+
+### Phase ファイル生成の禁止ルール
+
+#### 禁止パターン
+
+```yaml
+禁止:
+  - Phase ごとに phase-{n}-{name}.md を作成して最後に統合
+  - 中間ファイルを作成してクリーンアップしない
+
+理由:
+  - 統合後のクリーンアップが忘れられやすい
+```
+
+#### 推奨パターン
+
+```yaml
+推奨:
+  - 既存ファイルに直接追記（docs/*.md に追記）
+  - 中間成果物が必要な場合:
+    - ファイル名に「draft-」または「temp-」プレフィックス
+    - 最終 Phase の done_criteria に「中間成果物が削除されている」を含める
+```
+
+### 成果物チェックリスト
+
+#### playbook 作成時
+
+- [ ] Phase で作成するファイルをリストアップしたか？
+- [ ] 中間成果物があれば最終 Phase にクリーンアップを含めたか？
+- [ ] done_criteria に「中間成果物が削除されている」を含めたか？
+
+#### playbook 完了時
+
+- [ ] 全 Phase が done か？
+- [ ] archive-playbook.sh の提案が出力されたか？
+- [ ] POST_LOOP でアーカイブを実行したか？
+- [ ] state.md playbook.active を null に更新したか？
+
+---
+
 ## 連携ドキュメント
 
 - `CLAUDE.md` - LLM の振る舞いルール
-- `docs/archive-operation-rules.md` - アーカイブ操作ルール
 - `.claude/hooks/cleanup-hook.sh` - クリーンアップ Hook
+- `.claude/hooks/archive-playbook.sh` - アーカイブ検出 Hook
 - `plan/template/playbook-format.md` - playbook テンプレート
 
 ---
@@ -295,5 +473,6 @@ du -sh .archive/
 
 | 日時 | 内容 |
 |------|------|
+| 2025-12-21 | M122: archive-operation-rules.md と artifact-management-rules.md を統合 |
 | 2025-12-13 | docs/manifest.yaml 管理ルールを追加。docs/ ファイル管理セクション拡充。 |
 | 2025-12-13 | 初版作成。M014 対応。 |

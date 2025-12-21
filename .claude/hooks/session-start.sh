@@ -62,11 +62,10 @@ WS="$(pwd)"
 
 # === 初期化ペンディングフラグの設定 ===
 # init-guard.sh が必須ファイル Read 完了まで他ツールをブロックするために使用
-# consent-guard.sh が [理解確認] 完了まで Edit/Write をブロックするために使用
 INIT_DIR=".claude/.session-init"
 mkdir -p "$INIT_DIR"
 # user-intent.md は保持（compact 後の復元に必要）、セッション管理ファイルのみリセット
-rm -f "$INIT_DIR/pending" "$INIT_DIR/consent" "$INIT_DIR/required_playbook" 2>/dev/null || true
+rm -f "$INIT_DIR/pending" "$INIT_DIR/required_playbook" 2>/dev/null || true
 touch "$INIT_DIR/pending"
 
 # === state.md から情報抽出 ===
@@ -83,12 +82,6 @@ PLAYBOOK=$(awk '/## playbook/,/^---/' state.md | grep "^active:" | head -1 | sed
 
 # init-guard.sh 用に playbook パスを記録
 echo "$PLAYBOOK" > "$INIT_DIR/required_playbook"
-
-# consent ファイルは playbook が存在しない場合のみ作成
-# playbook 存在 = 計画済み = 合意済み → consent 不要
-if [ "$PLAYBOOK" = "null" ] || [ ! -f "$PLAYBOOK" ]; then
-    touch "$INIT_DIR/consent"  # [理解確認] 完了で削除
-fi
 
 # roadmap 取得（workspace 用）
 ROADMAP=$(grep -A10 "## plan_hierarchy" state.md 2>/dev/null | grep "roadmap:" | sed 's/.*: *//' | sed 's/ *#.*//')
@@ -321,6 +314,35 @@ $SEP
 EOF
 fi
 
+# === Next milestone 候補の表示（project.md から抽出）===
+PROJECT_FILE="plan/project.md"
+if [ -f "$PROJECT_FILE" ]; then
+    # status: not_started または in_progress のマイルストーンを抽出
+    PENDING_MS=$(awk '
+        /^- id: M[0-9]+/ { id=$3; name=""; status="" }
+        /^  name:/ { gsub(/^  name: *"?|"?$/, ""); name=$0 }
+        /^  status: (not_started|in_progress)/ {
+            status=$2
+            if (id != "" && name != "") {
+                print "  - " id ": " name " [" status "]"
+            }
+        }
+    ' "$PROJECT_FILE" 2>/dev/null | head -5)
+
+    if [ -n "$PENDING_MS" ]; then
+        cat <<EOF
+$SEP
+  📋 Next milestone 候補（project.md）
+$SEP
+$PENDING_MS
+
+  → pm を呼び出して playbook を作成してください
+  → 詳細は plan/project.md を Read
+
+EOF
+    fi
+fi
+
 # === 機能サマリー（repository-map.yaml）===
 REPO_MAP="docs/repository-map.yaml"
 if [ -f "$REPO_MAP" ]; then
@@ -351,6 +373,22 @@ EOF
         echo "  → bash .claude/hooks/generate-repository-map.sh で更新"
     fi
     echo ""
+fi
+
+# === Essential Docs（必須ドキュメント数）===
+ESSENTIAL_DOCS="docs/essential-documents.md"
+if [ -f "$ESSENTIAL_DOCS" ]; then
+    # total_essential_documents: から数値を抽出
+    ESSENTIAL_COUNT=$(grep "total_essential_documents:" "$ESSENTIAL_DOCS" 2>/dev/null | sed 's/.*: *//' | tr -d ' ')
+    [ -z "$ESSENTIAL_COUNT" ] && ESSENTIAL_COUNT="?"
+
+    cat <<EOF
+$SEP
+  📚 Essential docs: $ESSENTIAL_COUNT files
+$SEP
+  参照: docs/essential-documents.md（動線単位で整理）
+
+EOF
 fi
 
 # === CORE（動線単位の認識 - 最重要）===
