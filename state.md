@@ -19,7 +19,7 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m123-similar-function-consolidation.md
+active: plan/playbook-m123-minor-fixes.md
 branch: feat/m123-similar-function-consolidation
 last_archived: plan/archive/playbook-m122-auto-update-essential-docs.md
 ```
@@ -30,13 +30,12 @@ last_archived: plan/archive/playbook-m122-auto-update-essential-docs.md
 
 ```yaml
 milestone: M123
-phase: p3
+phase: p1
 done_when:
-  - session-start.sh が essential-documents.md の layer_summary を出力する
-  - repository-map.yaml が FREEZE_QUEUE に追加されている
-  - state.md から COMPONENT_REGISTRY セクションが削除されている
-  - 動線テスト（セッション開始時に Claude が動線情報を認識）が PASS
-next: p3
+  - session-start.sh が essential-documents.md 不存在時でもエラーにならない
+  - session-start.sh が layer_summary 空文字列時に適切な表示をする
+  - FREEZE_QUEUE エントリが形式統一されている（M123 MERGE）
+next: p2
 ```
 
 ---
@@ -93,7 +92,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 12:33:48
+last_start: 2025-12-21 12:48:18
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: false
 ```
@@ -155,8 +154,8 @@ queue:
   - { path: "docs/ARCHITECTURE.md", freeze_date: "2025-12-21", reason: "M122 MERGE → layer-architecture-design.md" }
   - { path: "docs/flow-document-map.md", freeze_date: "2025-12-21", reason: "M122 MERGE → essential-documents.md" }
   - { path: "docs/hook-registry.md", freeze_date: "2025-12-21", reason: "M122 MERGE → repository-map.yaml" }
-  # M123 統合（機能把握の単一化）
-  - { path: "docs/repository-map.yaml", freeze_date: "2025-12-21", reason: "M123 統合 → essential-documents.md + core-manifest.yaml で代替" }
+  # M123 MERGE（機能把握の単一化）
+  - { path: "docs/repository-map.yaml", freeze_date: "2025-12-21", reason: "M123 MERGE → essential-documents.md + core-manifest.yaml で代替" }
 freeze_period_days: 7
 ```
 

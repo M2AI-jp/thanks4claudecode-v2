@@ -363,7 +363,9 @@ if [ -f "$ESSENTIAL_DOCS" ]; then
     EXTENSION_LAYER=$(grep "Extension Layer:" "$ESSENTIAL_DOCS" 2>/dev/null | sed 's/.*: *//')
     TOTAL=$(grep "Total:" "$ESSENTIAL_DOCS" 2>/dev/null | head -1 | sed 's/.*: *//')
 
-    cat <<EOF
+    # 空文字列チェック: layer_summary が正しく取得できた場合のみ表示
+    if [ -n "$CORE_LAYER" ] && [ -n "$QUALITY_LAYER" ] && [ -n "$EXTENSION_LAYER" ] && [ -n "$TOTAL" ]; then
+        cat <<EOF
 $SEP
   🔄 動線サマリー（Layer Architecture）
 $SEP
@@ -375,6 +377,7 @@ $SEP
   参照: docs/essential-documents.md（動線単位で整理）
 
 EOF
+    fi
 fi
 
 # === CORE（動線単位の認識 - 最重要）===
