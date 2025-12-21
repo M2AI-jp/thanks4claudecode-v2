@@ -55,10 +55,10 @@ user_prompt_original: |
 ## goal
 
 ```yaml
-summary: pm が playbook 作成後に reviewer を自動起動し、Codex/ClaudeCode で自動レビューする仕組みを構築
+summary: pm が playbook 作成後に reviewer を自動起動し、worker に応じて Codex/ClaudeCode で自動レビューする仕組みを構築
 done_when:
-  - reviewer SubAgent が config.roles.reviewer を読んで分岐できる
-  - codex の場合、codex exec --full-auto を Bash で実行できる
+  - reviewer SubAgent が playbook.meta.roles.worker を読んで分岐できる（worker=codex → Claude レビュー、worker=claudecode → Codex レビュー）
+  - codex レビューの場合、codex exec --full-auto を Bash で実行できる
   - RESULT: PASS/FAIL をパースして reviewed: true/false を更新できる
   - FAIL 時に修正提案を返却できる
 ```
@@ -67,27 +67,27 @@ done_when:
 
 ## phases
 
-### p1: reviewer SubAgent の config.roles.reviewer 分岐機能追加
+### p1: reviewer SubAgent の roles.worker 分岐機能追加
 
-**goal**: reviewer.md を修正し、state.md の config.roles.reviewer を読んで処理を分岐する
+**goal**: reviewer.md を修正し、playbook.meta.roles.worker を読んで処理を分岐する（worker=codex → Claude レビュー、worker=claudecode → Codex レビュー）
 
 #### subtasks
 
-- [ ] **p1.1**: .claude/agents/reviewer.md に config.roles.reviewer 参照セクションが存在する
+- [ ] **p1.1**: .claude/agents/reviewer.md に playbook.meta.roles.worker 参照セクションが存在する
   - executor: claudecode
-  - test_command: `grep -q 'config.roles.reviewer' .claude/agents/reviewer.md && echo PASS || echo FAIL`
+  - test_command: `grep -q 'roles.worker' .claude/agents/reviewer.md && echo PASS || echo FAIL`
   - validations:
     - technical: "grep で該当セクションが存在することを確認"
-    - consistency: "state.md の config.roles 構造と整合"
-    - completeness: "claudecode/codex 両方のパスが記述されている"
+    - consistency: "playbook の meta.roles 構造と整合"
+    - completeness: "worker=codex と worker=claudecode 両方のパスが記述されている"
 
-- [ ] **p1.2**: reviewer.md に claudecode パス（従来の行動）と codex パス（新規）が明記されている
+- [ ] **p1.2**: reviewer.md に「worker=codex → Claude レビュー」「worker=claudecode → Codex レビュー」のロジックが明記されている
   - executor: claudecode
-  - test_command: `grep -q 'claudecode' .claude/agents/reviewer.md && grep -q 'codex.*exec' .claude/agents/reviewer.md && echo PASS || echo FAIL`
+  - test_command: `grep -q 'worker.*codex.*Claude\|codex.*worker.*Claude' .claude/agents/reviewer.md && grep -q 'worker.*claudecode.*Codex\|claudecode.*worker.*Codex' .claude/agents/reviewer.md && echo PASS || echo FAIL`
   - validations:
-    - technical: "両方のパスが存在することを grep で確認"
-    - consistency: "docs/ai-orchestration.md の役割定義と整合"
-    - completeness: "各パスの具体的な実行手順が記述されている"
+    - technical: "分岐ロジックが存在することを grep で確認"
+    - consistency: "作業者と異なる AI がレビューする原則"
+    - completeness: "両方の分岐パスが具体的な手順付きで記述されている"
 
 **status**: pending
 **max_iterations**: 5
@@ -218,13 +218,13 @@ done_when:
 
 #### subtasks
 
-- [ ] **p_final.1**: reviewer SubAgent が config.roles.reviewer を読んで分岐できる
+- [ ] **p_final.1**: reviewer SubAgent が playbook.meta.roles.worker を読んで分岐できる（worker=codex → Claude、worker=claudecode → Codex）
   - executor: claudecode
-  - test_command: `grep -q 'config.roles.reviewer' .claude/agents/reviewer.md && grep -qE 'claudecode|codex' .claude/agents/reviewer.md && echo PASS || echo FAIL`
+  - test_command: `grep -q 'roles.worker' .claude/agents/reviewer.md && grep -q 'worker.*codex.*Claude\|codex.*worker' .claude/agents/reviewer.md && echo PASS || echo FAIL`
   - validations:
-    - technical: "config.roles.reviewer 参照が実装されている"
-    - consistency: "state.md の config.roles 構造と整合"
-    - completeness: "claudecode/codex 両方の分岐がある"
+    - technical: "roles.worker 参照と分岐ロジックが実装されている"
+    - consistency: "playbook.meta.roles 構造と整合"
+    - completeness: "worker=codex と worker=claudecode 両方の分岐がある"
 
 - [ ] **p_final.2**: codex の場合、codex exec --full-auto を Bash で実行できる
   - executor: claudecode

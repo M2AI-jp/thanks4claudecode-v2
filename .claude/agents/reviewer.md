@@ -142,20 +142,28 @@ skills: lint-checker, deploy-checker
 /review plan/playbook-*.md
 ```
 
-## Codex 連携（動的 Reviewer 選択）
+## Playbook レビュー（動的 Reviewer 選択）
+
+> **原則**: 作業者と異なる AI がレビューする（分離原則）
 
 ### 実行フロー
 
 ```yaml
-1_state_check:
-  action: Read state.md → config.roles.reviewer を確認
-  file: state.md
-  path: config.roles.reviewer
+1_playbook_check:
+  action: Read 現在の playbook → meta.roles.worker を確認
+  file: state.md の playbook.active を取得 → そのファイルを Read
+  path: meta.roles.worker
 
 2_branch:
-  claudecode: 自身がレビュー実行（従来の行動）
-  codex: codex exec --full-auto を Bash で実行
-  coderabbit: 外部 API 呼び出し（未実装）
+  # worker=codex（コーディングタスク）→ Claude がレビュー
+  worker_is_codex:
+    reason: "Codex がコーディング中 → 異なる AI（Claude）がレビュー"
+    action: 自身（Claude）がレビュー実行（従来の行動）
+
+  # worker=claudecode（非コーディング/設計タスク）→ Codex がレビュー
+  worker_is_claudecode:
+    reason: "Claude が設計/ドキュメント中 → 異なる AI（Codex）がレビュー"
+    action: codex exec --full-auto を Bash で実行
 
 3_parse_result:
   pattern: grep -E "^RESULT:" output | tail -1
@@ -169,7 +177,21 @@ skills: lint-checker, deploy-checker
   FAIL: reviewed: false のまま
 ```
 
-### Codex 実行手順（config.roles.reviewer = codex の場合）
+### 分岐ロジック詳細
+
+```yaml
+if playbook.meta.roles.worker == codex:
+  # コーディングタスク → Claude（自分）がレビュー
+  reviewer: claudecode
+  method: 従来のレビュー手順を実行
+
+else if playbook.meta.roles.worker == claudecode:
+  # 非コーディングタスク → Codex がレビュー
+  reviewer: codex
+  method: codex exec --full-auto を Bash 実行
+```
+
+### Codex 実行手順（worker=claudecode の場合 → Codex レビュー）
 
 ```bash
 # 1. playbook パスを取得
@@ -239,7 +261,7 @@ escalation_message: |
   issues を確認してください。
 ```
 
-### 従来の行動（config.roles.reviewer = claudecode の場合）
+### Claude レビュー手順（worker=codex の場合 → Claude がレビュー）
 
 1. playbook-review-criteria.md を Read
 2. 対象 playbook を Read
@@ -254,5 +276,6 @@ escalation_message: |
 
 - `.claude/frameworks/playbook-review-criteria.md` - playbook レビュー基準（必須参照）
 - AGENTS.md - コーディング規約
-- state.md - 現在のコンテキスト（config.roles.reviewer を参照）
+- state.md - 現在のコンテキスト（playbook.active を参照）
+- playbook - meta.roles.worker で reviewer 分岐を決定
 - pm.md - 役割定義

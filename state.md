@@ -32,8 +32,8 @@ last_archived: plan/archive/playbook-m126-flow-context-completeness.md
 milestone: M127
 phase: p1
 done_when:
-  - "reviewer SubAgent が config.roles.reviewer を読んで分岐できる"
-  - "codex の場合、codex exec --full-auto を Bash で実行できる"
+  - "reviewer SubAgent が playbook.meta.roles.worker を読んで分岐できる（worker=codex → Claude、worker=claudecode → Codex）"
+  - "codex レビューの場合、codex exec --full-auto を Bash で実行できる"
   - "RESULT: PASS/FAIL をパースして reviewed: true/false を更新できる"
   - "FAIL 時に修正提案を返却できる"
 next: p1 を実行
