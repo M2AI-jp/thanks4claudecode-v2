@@ -110,6 +110,22 @@ test_planning_flow() {
     else
         log_fail "P5: pm subagent not documented"
     fi
+
+    # P6: session-start.sh が存在（セッション開始時のリマインダー）
+    log_test "P6: session-start.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/session-start.sh" ]]; then
+        log_pass "P6: session-start.sh exists"
+    else
+        log_fail "P6: session-start.sh not found"
+    fi
+
+    # P7: prompt-guard.sh が存在（ユーザー入力処理）
+    log_test "P7: prompt-guard.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/prompt-guard.sh" ]]; then
+        log_pass "P7: prompt-guard.sh exists"
+    else
+        log_fail "P7: prompt-guard.sh not found"
+    fi
 }
 
 # ==============================================================================
@@ -172,6 +188,38 @@ test_execution_flow() {
         log_pass "E5: Guard scripts are valid"
     else
         log_fail "E5: Guard script syntax error"
+    fi
+
+    # E6: init-guard.sh が存在（必須ファイル Read 確認）
+    log_test "E6: init-guard.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/init-guard.sh" ]]; then
+        log_pass "E6: init-guard.sh exists"
+    else
+        log_fail "E6: init-guard.sh not found"
+    fi
+
+    # E7: scope-guard.sh が存在（スコープ逸脱検出）
+    log_test "E7: scope-guard.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/scope-guard.sh" ]]; then
+        log_pass "E7: scope-guard.sh exists"
+    else
+        log_fail "E7: scope-guard.sh not found"
+    fi
+
+    # E8: subtask-guard.sh が存在（subtask 検証）
+    log_test "E8: subtask-guard.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/subtask-guard.sh" ]]; then
+        log_pass "E8: subtask-guard.sh exists"
+    else
+        log_fail "E8: subtask-guard.sh not found"
+    fi
+
+    # E9: depends-check.sh が存在（依存関係検証）
+    log_test "E9: depends-check.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/depends-check.sh" ]]; then
+        log_pass "E9: depends-check.sh exists"
+    else
+        log_fail "E9: depends-check.sh not found"
     fi
 }
 
@@ -354,6 +402,22 @@ test_flow_integration() {
         fi
     else
         log_fail "I5: essential-documents.md not found"
+    fi
+
+    # I6: check-coherence.sh が存在（動線連携の整合性チェック）
+    log_test "I6: check-coherence.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/check-coherence.sh" ]]; then
+        log_pass "I6: check-coherence.sh exists"
+    else
+        log_fail "I6: check-coherence.sh not found"
+    fi
+
+    # I7: lint-check.sh が存在（コード品質チェック）
+    log_test "I7: lint-check.sh exists"
+    if [[ -f "${REPO_ROOT}/.claude/hooks/lint-check.sh" ]]; then
+        log_pass "I7: lint-check.sh exists"
+    else
+        log_fail "I7: lint-check.sh not found"
     fi
 }
 

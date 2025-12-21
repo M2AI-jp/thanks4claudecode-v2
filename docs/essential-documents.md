@@ -2,7 +2,7 @@
 
 > **動線単位でドキュメントを整理した Single Source of Truth**
 >
-> このファイルは governance/core-manifest.yaml に基づいて手動で管理されます
+> このファイルは `scripts/generate-essential-docs.sh` により自動生成されます
 
 ---
 
@@ -83,6 +83,7 @@ layer_summary:
 | `check-protected-edit.sh` | Hook | HARD_BLOCK ファイル保護 |
 | `pre-bash-check.sh` | Hook | 危険コマンドブロック |
 | `check-main-branch.sh` | Hook | main ブランチ保護 |
+| `lint-check.sh` | Hook | コミット前 Lint 実行 |
 | `lint-checker` | Skill | 静的解析 |
 | `test-runner` | Skill | テスト実行 |
 | `archive-playbook.sh` | Hook | playbook アーカイブ |
@@ -129,6 +130,7 @@ done_criteria 検証で参照するドキュメント。
 | `check-protected-edit.sh` | Hook | HARD_BLOCK ファイル保護 |
 | `pre-bash-check.sh` | Hook | 危険コマンドブロック |
 | `check-main-branch.sh` | Hook | main ブランチ保護 |
+| `lint-check.sh` | Hook | コミット前 Lint 実行 |
 | `lint-checker` | Skill | 静的解析 |
 | `test-runner` | Skill | テスト実行 |
 | `archive-playbook.sh` | Hook | playbook アーカイブ |
@@ -267,4 +269,4 @@ queue:
 
 | 日時 | 内容 |
 |------|------|
-| 2025-12-21 | M140: 手動管理に変更（consent-guard.sh, create-pr-hook.sh 削除） |
+| 2025-12-21 | 自動生成（generate-essential-docs.sh） |

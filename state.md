@@ -30,12 +30,12 @@ last_archived: plan/archive/playbook-m141-spec-sync.md
 
 ```yaml
 milestone: M142
-phase: p1
+phase: p_final
 done_when:
-  - "hook-runtime-test.sh が全登録 Hook をカバーしている"
-  - "各 Hook の期待動作がコメントで明文化されている"
-  - "hook-runtime-test.sh が全テスト PASS"
-next: p1 完了後 p2 へ
+  - "flow-runtime-test.sh が 4 動線で関連 Hook をテストしている"
+  - "e2e-contract-test.sh が契約シナリオで Guard 動作を検証している"
+  - "全動線テストが PASS（flow: 25+、e2e: 77+）"
+next: p_final 完了後 M143 へ
 ```
 
 ---
@@ -92,7 +92,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 18:08:39
+last_start: 2025-12-21 18:24:56
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: true
 ```
