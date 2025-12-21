@@ -1566,24 +1566,120 @@ success_criteria:
     1. critic-guard.sh: self_complete がセッション跨ぎで残る
     2. prompt-guard.sh: exit 0 で「推奨」止まり、強制ではない
     3. RUNBOOK.md: 「判断すべき瞬間」が曖昧
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-21
   depends_on: [M148]
   playbooks:
     - playbook-m149a-critic-guard-fix.md
     - playbook-m149b-prompt-guard-block.md
     - playbook-m149c-self-aware-guidelines.md
   done_when:
-    - "[ ] critic-guard.sh が self_complete にフェーズ情報を検証する"
-    - "[ ] session-start.sh で self_complete がリセットされる"
-    - "[ ] prompt-guard.sh が playbook=null + タスク検出時に exit 2 でブロックする"
-    - "[ ] タスク検出パターンが強化されている"
-    - "[ ] RUNBOOK.md に Self-Aware Operation セクションが追加されている"
-    - "[ ] 全テスト（flow-runtime-test）が PASS する"
+    - "[x] critic-guard.sh が self_complete にフェーズ情報を検証する"
+    - "[x] session-start.sh で self_complete がリセットされる"
+    - "[x] prompt-guard.sh が playbook=null + タスク検出時に exit 2 でブロックする"
+    - "[x] タスク検出パターンが強化されている"
+    - "[x] RUNBOOK.md に Self-Aware Operation セクションが追加されている"
+    - "[x] 全テスト（flow-runtime-test）が PASS する"
   test_commands:
     - "grep -q 'phase\\|PHASE_ID' .claude/hooks/critic-guard.sh && echo PASS || echo FAIL"
     - "grep -A20 'WORK_PATTERNS' .claude/hooks/prompt-guard.sh | grep -q 'exit 2' && echo PASS || echo FAIL"
     - "grep -q 'Self-Aware' RUNBOOK.md && echo PASS || echo FAIL"
     - "bash scripts/flow-runtime-test.sh 2>&1 | grep -q 'ALL.*PASS' && echo PASS || echo FAIL"
+
+# ============================================================
+# M150-M155: Deep Audit + Final Freeze（完成ロードマップ）
+# ============================================================
+# 背景: 凍結対象の全ファイルを動線単位で1つずつ精査し、
+#       1行の無駄もない状態でリファクタリングして凍結する。
+# 目的: リポジトリの完成
+# ============================================================
+
+- id: M150
+  name: "Deep Audit - 計画動線"
+  description: |
+    計画動線の全7ファイルを1つずつ精査し、動作確認、必要性議論、Codex レビューを実施。
+    対象: prompt-guard.sh, task-start.md, pm.md, state/SKILL.md, plan-management/SKILL.md, playbook-init.md, reviewer.md
+  status: pending
+  depends_on: [M149]
+  playbooks:
+    - playbook-m150-deep-audit-planning-flow.md
+  done_when:
+    - "[ ] 全7ファイルが Read され、動作が理解されている"
+    - "[ ] 各ファイルに対して Codex レビューが完了している"
+    - "[ ] 各ファイルの処遇（Keep/Simplify/Delete）が決定している"
+    - "[ ] 精査結果が docs/deep-audit-planning-flow.md に記録されている"
+
+- id: M151
+  name: "Deep Audit - 検証動線"
+  description: |
+    検証動線の全5ファイルを1つずつ精査。
+    対象: crit.md, critic.md, critic-guard.sh, test.md, lint.md
+  status: pending
+  depends_on: [M150]
+  playbooks:
+    - playbook-m151-deep-audit-verification-flow.md
+  done_when:
+    - "[ ] 全5ファイルの精査が完了"
+    - "[ ] Codex レビューが完了"
+    - "[ ] 精査結果が docs/deep-audit-verification-flow.md に記録されている"
+
+- id: M152
+  name: "Deep Audit - 実行動線"
+  description: |
+    実行動線の全10ファイルを1つずつ精査。
+    対象: init-guard.sh, playbook-guard.sh, subtask-guard.sh, scope-guard.sh,
+          check-protected-edit.sh, pre-bash-check.sh, check-main-branch.sh,
+          lint-check.sh, lint-checker/SKILL.md, test-runner/SKILL.md
+  status: pending
+  depends_on: [M151]
+  playbooks:
+    - playbook-m152-deep-audit-execution-flow.md
+  done_when:
+    - "[ ] 全10ファイルの精査が完了"
+    - "[ ] Codex レビューが完了"
+    - "[ ] 精査結果が docs/deep-audit-execution-flow.md に記録されている"
+
+- id: M153
+  name: "Deep Audit - 完了動線 + 共通基盤 + 横断的"
+  description: |
+    完了動線7 + 共通基盤6 + 横断的3 = 16ファイルを1つずつ精査。
+  status: pending
+  depends_on: [M152]
+  playbooks:
+    - playbook-m153-deep-audit-completion-common.md
+  done_when:
+    - "[ ] 全16ファイルの精査が完了"
+    - "[ ] Codex レビューが完了"
+    - "[ ] 精査結果が docs/deep-audit-completion-common.md に記録されている"
+
+- id: M154
+  name: "Refactoring + Spec Sync"
+  description: |
+    M150-M153 の Deep Audit 結論に基づき、不要コードを削除し、仕様と実態を完全同期。
+  status: pending
+  depends_on: [M153]
+  playbooks:
+    - playbook-m154-refactoring-spec-sync.md
+  done_when:
+    - "[ ] Delete 判定されたファイルが全て削除されている"
+    - "[ ] Simplify 判定されたファイルが全て簡素化されている"
+    - "[ ] verify-manifest.sh が PASS（仕様=実態）"
+    - "[ ] 全テストが PASS"
+
+- id: M155
+  name: "Final Verification + Freeze"
+  description: |
+    全コア機能が網羅された状態で凍結し、v1.0.0 をリリース。
+  status: pending
+  depends_on: [M154]
+  playbooks:
+    - playbook-m155-final-freeze.md
+  done_when:
+    - "[ ] 全テスト PASS"
+    - "[ ] Core Layer 全ファイルが protected-files.txt に登録"
+    - "[ ] core-manifest.yaml に frozen: true 設定"
+    - "[ ] CLAUDE.md version 2.0.0"
+    - "[ ] git tag v1.0.0"
 
 ```
 
