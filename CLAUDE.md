@@ -2,9 +2,9 @@
 
 ```yaml
 Status: FROZEN
-Version: 1.1.0
+Version: 2.0.0
 Owner: Repo Maintainers
-Last Updated: 2025-12-18
+Last Updated: 2025-12-22
 ```
 
 > **This file is the immutable operating constitution for Claude in this repository.**

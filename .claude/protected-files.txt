@@ -30,6 +30,25 @@ HARD_BLOCK:.claude/hooks/scope-guard.sh
 HARD_BLOCK:.claude/hooks/executor-guard.sh
 HARD_BLOCK:.claude/hooks/playbook-guard.sh
 
+# Core Layer Commands (M155 Final Freeze)
+HARD_BLOCK:.claude/commands/task-start.md
+HARD_BLOCK:.claude/commands/playbook-init.md
+HARD_BLOCK:.claude/commands/crit.md
+HARD_BLOCK:.claude/commands/test.md
+HARD_BLOCK:.claude/commands/lint.md
+
+# Core Layer Subagents (M155 Final Freeze)
+HARD_BLOCK:.claude/agents/pm.md
+HARD_BLOCK:.claude/agents/critic.md
+HARD_BLOCK:.claude/agents/reviewer.md
+
+# Core Layer Skills (M155 Final Freeze)
+HARD_BLOCK:.claude/skills/state/SKILL.md
+HARD_BLOCK:.claude/skills/plan-management/SKILL.md
+
+# Core Layer Hooks (M155 Final Freeze)
+HARD_BLOCK:.claude/hooks/prompt-guard.sh
+
 # === BLOCK: 運用でゆるめ可能（strict: ブロック / trusted: WARN） ===
 BLOCK:plan/template/playbook-format.md
 BLOCK:.claude/settings.json
