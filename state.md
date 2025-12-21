@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m158-completion-flow-push-fix.md
+active: plan/playbook-m159-gh-pr-patterns.md
 branch: feat/m158-completion-flow-push-fix
-last_archived: plan/archive/playbook-m157-post-m156-completion.md
+last_archived: plan/archive/playbook-m158-completion-flow-push-fix.md
 ```
 
 ---
@@ -29,12 +29,13 @@ last_archived: plan/archive/playbook-m157-post-m156-completion.md
 ## goal
 
 ```yaml
-milestone: M157
+milestone: M159
 phase: p0
 done_when:
-  - "project.md の M156 status を achieved に更新"
-  - "state.md が M157 playbook を参照している"
-  - "flow-runtime-test.sh が PASS（25/25）"
+  - "scripts/contract.sh に gh pr create/merge パターンが追加されている"
+  - "変更がコミット・プッシュされている"
+  - "PR が作成・マージされている"
+  - "main ブランチが最新状態"
 next: p1
 ```
 
@@ -57,7 +58,7 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: true       # LLM の自己申告（critic PASS で true）
+self_complete: false      # LLM の自己申告（critic PASS で true）
 user_verified: false     # ユーザーの確認（明示的 OK で true）
 ```
 

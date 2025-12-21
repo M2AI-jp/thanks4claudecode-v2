@@ -307,6 +307,10 @@ ADMIN_MAINTENANCE_PATTERNS=(
     '^git[[:space:]]+push[[:space:]]+-u[[:space:]]+origin[[:space:]]+[^[:space:]]+$'
     # git push origin（デフォルトブランチ）
     '^git[[:space:]]+push[[:space:]]+origin$'
+    # gh pr create（PR 作成）
+    '^gh[[:space:]]+pr[[:space:]]+create'
+    # gh pr merge（PR マージ）
+    '^gh[[:space:]]+pr[[:space:]]+merge'
 )
 
 # Admin Maintenance allowlist に一致するか判定
