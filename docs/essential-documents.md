@@ -10,7 +10,7 @@
 
 ```yaml
 source: governance/core-manifest.yaml
-generated_at: 2025-12-21
+generated_at: 2025-12-22
 organization: 動線単位（計画・実行・検証・完了・共通）
 
 layer_summary:
@@ -77,6 +77,18 @@ layer_summary:
 
 | コンポーネント | 種別 | 役割 |
 |---------------|------|------|
+| `prompt-guard.sh` | Hook | タスク検出、pm 必須警告 |
+| `task-start.md` | Command | 計画動線の起点コマンド |
+| `pm.md` | Subagent | playbook 作成 |
+| `state` | Skill | state.md 管理 |
+| `plan-management` | Skill | playbook 運用ガイド |
+| `playbook-init.md` | Command | playbook 直接作成（旧互換） |
+| `reviewer.md` | Subagent | playbook レビュー |
+| `crit.md` | Command | 検証起点コマンド |
+| `critic.md` | Subagent | done_criteria 検証 |
+| `critic-guard.sh` | Hook | critic PASS 必須 |
+| `test.md` | Command | test_command 実行 |
+| `lint.md` | Command | state/playbook 整合性チェック |
 | `init-guard.sh` | Hook | 必須ファイル Read 強制 |
 | `playbook-guard.sh` | Hook | playbook 存在チェック |
 | `subtask-guard.sh` | Hook | 3観点検証（technical/consistency/completeness） |
@@ -121,6 +133,13 @@ done_criteria 検証で参照するドキュメント。
 
 | コンポーネント | 種別 | 役割 |
 |---------------|------|------|
+| `prompt-guard.sh` | Hook | タスク検出、pm 必須警告 |
+| `task-start.md` | Command | 計画動線の起点コマンド |
+| `pm.md` | Subagent | playbook 作成 |
+| `state` | Skill | state.md 管理 |
+| `plan-management` | Skill | playbook 運用ガイド |
+| `playbook-init.md` | Command | playbook 直接作成（旧互換） |
+| `reviewer.md` | Subagent | playbook レビュー |
 | `crit.md` | Command | 検証起点コマンド |
 | `critic.md` | Subagent | done_criteria 検証 |
 | `critic-guard.sh` | Hook | critic PASS 必須 |
@@ -213,6 +232,35 @@ Phase/playbook 完了時に参照するドキュメント。
 
 | コンポーネント | 種別 | 役割 |
 |---------------|------|------|
+| `prompt-guard.sh` | Hook | タスク検出、pm 必須警告 |
+| `task-start.md` | Command | 計画動線の起点コマンド |
+| `pm.md` | Subagent | playbook 作成 |
+| `state` | Skill | state.md 管理 |
+| `plan-management` | Skill | playbook 運用ガイド |
+| `playbook-init.md` | Command | playbook 直接作成（旧互換） |
+| `reviewer.md` | Subagent | playbook レビュー |
+| `crit.md` | Command | 検証起点コマンド |
+| `critic.md` | Subagent | done_criteria 検証 |
+| `critic-guard.sh` | Hook | critic PASS 必須 |
+| `test.md` | Command | test_command 実行 |
+| `lint.md` | Command | state/playbook 整合性チェック |
+| `init-guard.sh` | Hook | 必須ファイル Read 強制 |
+| `playbook-guard.sh` | Hook | playbook 存在チェック |
+| `subtask-guard.sh` | Hook | 3観点検証（technical/consistency/completeness） |
+| `scope-guard.sh` | Hook | done_criteria 変更検出 |
+| `check-protected-edit.sh` | Hook | HARD_BLOCK ファイル保護 |
+| `pre-bash-check.sh` | Hook | 危険コマンドブロック |
+| `check-main-branch.sh` | Hook | main ブランチ保護 |
+| `lint-check.sh` | Hook | コミット前 Lint 実行 |
+| `lint-checker` | Skill | 静的解析 |
+| `test-runner` | Skill | テスト実行 |
+| `archive-playbook.sh` | Hook | playbook アーカイブ |
+| `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
+| `post-loop.md` | Command | 完了後処理 |
+| `context-management` | Skill | コンテキスト管理 |
+| `rollback.md` | Command | Git ロールバック |
+| `state-rollback.md` | Command | state.md ロールバック |
+| `focus.md` | Command | focus 切り替え |
 | `session-start.sh` | Hook | セッション初期化 |
 | `session-end.sh` | Hook | セッション終了処理 |
 | `pre-compact.sh` | Hook | コンパクト前処理 |
@@ -261,4 +309,4 @@ queue:
 
 | 日時 | 内容 |
 |------|------|
-| 2025-12-21 | 自動生成（generate-essential-docs.sh） |
+| 2025-12-22 | 自動生成（generate-essential-docs.sh） |
