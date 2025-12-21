@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m156-pipeline-completeness-audit.md
-branch: feat/m156-pipeline-completeness-audit
-last_archived: plan/archive/playbook-m155-final-freeze.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m156-pipeline-completeness-audit.md
 ```
 
 ---
@@ -58,7 +58,7 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: true      # LLM の自己申告（critic PASS で true）
+self_complete: false      # LLM の自己申告（critic PASS で true）
 user_verified: false     # ユーザーの確認（明示的 OK で true）
 ```
 
@@ -93,7 +93,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-22 00:56:21
+last_start: 2025-12-22 01:21:41
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: true
 deep_audit_completed: 2025-12-21
