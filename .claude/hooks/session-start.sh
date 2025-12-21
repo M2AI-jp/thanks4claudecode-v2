@@ -56,6 +56,17 @@ if [ -f "state.md" ]; then
     fi
 fi
 
+# === essential-documents.md 自動更新チェック ===
+# core-manifest.yaml が essential-documents.md より新しい場合に再生成
+MANIFEST="governance/core-manifest.yaml"
+ESSENTIAL="docs/essential-documents.md"
+GENERATOR="scripts/generate-essential-docs.sh"
+if [ -f "$MANIFEST" ] && [ -f "$GENERATOR" ]; then
+    if [ ! -f "$ESSENTIAL" ] || [ "$MANIFEST" -nt "$ESSENTIAL" ]; then
+        bash "$GENERATOR" >/dev/null 2>&1 || true
+    fi
+fi
+
 # === 共通変数 ===
 SEP="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 WS="$(pwd)"

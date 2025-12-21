@@ -1,23 +1,23 @@
 # Essential Documents - Claude が把握すべき必須ドキュメント
 
-> **M122: 87ファイル全精査の結果、Claude が参照すべきファイルを動線単位で整理**
+> **動線単位でドキュメントを整理した Single Source of Truth**
 >
-> このファイルがドキュメント参照の Single Source of Truth
+> このファイルは `scripts/generate-essential-docs.sh` により自動生成されます
 
 ---
 
 ## 概要
 
 ```yaml
-total_reviewed: 87  # p1-p5 で精査完了
-total_essential: 70  # KEEP 判定ファイル数
+source: governance/core-manifest.yaml
+generated_at: 2025-12-21
 organization: 動線単位（計画・実行・検証・完了・共通）
-update_policy: M122 以降、新規ドキュメントは既存ファイルへの統合を優先
 
 layer_summary:
   Core Layer: 11 コンポーネント（計画動線6 + 検証動線5）
   Quality Layer: 10 コンポーネント（実行動線）
   Extension Layer: 15 コンポーネント（完了7 + 共通5 + 横断3）
+  Total: 36 コンポーネント
 ```
 
 ---
@@ -42,10 +42,10 @@ layer_summary:
 |---------------|------|------|
 | `prompt-guard.sh` | Hook | タスク検出、pm 必須警告 |
 | `task-start.md` | Command | 計画動線の起点コマンド |
-| `pm.md` | SubAgent | playbook 作成の唯一の正規ルート |
+| `pm.md` | Subagent | playbook 作成 |
 | `state` | Skill | state.md 管理 |
 | `plan-management` | Skill | playbook 運用ガイド |
-| `playbook-init.md` | Command | /task-start へのエイリアス（旧互換） |
+| `playbook-init.md` | Command | playbook 直接作成（旧互換） |
 
 ### 参考テンプレート
 
@@ -77,7 +77,7 @@ layer_summary:
 | コンポーネント | 種別 | 役割 |
 |---------------|------|------|
 | `init-guard.sh` | Hook | 必須ファイル Read 強制 |
-| `playbook-guard.sh` | Hook | playbook=null で Edit/Write ブロック |
+| `playbook-guard.sh` | Hook | playbook 存在チェック |
 | `subtask-guard.sh` | Hook | 3観点検証（technical/consistency/completeness） |
 | `scope-guard.sh` | Hook | done_criteria 変更検出 |
 | `check-protected-edit.sh` | Hook | HARD_BLOCK ファイル保護 |
@@ -86,6 +86,21 @@ layer_summary:
 | `check-main-branch.sh` | Hook | main ブランチ保護 |
 | `lint-checker` | Skill | 静的解析 |
 | `test-runner` | Skill | テスト実行 |
+| `archive-playbook.sh` | Hook | playbook アーカイブ |
+| `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
+| `create-pr-hook.sh` | Hook | PR 作成 |
+| `post-loop` | Skill | 完了後処理 |
+| `context-management` | Skill | コンテキスト管理 |
+| `rollback.md` | Command | Git ロールバック |
+| `state-rollback.md` | Command | state.md ロールバック |
+| `session-start.sh` | Hook | セッション初期化 |
+| `session-end.sh` | Hook | セッション終了処理 |
+| `pre-compact.sh` | Hook | コンパクト前処理 |
+| `stop-summary.sh` | Hook | 中断時サマリー |
+| `log-subagent.sh` | Hook | SubAgent ログ |
+| `check-coherence.sh` | Hook | focus/playbook/branch 整合性 |
+| `depends-check.sh` | Hook | playbook 間依存関係 |
+| `executor-guard.sh` | Hook | executor 制御 |
 
 ---
 
@@ -104,11 +119,36 @@ done_criteria 検証で参照するドキュメント。
 
 | コンポーネント | 種別 | 役割 |
 |---------------|------|------|
-| `crit.md` | Command | 検証起点コマンド（/crit） |
-| `critic.md` | SubAgent | done_criteria 検証の唯一の正規ルート |
-| `critic-guard.sh` | Hook | critic PASS 必須の強制 |
+| `crit.md` | Command | 検証起点コマンド |
+| `critic.md` | Subagent | done_criteria 検証 |
+| `critic-guard.sh` | Hook | critic PASS 必須 |
 | `test` | Skill | test_command 実行 |
 | `lint` | Skill | state/playbook 整合性チェック |
+| `init-guard.sh` | Hook | 必須ファイル Read 強制 |
+| `playbook-guard.sh` | Hook | playbook 存在チェック |
+| `subtask-guard.sh` | Hook | 3観点検証（technical/consistency/completeness） |
+| `scope-guard.sh` | Hook | done_criteria 変更検出 |
+| `check-protected-edit.sh` | Hook | HARD_BLOCK ファイル保護 |
+| `pre-bash-check.sh` | Hook | 危険コマンドブロック |
+| `consent-guard.sh` | Hook | 危険操作同意取得 |
+| `check-main-branch.sh` | Hook | main ブランチ保護 |
+| `lint-checker` | Skill | 静的解析 |
+| `test-runner` | Skill | テスト実行 |
+| `archive-playbook.sh` | Hook | playbook アーカイブ |
+| `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
+| `create-pr-hook.sh` | Hook | PR 作成 |
+| `post-loop` | Skill | 完了後処理 |
+| `context-management` | Skill | コンテキスト管理 |
+| `rollback.md` | Command | Git ロールバック |
+| `state-rollback.md` | Command | state.md ロールバック |
+| `session-start.sh` | Hook | セッション初期化 |
+| `session-end.sh` | Hook | セッション終了処理 |
+| `pre-compact.sh` | Hook | コンパクト前処理 |
+| `stop-summary.sh` | Hook | 中断時サマリー |
+| `log-subagent.sh` | Hook | SubAgent ログ |
+| `check-coherence.sh` | Hook | focus/playbook/branch 整合性 |
+| `depends-check.sh` | Hook | playbook 間依存関係 |
+| `executor-guard.sh` | Hook | executor 制御 |
 
 ### 評価フレームワーク
 
@@ -135,10 +175,10 @@ Phase/playbook 完了時に参照するドキュメント。
 
 | コンポーネント | 種別 | 役割 |
 |---------------|------|------|
-| `archive-playbook.sh` | Hook | playbook アーカイブ提案 |
+| `archive-playbook.sh` | Hook | playbook アーカイブ |
 | `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
-| `create-pr-hook.sh` | Hook | PR 自動作成 |
-| `post-loop` | Skill | POST_LOOP 処理（自動コミット/マージ/次タスク） |
+| `create-pr-hook.sh` | Hook | PR 作成 |
+| `post-loop` | Skill | 完了後処理 |
 | `context-management` | Skill | コンテキスト管理 |
 | `rollback.md` | Command | Git ロールバック |
 | `state-rollback.md` | Command | state.md ロールバック |
@@ -175,9 +215,9 @@ Phase/playbook 完了時に参照するドキュメント。
 | `pre-compact.sh` | Hook | コンパクト前処理 |
 | `stop-summary.sh` | Hook | 中断時サマリー |
 | `log-subagent.sh` | Hook | SubAgent ログ |
-| `check-coherence.sh` | Hook | focus/playbook/branch 整合性（横断） |
-| `depends-check.sh` | Hook | playbook 間依存関係（横断） |
-| `executor-guard.sh` | Hook | executor 制御（横断） |
+| `check-coherence.sh` | Hook | focus/playbook/branch 整合性 |
+| `depends-check.sh` | Hook | playbook 間依存関係 |
+| `executor-guard.sh` | Hook | executor 制御 |
 
 ---
 
@@ -206,22 +246,23 @@ Phase/playbook 完了時に参照するドキュメント。
 以下のファイルは統合または廃止され、FREEZE_QUEUE に入っています:
 
 ```yaml
-統合済み（参照先が変更）:
-  - admin-contract.md → core-contract.md
-  - archive-operation-rules.md → folder-management.md
-  - artifact-management-rules.md → folder-management.md
-  - orchestration-contract.md → ai-orchestration.md
-  - toolstack-patterns.md → ai-orchestration.md
-  - completion-criteria.md → verification-criteria.md
-
-廃止予定:
-  - hook-registry.md（repository-map.yaml で代替）
-  - current-definitions.md（散逸した定義）
-  - deprecated-references.md（廃止済み参照）
-  - flow-test-report.md（一時レポート）
-  - golden-path-verification-report.md（一時レポート）
-  - m106-critic-guard-patch.md（パッチ完了）
-  - scenario-test-report.md（一時レポート）
+queue:
+  - docs/current-definitions.md
+  - docs/deprecated-references.md
+  - docs/document-catalog.md
+  - docs/flow-test-report.md
+  - docs/golden-path-verification-report.md
+  - docs/m106-critic-guard-patch.md
+  - docs/scenario-test-report.md
+  - docs/admin-contract.md
+  - docs/archive-operation-rules.md
+  - docs/artifact-management-rules.md
+  - docs/completion-criteria.md
+  - docs/orchestration-contract.md
+  - docs/toolstack-patterns.md
+  - docs/ARCHITECTURE.md
+  - docs/flow-document-map.md
+  - docs/hook-registry.md
 ```
 
 ---
@@ -230,5 +271,4 @@ Phase/playbook 完了時に参照するドキュメント。
 
 | 日時 | 内容 |
 |------|------|
-| 2025-12-21 | M122 全87ファイル精査結果を反映。動線単位で全コンポーネント網羅。|
-| 2025-12-21 | 初版作成（M122） |
+| 2025-12-21 | 自動生成（generate-essential-docs.sh） |

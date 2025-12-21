@@ -19,8 +19,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/playbook-m122-auto-update-essential-docs.md
+branch: feat/m122-auto-update-essential-docs
 last_archived: plan/archive/playbook-m122-full-review.md
 ```
 
@@ -29,9 +29,13 @@ last_archived: plan/archive/playbook-m122-full-review.md
 ## goal
 
 ```yaml
-milestone: null
-phase: null
-done_when: []
+milestone: M122
+phase: p1
+done_when:
+  - scripts/generate-essential-docs.sh が存在し実行可能
+  - generate-essential-docs.sh が core-manifest.yaml と state.md から essential-documents.md を正しく生成する
+  - session-start.sh に core-manifest.yaml 更新検出ロジックが統合されている
+  - スクリプト実行で docs/essential-documents.md が更新される
 next: null
 ```
 
@@ -89,7 +93,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 04:49:32
+last_start: 2025-12-21 11:58:46
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: false
 ```

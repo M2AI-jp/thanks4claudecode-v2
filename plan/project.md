@@ -1176,16 +1176,19 @@ success_criteria:
     - これまで何度も全仕様把握の仕組み作りに挑戦して失敗
     - 残存ファイルが散逸し、根拠不明の数値目標が設定されていた
     - playbook 作成時にユーザープロンプト原文が記録されていなかった
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-21
   depends_on: [M107]
   playbooks:
     - playbook-m122-session-flow-doc-integration.md
+    - playbook-m122-full-review.md
+    - playbook-m122-auto-update-essential-docs.md
   done_when:
-    - "[ ] docs/ 内の全ファイルが動線単位で精査されている（1ファイル1subtask で検証）"
-    - "[ ] 動線単位で必要なファイルのみ残存し、不要な記載は統合済み"
-    - "[ ] docs/essential-documents.md が動線単位で全機能を網羅している"
-    - "[ ] essential-documents.md が自動更新される仕組みが構築されている"
-    - "[ ] playbook に user_prompt_original フィールドが標準化されている"
+    - "[x] docs/ 内の全ファイルが動線単位で精査されている（1ファイル1subtask で検証）"
+    - "[x] 動線単位で必要なファイルのみ残存し、不要な記載は統合済み"
+    - "[x] docs/essential-documents.md が動線単位で全機能を網羅している"
+    - "[x] essential-documents.md が自動更新される仕組みが構築されている"
+    - "[x] playbook に user_prompt_original フィールドが標準化されている"
   test_commands:
     - "test -f docs/essential-documents.md && grep -q '動線' docs/essential-documents.md && echo PASS || echo FAIL"
     - "grep -q 'user_prompt_original' plan/template/playbook-format.md && echo PASS || echo FAIL"
