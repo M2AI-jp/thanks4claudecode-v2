@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m126-flow-context-completeness.md
-branch: feat/m126-flow-context-completeness
-last_archived: plan/archive/playbook-m123-minor-fixes.md
+active: plan/playbook-m127-playbook-reviewer-automation.md
+branch: feat/m127-playbook-reviewer-automation
+last_archived: plan/archive/playbook-m126-flow-context-completeness.md
 ```
 
 ---
@@ -29,14 +29,14 @@ last_archived: plan/archive/playbook-m123-minor-fixes.md
 ## goal
 
 ```yaml
-milestone: M126
+milestone: M127
 phase: p1
 done_when:
-  - "cleanup-hook.sh から削除済みスクリプト/ファイル（generate-repository-map.sh, check-spec-sync.sh, repository-map.yaml）への参照が除去されている"
-  - "全 Hook が存在するファイルのみを参照している"
-  - "固定 6 Skill に対応する Command が存在する: lint-checker→lint.md, state→focus.md, post-loop→post-loop.md, context-management→compact.md, test-runner→test.md, plan-management→task-start.md"
-  - "scripts/flow-integrity-test.sh が PASS する"
-next: p1.1 cleanup-hook.sh から削除済みスクリプト参照を除去
+  - "reviewer SubAgent が config.roles.reviewer を読んで分岐できる"
+  - "codex の場合、codex exec --full-auto を Bash で実行できる"
+  - "RESULT: PASS/FAIL をパースして reviewed: true/false を更新できる"
+  - "FAIL 時に修正提案を返却できる"
+next: p1 を実行
 ```
 
 ---

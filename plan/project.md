@@ -1246,18 +1246,49 @@ success_criteria:
     **目的:**
     1. 動線の内部参照を完全に整合させる（削除済みファイルへの参照を除去）
     2. Skills を Commands として正規化（/skill-name で呼べる形式に統一）
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-21
   depends_on: [M123]
   playbooks:
     - playbook-m126-flow-context-completeness.md
   done_when:
-    - "[ ] cleanup-hook.sh から削除済みスクリプトへの参照が除去されている"
-    - "[ ] 全 Hook が存在するファイルのみを参照している"
-    - "[ ] 全 Skill に対応する Command が存在する（6 Skills → 6 Commands）"
-    - "[ ] scripts/flow-integrity-test.sh が PASS する"
+    - "[x] cleanup-hook.sh から削除済みスクリプトへの参照が除去されている"
+    - "[x] 全 Hook が存在するファイルのみを参照している"
+    - "[x] 全 Skill に対応する Command が存在する（6 Skills → 6 Commands）"
+    - "[x] scripts/flow-integrity-test.sh が PASS する"
   test_commands:
     - "! grep -qE 'generate-repository-map\\.sh|check-spec-sync\\.sh' .claude/hooks/cleanup-hook.sh && echo PASS || echo FAIL"
     - "bash scripts/flow-integrity-test.sh 2>&1 | tail -1 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL"
+
+- id: M127
+  name: "Playbook Reviewer 動線の自動化"
+  description: |
+    **背景（M126 Codex 手動レビュー体験から）:**
+    - `codex exec --full-auto` で playbook レビューが可能
+    - 5 ラウンドのレビューサイクルで test_command の堅牢化を学習
+    - 「レビューなしの実装は何もしないよりタチが悪い」
+
+    **目的:**
+    1. pm が playbook 作成後、自動的に reviewer SubAgent を起動
+    2. reviewer が config.roles.reviewer に基づいて Codex/ClaudeCode を選択
+    3. Codex の場合、`codex exec --full-auto` を実行し RESULT: PASS/FAIL をパース
+    4. FAIL なら修正サイクル、PASS なら reviewed: true に更新
+
+    **学習した test_command 設計原則:**
+    - exit code で成功/失敗を判定可能にする
+    - 存在チェックは test -f で明示的に行う
+    - grep の否定は反転ロジックを使う
+    - done_when は具体的なファイル名/固定数を明記する
+  status: pending
+  depends_on: [M126]
+  playbooks: []
+  done_when:
+    - "[ ] reviewer SubAgent が config.roles.reviewer を読んで分岐できる"
+    - "[ ] codex の場合、codex exec --full-auto を Bash で実行できる"
+    - "[ ] RESULT: PASS/FAIL をパースして reviewed: true/false を更新できる"
+    - "[ ] FAIL 時に修正提案を返却できる"
+  test_commands:
+    - "grep -q 'codex exec' .claude/agents/reviewer.md && echo PASS || echo FAIL"
 
 ```
 

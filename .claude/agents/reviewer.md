@@ -142,9 +142,117 @@ skills: lint-checker, deploy-checker
 /review plan/playbook-*.md
 ```
 
+## Codex 連携（動的 Reviewer 選択）
+
+### 実行フロー
+
+```yaml
+1_state_check:
+  action: Read state.md → config.roles.reviewer を確認
+  file: state.md
+  path: config.roles.reviewer
+
+2_branch:
+  claudecode: 自身がレビュー実行（従来の行動）
+  codex: codex exec --full-auto を Bash で実行
+  coderabbit: 外部 API 呼び出し（未実装）
+
+3_parse_result:
+  pattern: grep -E "^RESULT:" output | tail -1
+  PASS: reviewed: true に更新
+  FAIL: 修正提案を返却
+
+4_update_playbook:
+  tool: Edit
+  target: playbook の meta.reviewed フィールド
+  PASS: reviewed: true
+  FAIL: reviewed: false のまま
+```
+
+### Codex 実行手順（config.roles.reviewer = codex の場合）
+
+```bash
+# 1. playbook パスを取得
+playbook_path=$(grep 'active:' state.md | awk '{print $2}')
+
+# 2. codex exec --full-auto を実行（タイムアウト 180秒）
+codex exec --full-auto "${playbook_path} をレビューしてください。
+done_when が検証可能か、test_command が適切か評価し、
+最後に RESULT: PASS または RESULT: FAIL を必ず出力してください。" \
+  2>&1 | tee /tmp/codex-review.txt
+
+# 3. RESULT をパース
+result=$(grep -E "^RESULT:" /tmp/codex-review.txt | tail -1)
+```
+
+### プロンプトテンプレート
+
+playbook-review-criteria.md を参照した上で、以下のプロンプトを使用:
+
+```
+{playbook_path} をレビューしてください。
+
+## レビュー観点
+1. done_when が検証可能か（具体的、測定可能、達成可能）
+2. test_command が適切か（exit code で成功/失敗判定可能）
+3. Phase の依存関係が正しいか
+4. validations の 3 観点（technical, consistency, completeness）が妥当か
+
+## 出力フォーマット
+問題があれば ISSUES: セクションに列挙。
+改善案があれば SUGGESTIONS: セクションに列挙。
+最後に必ず RESULT: PASS または RESULT: FAIL を出力。
+```
+
+### RESULT: PASS/FAIL のパースと処理
+
+```yaml
+PASS:
+  action:
+    - Edit で playbook の reviewed: false → reviewed: true に更新
+    - pm に PASS を返却
+  message: "Codex レビュー PASS - playbook 確定"
+
+FAIL:
+  action:
+    - 修正提案を issues フォーマットで返却
+    - playbook の reviewed: false のまま
+    - pm に FAIL と issues を返却
+  message: "Codex レビュー FAIL - 修正が必要"
+  retry: 最大 3回までリトライ可能
+```
+
+### FAIL 時の修正提案フォーマット
+
+```yaml
+issues:
+  - severity: major|minor
+    location: "{file}:{line}"
+    description: "問題の説明"
+    suggestion: "具体的な修正案"
+
+max_retries: 3
+escalation: 3回 FAIL で人間エスカレーション
+escalation_message: |
+  Codex レビューが 3回 FAIL しました。
+  人間の判断が必要です。
+  issues を確認してください。
+```
+
+### 従来の行動（config.roles.reviewer = claudecode の場合）
+
+1. playbook-review-criteria.md を Read
+2. 対象 playbook を Read
+3. 各 phase の done_criteria, test_command を検証
+4. 出力フォーマットに従ってレビュー結果を作成
+5. Approved/Needs Changes/Rejected を判定
+6. Approved なら reviewed: true に更新
+
+---
+
 ## 参照ファイル
 
 - `.claude/frameworks/playbook-review-criteria.md` - playbook レビュー基準（必須参照）
 - AGENTS.md - コーディング規約
-- state.md - 現在のコンテキスト
+- state.md - 現在のコンテキスト（config.roles.reviewer を参照）
 - pm.md - 役割定義
