@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m155-final-freeze.md
-branch: feat/m150-deep-audit-planning
-last_archived: plan/archive/playbook-m154-refactoring-spec-sync.md
+active: null  # M155 完了
+branch: main
+last_archived: plan/archive/playbook-m155-final-freeze.md
 ```
 
 ---
