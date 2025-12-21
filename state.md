@@ -30,14 +30,14 @@ last_archived: plan/archive/playbook-m128-e2e-audit.md
 
 ```yaml
 milestone: M129
-phase: p2 (設計フェーズ)
+phase: p3 (ユーザー確認フェーズ)
 done_when:
   - "[ ] 「実際の Hook 発火」を検証するテスト（hook-runtime-test.sh）が全 PASS"
   - "[ ] 「4 動線」の実行時検証テスト（flow-runtime-test.sh）が全 PASS"
   - "[ ] fail-closed/HARD_BLOCK/admin maintenance テストが e2e-contract-test.sh に追加され全 PASS"
   - "[ ] コンテキスト保持機構（session-start, pre-compact）の動作検証テストが全 PASS"
   - "[ ] ユーザー承認を得た設計に基づいて実装が完了"
-next: p2.1-p2.5 の設計書作成
+next: 統合設計書（tmp/m129-unified-design.md）のユーザー承認を取得
 ```
 
 ---
