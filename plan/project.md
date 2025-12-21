@@ -1260,6 +1260,37 @@ success_criteria:
     - "! grep -qE 'generate-repository-map\\.sh|check-spec-sync\\.sh' .claude/hooks/cleanup-hook.sh && echo PASS || echo FAIL"
     - "bash scripts/flow-integrity-test.sh 2>&1 | tail -1 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL"
 
+- id: M129
+  name: "動線 100% 担保 - 実行時検証システム"
+  description: |
+    **背景（M128 Codex レビュー FAIL 指摘）:**
+    - e2e-contract-test.sh が contract_check_* を直接テストしているが、
+      実際の Hook（pre-bash-check.sh の JSON 解析、playbook-guard.sh の配線）はテストしていない
+    - flow-integrity-test.sh が純粋に静的（ファイル存在確認のみ）
+    - done_when の証拠不足（grep/bash -n チェックに依存）
+
+    **目的:**
+    1. 実際の Hook 発火を検証するテスト（hook-runtime-test.sh）
+    2. 4 動線の実行時検証テスト（flow-runtime-test.sh）
+    3. fail-closed/HARD_BLOCK/admin maintenance テスト追加
+    4. コンテキスト保持機構のテスト（context-test.sh）
+  status: achieved
+  achieved_at: 2025-12-21
+  depends_on: [M128]
+  playbooks:
+    - playbook-m129-runtime-verification-system.md
+  done_when:
+    - "[x] 「実際の Hook 発火」を検証するテスト（hook-runtime-test.sh）が全 PASS"
+    - "[x] 「4 動線」の実行時検証テスト（flow-runtime-test.sh）が全 PASS"
+    - "[x] fail-closed/HARD_BLOCK/admin maintenance テストが e2e-contract-test.sh に追加され全 PASS"
+    - "[x] コンテキスト保持機構（session-start, pre-compact）の動作検証テストが全 PASS"
+    - "[x] ユーザー承認を得た設計に基づいて実装が完了"
+  test_commands:
+    - "bash scripts/hook-runtime-test.sh"
+    - "bash scripts/flow-runtime-test.sh"
+    - "bash scripts/e2e-contract-test.sh all"
+    - "bash scripts/context-test.sh"
+
 - id: M127
   name: "Playbook Reviewer 動線の自動化"
   description: |

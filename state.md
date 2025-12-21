@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m129-runtime-verification-system.md
-branch: feat/m129-runtime-verification
-last_archived: plan/archive/playbook-m128-e2e-audit.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m129-runtime-verification-system.md
 ```
 
 ---
@@ -29,15 +29,10 @@ last_archived: plan/archive/playbook-m128-e2e-audit.md
 ## goal
 
 ```yaml
-milestone: M129
-phase: p5 (統合検証フェーズ)
-done_when:
-  - "[x] 「実際の Hook 発火」を検証するテスト（hook-runtime-test.sh）が全 PASS"
-  - "[x] 「4 動線」の実行時検証テスト（flow-runtime-test.sh）が全 PASS"
-  - "[x] fail-closed/HARD_BLOCK/admin maintenance テストが e2e-contract-test.sh に追加され全 PASS"
-  - "[x] コンテキスト保持機構（session-start, pre-compact）の動作検証テストが全 PASS"
-  - "[x] ユーザー承認を得た設計に基づいて実装が完了"
-next: /crit → コミット → アーカイブ
+milestone: null
+phase: null
+done_when: []
+next: 次のマイルストーンを選択
 ```
 
 ---
