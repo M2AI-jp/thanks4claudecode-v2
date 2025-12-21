@@ -90,7 +90,9 @@ layer_summary:
 | `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
 | `create-pr-hook.sh` | Hook | PR 作成 |
 | `post-loop` | Skill | 完了後処理 |
+| `/post-loop` | Command | post-loop Skill 呼び出し |
 | `context-management` | Skill | コンテキスト管理 |
+| `/compact` | Command | context-management Skill 呼び出し |
 | `rollback.md` | Command | Git ロールバック |
 | `state-rollback.md` | Command | state.md ロールバック |
 | `session-start.sh` | Hook | セッション初期化 |
@@ -138,7 +140,9 @@ done_criteria 検証で参照するドキュメント。
 | `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
 | `create-pr-hook.sh` | Hook | PR 作成 |
 | `post-loop` | Skill | 完了後処理 |
+| `/post-loop` | Command | post-loop Skill 呼び出し |
 | `context-management` | Skill | コンテキスト管理 |
+| `/compact` | Command | context-management Skill 呼び出し |
 | `rollback.md` | Command | Git ロールバック |
 | `state-rollback.md` | Command | state.md ロールバック |
 | `session-start.sh` | Hook | セッション初期化 |
@@ -179,7 +183,9 @@ Phase/playbook 完了時に参照するドキュメント。
 | `cleanup-hook.sh` | Hook | tmp/ クリーンアップ |
 | `create-pr-hook.sh` | Hook | PR 作成 |
 | `post-loop` | Skill | 完了後処理 |
+| `/post-loop` | Command | post-loop Skill 呼び出し |
 | `context-management` | Skill | コンテキスト管理 |
+| `/compact` | Command | context-management Skill 呼び出し |
 | `rollback.md` | Command | Git ロールバック |
 | `state-rollback.md` | Command | state.md ロールバック |
 

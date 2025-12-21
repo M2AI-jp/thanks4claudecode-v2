@@ -1214,19 +1214,50 @@ success_criteria:
     3. 承認を得て統合を実装
     4. 不要な機能を FREEZE_QUEUE に追加
     5. 動線単位で他の類似機能がないかチェック
-  status: in_progress
+  status: achieved
+  achieved_at: 2025-12-21
   depends_on: [M122]
   playbooks:
     - playbook-m123-similar-function-consolidation.md
   done_when:
-    - "[ ] session-start.sh が essential-documents.md の layer_summary を出力する"
-    - "[ ] repository-map.yaml が FREEZE_QUEUE に追加されている"
-    - "[ ] state.md から COMPONENT_REGISTRY セクションが削除されている"
-    - "[ ] 動線テスト（セッション開始時に Claude が動線情報を認識）が PASS"
+    - "[x] session-start.sh が essential-documents.md の layer_summary を出力する"
+    - "[x] repository-map.yaml が FREEZE_QUEUE に追加されている"
+    - "[x] state.md から COMPONENT_REGISTRY セクションが削除されている"
+    - "[x] 動線テスト（セッション開始時に Claude が動線情報を認識）が PASS"
   test_commands:
     - "bash .claude/hooks/session-start.sh 2>&1 | grep -qE '計画動線|実行動線|検証動線|完了動線' && echo PASS || echo FAIL"
     - "grep 'repository-map.yaml' state.md | grep -q 'freeze_date' && echo PASS || echo FAIL"
     - "! grep -q '## COMPONENT_REGISTRY' state.md && echo PASS || echo FAIL"
+
+- id: M126
+  name: "動線コンテキスト内部参照の完全化"
+  description: |
+    **ユーザープロンプト原文（2025-12-21）:**
+    > M126 playbook を作成してください。
+    > Skills は `/skill-name` で呼べる形式（コマンド化）が推奨される
+    > 既存の動線（Hook, SubAgent, Skill, Command）に機能不全がある:
+    > - 削除済みファイルへの参照が残っている
+    > - Skills と Commands の対応が不完全
+
+    **背景:**
+    - cleanup-hook.sh が削除済みスクリプト（generate-repository-map.sh, check-spec-sync.sh）を参照
+    - Skills と Commands の対応が不完全（context-management, post-loop にコマンドなし）
+
+    **目的:**
+    1. 動線の内部参照を完全に整合させる（削除済みファイルへの参照を除去）
+    2. Skills を Commands として正規化（/skill-name で呼べる形式に統一）
+  status: in_progress
+  depends_on: [M123]
+  playbooks:
+    - playbook-m126-flow-context-completeness.md
+  done_when:
+    - "[ ] cleanup-hook.sh から削除済みスクリプトへの参照が除去されている"
+    - "[ ] 全 Hook が存在するファイルのみを参照している"
+    - "[ ] 全 Skill に対応する Command が存在する（6 Skills → 6 Commands）"
+    - "[ ] scripts/flow-integrity-test.sh が PASS する"
+  test_commands:
+    - "! grep -qE 'generate-repository-map\\.sh|check-spec-sync\\.sh' .claude/hooks/cleanup-hook.sh && echo PASS || echo FAIL"
+    - "bash scripts/flow-integrity-test.sh 2>&1 | tail -1 | grep -q 'ALL TESTS PASSED' && echo PASS || echo FAIL"
 
 ```
 
