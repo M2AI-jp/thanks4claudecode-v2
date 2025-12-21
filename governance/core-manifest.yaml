@@ -20,23 +20,31 @@
 # ═══════════════════════════════════════════════════════════════════
 
 version: 3
-frozen_at: "2025-12-20"
+frozen: true
+frozen_at: "2025-12-21"
 upgraded_from: 2
+deep_audit_completed: "2025-12-21"
 
 # ────────────────────────────────────────────────────────────────
 # 変更ポリシー
 # ────────────────────────────────────────────────────────────────
 policy:
   golden_rule: "全コンポーネントは動線単位で扱う"
+  frozen: true
   no_new_components: true
   allow_changes:
-    - bugfix
-    - deletion
-    - test_improvement
+    - bugfix_only  # Core Layer は bugfix のみ許可
   forbid_changes:
-    - new_hook_without_review
-    - new_subagent_without_review
-    - new_skill_without_review
+    - new_hook
+    - new_subagent
+    - new_skill
+    - new_command
+    - feature_addition
+  deep_audit_status:
+    M150_planning_flow: "completed"
+    M151_verification_flow: "completed"
+    M152_execution_flow: "completed"
+    M153_completion_common: "completed"
 
 # ════════════════════════════════════════════════════════════════
 # CORE LAYER（計画動線 + 検証動線）

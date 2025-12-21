@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m152-deep-audit-execution-flow.md
+active: plan/playbook-m155-final-freeze.md
 branch: feat/m150-deep-audit-planning
-last_archived: plan/archive/playbook-m151-deep-audit-verification-flow.md
+last_archived: plan/archive/playbook-m154-refactoring-spec-sync.md
 ```
 
 ---
@@ -29,15 +29,15 @@ last_archived: plan/archive/playbook-m151-deep-audit-verification-flow.md
 ## goal
 
 ```yaml
-milestone: M152
+milestone: M155
 phase: p1
 done_when:
-  - "実行動線10ファイル全てが Read + 理解されている"
-  - "各ファイルに対して Codex レビューが完了している"
-  - "各ファイルの処遇（Keep/Simplify/Delete）が決定している"
-  - "動作確認テストが実施されている"
-  - "精査結果が docs/deep-audit-execution-flow.md に記録されている"
-next: M152 → M153 → M154 → M155
+  - "全テスト（flow-runtime-test）が PASS"
+  - "Core Layer 全ファイルが protected-files.txt に登録されている"
+  - "core-manifest.yaml に frozen: true が設定されている"
+  - "CLAUDE.md が version 2.0.0 にバンプされている"
+  - "git tag v1.0.0 が作成されている"
+next: Complete
 ```
 
 ---
@@ -94,7 +94,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-21 23:28:30
+last_start: 2025-12-21 23:40:52
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: true
 ```
