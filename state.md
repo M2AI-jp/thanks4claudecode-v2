@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m161-settings-json-cleanup.md
-branch: feat/m161-settings-json-cleanup
-last_archived: plan/archive/playbook-m160-desktop-notification.md
+active: null
+branch: null
+last_archived: plan/archive/playbook-m161-settings-json-cleanup.md
 ```
 
 ---
@@ -57,7 +57,7 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: true
+self_complete: false
 user_verified: false
 ```
 
