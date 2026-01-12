@@ -19,8 +19,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: null
-branch: null
+active: plan/playbook-m160-desktop-notification.md
+branch: feat/m160-desktop-notification
 last_archived: plan/archive/playbook-m159-gh-pr-patterns.md
 ```
 
@@ -29,14 +29,13 @@ last_archived: plan/archive/playbook-m159-gh-pr-patterns.md
 ## goal
 
 ```yaml
-milestone: M159
-phase: p0
+milestone: M160
+phase: p1
 done_when:
-  - "scripts/contract.sh に gh pr create/merge パターンが追加されている"
-  - "変更がコミット・プッシュされている"
-  - "PR が作成・マージされている"
-  - "main ブランチが最新状態"
-next: p1
+  - "~/.claude/notify.sh が存在し、実行可能である"
+  - "notify.sh を実行すると macOS デスクトップ通知が表示される"
+  - "settings.json の Stop フックで notify.sh が呼び出される設定になっている"
+next: p2
 ```
 
 ---
@@ -93,7 +92,7 @@ forbidden:
 ## session
 
 ```yaml
-last_start: 2025-12-22 01:21:41
+last_start: 2026-01-12 18:19:56
 last_clear: 2025-12-13 00:30:00
 uncommitted_warning: true
 deep_audit_completed: 2025-12-21
