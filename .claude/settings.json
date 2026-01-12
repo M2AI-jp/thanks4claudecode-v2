@@ -34,28 +34,6 @@
             "command": "bash .claude/hooks/check-main-branch.sh",
             "timeout": 3000
           }
-        ],
-        "Stop": [
-          {
-            "matcher": "",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "echo '{\"cwd\": \"'\"$(pwd)\"'\", \"notification_type\": \"stop\"}' | ~/.claude/notify.sh"
-              }
-            ]
-          }
-        ],
-        "Notification": [
-          {
-            "matcher": "",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "~/.claude/notify.sh"
-              }
-            ]
-          }
         ]
       },
       {
@@ -224,6 +202,11 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/stop-summary.sh",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/notify.sh",
             "timeout": 3000
           }
         ]
