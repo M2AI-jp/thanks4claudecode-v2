@@ -33,6 +33,7 @@ export default function TradeHistory({ onRecordTrade }: TradeHistoryProps) {
 
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString("ja-JP", {
+      timeZone: "Asia/Tokyo",
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
@@ -41,6 +42,7 @@ export default function TradeHistory({ onRecordTrade }: TradeHistoryProps) {
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("ja-JP", {
+      timeZone: "Asia/Tokyo",
       month: "2-digit",
       day: "2-digit",
     });
