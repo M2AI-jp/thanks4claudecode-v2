@@ -6,6 +6,9 @@ import {
   PollingMode,
 } from "./twelve-data-service";
 
+// JST offset in seconds (UTC+9)
+const JST_OFFSET_SECONDS = 9 * 60 * 60;
+
 export interface PriceData {
   timestamp: number;
   open: number;
@@ -216,7 +219,8 @@ class PriceService {
 
       for (let i = count - 1; i >= 0; i--) {
         const candleTime = currentCandleTime - i * timeframeMs;
-        const time = Math.floor(candleTime / 1000) as Time;
+        // Add JST offset to display correct time
+        const time = (Math.floor(candleTime / 1000) + JST_OFFSET_SECONDS) as Time;
         const candle = tempSimulator.generateCandle(timeframeMs);
         candles.push({
           time,
@@ -235,7 +239,8 @@ class PriceService {
     // Update current (last) candle with latest price
     if (this.currentPrice && candles.length > 0) {
       const lastCandle = candles[candles.length - 1];
-      const expectedTime = Math.floor(currentCandleTime / 1000) as Time;
+      // Add JST offset for comparison and new candle creation
+      const expectedTime = (Math.floor(currentCandleTime / 1000) + JST_OFFSET_SECONDS) as Time;
 
       // Check if we need a new candle
       if (lastCandle.time !== expectedTime) {

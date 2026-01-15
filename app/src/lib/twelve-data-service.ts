@@ -1,5 +1,8 @@
 import { CandlestickData, Time } from "lightweight-charts";
 
+// JST offset in seconds (UTC+9)
+const JST_OFFSET_SECONDS = 9 * 60 * 60;
+
 export interface TwelveDataConfig {
   apiKey: string;
   symbol?: string;
@@ -167,10 +170,10 @@ class TwelveDataService {
         throw new Error("API returned error status");
       }
 
-      // Convert to CandlestickData format
+      // Convert to CandlestickData format with JST offset
       const candles: CandlestickData<Time>[] = data.values
         .map((v) => ({
-          time: (new Date(v.datetime).getTime() / 1000) as Time,
+          time: (new Date(v.datetime).getTime() / 1000 + JST_OFFSET_SECONDS) as Time,
           open: parseFloat(v.open),
           high: parseFloat(v.high),
           low: parseFloat(v.low),
