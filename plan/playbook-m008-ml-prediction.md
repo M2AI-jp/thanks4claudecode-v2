@@ -301,9 +301,9 @@ interface Features {
   - command: `cd /Users/yoshinobua/Documents/Dev/Ind/chart-system/app && npx tsc --noEmit`
   - status: completed
 
-- [ ] **ft2**: 変更を全てコミットする
+- [x] **ft2**: 変更を全てコミットする
   - command: `git add -A && git status`
-  - status: pending
+  - status: completed
 
 ---
 
