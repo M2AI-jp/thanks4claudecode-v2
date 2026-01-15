@@ -7,7 +7,7 @@ import {
 } from "./twelve-data-service";
 
 // JST offset in seconds (adjusted for chart display)
-const JST_OFFSET_SECONDS = 2 * 60 * 60;
+const JST_OFFSET_SECONDS = 7 * 60 * 60;
 
 export interface PriceData {
   timestamp: number;
