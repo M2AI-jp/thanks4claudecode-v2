@@ -6,8 +6,8 @@ import {
   PollingMode,
 } from "./twelve-data-service";
 
-// JST offset in seconds (UTC+9)
-const JST_OFFSET_SECONDS = 9 * 60 * 60;
+// JST offset in seconds (adjusted for chart display)
+const JST_OFFSET_SECONDS = 2 * 60 * 60;
 
 export interface PriceData {
   timestamp: number;

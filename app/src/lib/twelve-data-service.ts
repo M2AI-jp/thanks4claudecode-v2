@@ -1,7 +1,7 @@
 import { CandlestickData, Time } from "lightweight-charts";
 
-// JST offset in seconds (UTC+9)
-const JST_OFFSET_SECONDS = 9 * 60 * 60;
+// JST offset in seconds (adjusted for Twelve Data API which returns local exchange time)
+const JST_OFFSET_SECONDS = 2 * 60 * 60;
 
 export interface TwelveDataConfig {
   apiKey: string;
