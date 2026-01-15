@@ -46,6 +46,35 @@ export const modelWeights = sqliteTable("model_weights", {
   updatedAt: integer("updated_at").notNull().$defaultFn(() => Date.now()),
 });
 
+// App settings (key-value store)
+export const appSettings = sqliteTable("app_settings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(), // JSON string
+  updatedAt: integer("updated_at").notNull().$defaultFn(() => Date.now()),
+});
+
+// ML Prediction weights
+export const predictionWeights = sqliteTable("prediction_weights", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(), // e.g., "emaTrend", "macdHist", "bias"
+  value: real("value").notNull(),
+  updatedAt: integer("updated_at").notNull().$defaultFn(() => Date.now()),
+});
+
+// ML Prediction history
+export const predictionHistory = sqliteTable("prediction_history", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  timestamp: integer("timestamp").notNull(), // Candle timestamp
+  prediction: text("prediction").notNull(), // HIGH or LOW
+  actual: text("actual"), // HIGH, LOW, or null (pending)
+  confidence: real("confidence").notNull(), // 0-1
+  probability: real("probability").notNull(), // Raw probability
+  features: text("features"), // JSON string of feature values
+  correct: integer("correct"), // 1 = correct, 0 = incorrect, null = pending
+  createdAt: integer("created_at").notNull().$defaultFn(() => Date.now()),
+});
+
 // Type exports
 export type Price = typeof prices.$inferSelect;
 export type NewPrice = typeof prices.$inferInsert;
@@ -55,3 +84,9 @@ export type Trade = typeof trades.$inferSelect;
 export type NewTrade = typeof trades.$inferInsert;
 export type ModelWeight = typeof modelWeights.$inferSelect;
 export type NewModelWeight = typeof modelWeights.$inferInsert;
+export type AppSetting = typeof appSettings.$inferSelect;
+export type NewAppSetting = typeof appSettings.$inferInsert;
+export type PredictionWeight = typeof predictionWeights.$inferSelect;
+export type NewPredictionWeight = typeof predictionWeights.$inferInsert;
+export type PredictionHistoryRecord = typeof predictionHistory.$inferSelect;
+export type NewPredictionHistoryRecord = typeof predictionHistory.$inferInsert;

@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useSignal } from "@/hooks/useSignal";
 import { usePriceData } from "@/hooks/usePriceData";
+import { usePrediction } from "@/hooks/usePrediction";
 
 const Chart = dynamic(() => import("@/components/Chart"), {
   ssr: false,
@@ -28,7 +30,8 @@ const TradeHistory = dynamic(() => import("@/components/TradeHistory"), {
 export default function Home() {
   const [strictLevel, setStrictLevel] = useState<1 | 2 | 3>(2);
   const { signal } = useSignal({ timeframe: "5m", strictLevel, refreshInterval: 30000 });
-  const { currentPrice, dataSource, apiStats } = usePriceData({ timeframe: "5m", refreshInterval: 30000 });
+  const { currentPrice, dataSource } = usePriceData({ timeframe: "5m", refreshInterval: 30000 });
+  const { prediction, accuracy } = usePrediction({ timeframe: "5m", refreshInterval: 10000 });
   const [isTrading, setIsTrading] = useState(false);
 
   const details = signal?.details;
@@ -114,6 +117,16 @@ export default function Home() {
   return (
     <div className="p-4">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-end mb-2">
+          <Link
+            href="/settings"
+            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm text-slate-300 transition-colors"
+          >
+            ⚙ 設定
+          </Link>
+        </div>
+
         {/* Chart */}
         <div className="mb-4">
           <Chart showEMA={true} showBB={true} />
@@ -122,44 +135,45 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Left Column - Signal & Controls */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Signal Panel */}
+            {/* ML Prediction Panel */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-slate-800 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-slate-400 mb-2">
-                  Signal
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg p-4 border border-purple-500/30">
+                <h3 className="text-sm font-medium text-purple-400 mb-2">
+                  ML Prediction
                 </h3>
                 <p
                   className={`text-2xl font-bold ${
-                    signal?.direction === "HIGH"
+                    prediction?.direction === "HIGH"
                       ? "text-green-400"
-                      : signal?.direction === "LOW"
+                      : prediction?.direction === "LOW"
                       ? "text-red-400"
                       : "text-slate-300"
                   }`}
                 >
-                  {signal?.direction || "---"}
+                  {prediction?.direction || "---"}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  {signal?.direction ? "Signal detected!" : "Waiting"}
+                  {prediction ? `${(prediction.confidence * 100).toFixed(0)}% confidence` : "Calculating..."}
                 </p>
               </div>
 
               <div className="bg-slate-800 rounded-lg p-4">
                 <h3 className="text-sm font-medium text-slate-400 mb-2">
-                  Score
+                  Accuracy
                 </h3>
                 <p
                   className={`text-2xl font-bold ${
-                    signal?.score && signal.score >= 4
+                    accuracy.accuracy >= 0.55
                       ? "text-green-400"
+                      : accuracy.accuracy >= 0.5
+                      ? "text-yellow-400"
                       : "text-slate-300"
                   }`}
                 >
-                  {signal?.score ? signal.score.toFixed(1) : "-.-"}
+                  {accuracy.total > 0 ? `${(accuracy.accuracy * 100).toFixed(1)}%` : "--%"}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  H:{details?.highScore.toFixed(1) || "-"} L:
-                  {details?.lowScore.toFixed(1) || "-"}
+                  {accuracy.correct}/{accuracy.total} correct
                 </p>
               </div>
 
@@ -181,23 +195,14 @@ export default function Home() {
 
               <div className="bg-slate-800 rounded-lg p-4">
                 <h3 className="text-sm font-medium text-slate-400 mb-2">
-                  Strict
+                  Probability
                 </h3>
-                <div className="flex gap-1">
-                  {([1, 2, 3] as const).map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setStrictLevel(level)}
-                      className={`px-2 py-1 rounded text-xs ${
-                        strictLevel === level
-                          ? "bg-yellow-500 text-black font-bold"
-                          : "bg-slate-700 text-slate-300"
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
+                <p className="text-2xl font-bold text-slate-300">
+                  {prediction ? `${(prediction.probability * 100).toFixed(1)}%` : "--%"}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  HIGH probability
+                </p>
               </div>
             </div>
 
@@ -207,7 +212,7 @@ export default function Home() {
                 onClick={() => recordTrade("HIGH")}
                 disabled={isTrading}
                 className={`py-4 rounded-lg font-bold text-xl transition-all ${
-                  signal?.direction === "HIGH"
+                  prediction?.direction === "HIGH" && prediction.confidence > 0.3
                     ? "bg-green-500 hover:bg-green-400 text-white animate-pulse"
                     : "bg-green-600/30 hover:bg-green-600/50 text-green-400"
                 } ${isTrading ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -218,7 +223,7 @@ export default function Home() {
                 onClick={() => recordTrade("LOW")}
                 disabled={isTrading}
                 className={`py-4 rounded-lg font-bold text-xl transition-all ${
-                  signal?.direction === "LOW"
+                  prediction?.direction === "LOW" && prediction.confidence > 0.3
                     ? "bg-red-500 hover:bg-red-400 text-white animate-pulse"
                     : "bg-red-600/30 hover:bg-red-600/50 text-red-400"
                 } ${isTrading ? "opacity-50 cursor-not-allowed" : ""}`}

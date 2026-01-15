@@ -9,7 +9,7 @@
 ## focus
 
 ```yaml
-current: plan-template  # 現在作業中のプロジェクト名
+current: chart-system  # 現在作業中のプロジェクト名
 session: task           # task | discussion
 project: plan/project.md
 ```
@@ -19,9 +19,9 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/archive/playbook-project-completion.md
-branch: main
-last_archived: plan/archive/playbook-project-completion.md
+active: plan/playbook-m008-ml-prediction.md
+branch: feat/M008-ml-prediction
+last_archived: plan/archive/playbook-m007-learning-engine.md
 ```
 
 ---
@@ -29,10 +29,15 @@ last_archived: plan/archive/playbook-project-completion.md
 ## goal
 
 ```yaml
-milestone: null
-phase: null
-done_when: []
-next: null
+milestone: M008
+phase: p1
+done_when:
+  - prediction-engine.ts が存在し、ML ベースの予測ロジックが実装されている
+  - 過去の価格データとインジケーターを特徴量として学習モデルが訓練される
+  - 毎ローソク足ごとに次の方向（HIGH/LOW）と確信度を予測・表示する
+  - prediction_history テーブルに予測履歴が保存される
+  - 予測精度が UI に表示される
+next: p2
 ```
 
 ---
@@ -54,7 +59,7 @@ return_to: null
 ## verification
 
 ```yaml
-self_complete: false
+self_complete: true
 user_verified: false
 ```
 

@@ -8,6 +8,20 @@
       "when": 1768452748075,
       "tag": "0000_foamy_longshot",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1768457986270,
+      "tag": "0001_loud_king_cobra",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1768459560410,
+      "tag": "0002_steady_shiver_man",
+      "breakpoints": true
     }
   ]
 }
