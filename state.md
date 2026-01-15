@@ -19,8 +19,8 @@ project: plan/project.md
 ## playbook
 
 ```yaml
-active: plan/playbook-m008-ml-prediction.md
-branch: feat/M008-ml-prediction
+active: plan/playbook-m009-docker-setup.md
+branch: feat/M009-docker-setup
 last_archived: plan/archive/playbook-m007-learning-engine.md
 ```
 
@@ -29,14 +29,13 @@ last_archived: plan/archive/playbook-m007-learning-engine.md
 ## goal
 
 ```yaml
-milestone: M008
+milestone: M009
 phase: p1
 done_when:
-  - prediction-engine.ts が存在し、ML ベースの予測ロジックが実装されている
-  - 過去の価格データとインジケーターを特徴量として学習モデルが訓練される
-  - 毎ローソク足ごとに次の方向（HIGH/LOW）と確信度を予測・表示する
-  - prediction_history テーブルに予測履歴が保存される
-  - 予測精度が UI に表示される
+  - app/Dockerfile が存在し、Next.js アプリをビルド・実行できる
+  - docker-compose.yml が存在し、SQLite ボリュームマウントが設定されている
+  - docker compose up でアプリが起動し、http://localhost:3000 にアクセスできる
+  - SQLite データが永続化され、コンテナ再起動後もデータが保持される
 next: p2
 ```
 

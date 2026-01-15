@@ -57,3 +57,7 @@ test/core/
 test/scenarios/
 test/results/
 test/template/
+
+# Docker data directory (SQLite persistence)
+data/*
+!data/.gitkeep
