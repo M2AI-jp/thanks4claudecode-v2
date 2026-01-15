@@ -138,6 +138,17 @@ export default function Chart({
       crosshair: {
         mode: 1,
       },
+      localization: {
+        timeFormatter: (time: number) => {
+          const date = new Date(time * 1000);
+          return date.toLocaleTimeString("ja-JP", {
+            timeZone: "Asia/Tokyo",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        },
+        dateFormat: "yyyy-MM-dd",
+      },
     });
 
     chartRef.current = chart;
